@@ -57,36 +57,45 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Pricing & Stock Row -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div>
-                        <label class="block text-slate-300 mb-1 font-semibold">Original Price (PKR) *</label>
-                        <input type="number" id="prodOriginalPrice" placeholder="e.g. 3000" required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-white outline-none focus:border-amber-400">
+                        <label class="block text-slate-300 mb-1 font-semibold">Original Retail Price (PKR) *</label>
+                        <input type="number" id="prodOriginalPrice" placeholder="3000" required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-white outline-none focus:border-amber-400">
                     </div>
                     <div>
-                        <label class="block text-slate-300 mb-1 font-semibold">Discounted Selling Price (PKR) *</label>
-                        <input type="number" id="prodPrice" placeholder="e.g. 1999" required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-white outline-none focus:border-amber-400">
+                        <label class="block text-slate-300 mb-1 font-semibold">Single Piece Price (PKR) *</label>
+                        <input type="number" id="prodPrice" placeholder="1999" required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-white outline-none focus:border-amber-400">
                     </div>
                     <div>
-                        <label class="block text-slate-300 mb-1 font-semibold">Stock Quantity *</label>
-                        <input type="number" id="prodStock" placeholder="e.g. 50" required min="0" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-white outline-none focus:border-amber-400">
+                        <label class="block text-slate-300 mb-1 font-semibold">Bulk Rate (PKR) (Optional)</label>
+                        <input type="number" id="prodBulkPrice" placeholder="1500" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-white outline-none focus:border-amber-400">
+                    </div>
+                    <div>
+                        <label class="block text-slate-300 mb-1 font-semibold">Min Qty for Bulk (Optional)</label>
+                        <input type="number" id="prodBulkQty" placeholder="10" min="2" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-white outline-none focus:border-amber-400">
                     </div>
                 </div>
 
-                <!-- Sizes, Colors & Weight -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Sizes, Colors, Weight & Stock -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-slate-300 mb-1 font-semibold">Stock Quantity *</label>
+                        <input type="number" id="prodStock" placeholder="50" required min="0" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-white outline-none focus:border-amber-400">
+                    </div>
                     <div>
                         <label class="block text-slate-300 mb-1 font-semibold">Available Sizes</label>
-                        <div class="flex items-center gap-2 bg-slate-950 p-2.5 rounded-lg border border-slate-700 text-slate-300 overflow-x-auto">
-                            <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" name="prodSize" value="S" class="accent-amber-500"> S</label>
-                            <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" name="prodSize" value="M" class="accent-amber-500"> M</label>
-                            <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" name="prodSize" value="L" class="accent-amber-500"> L</label>
-                            <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" name="prodSize" value="XL" class="accent-amber-500"> XL</label>
-                            <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" name="prodSize" value="Free Size" class="accent-amber-500"> Free Size</label>
+                        <div class="flex items-center gap-1.5 bg-slate-950 p-2 rounded-lg border border-slate-700 text-slate-300 overflow-x-auto text-[11px]">
+                            <label class="flex items-center gap-0.5 cursor-pointer"><input type="checkbox" name="prodSize" value="S" class="accent-amber-500"> S</label>
+                            <label class="flex items-center gap-0.5 cursor-pointer"><input type="checkbox" name="prodSize" value="M" class="accent-amber-500"> M</label>
+                            <label class="flex items-center gap-0.5 cursor-pointer"><input type="checkbox" name="prodSize" value="L" class="accent-amber-500"> L</label>
+                            <label class="flex items-center gap-0.5 cursor-pointer"><input type="checkbox" name="prodSize" value="XL" class="accent-amber-500"> XL</label>
+                            <label class="flex items-center gap-0.5 cursor-pointer"><input type="checkbox" name="prodSize" value="Free Size" class="accent-amber-500"> Free</label>
                         </div>
                     </div>
                     <div>
-                        <label class="block text-slate-300 mb-1 font-semibold">Available Colors (Comma Separated)</label>
-                        <input type="text" id="prodColors" placeholder="e.g. Red, Black, Blue" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-white outline-none focus:border-amber-400">
+                        <label class="block text-slate-300 mb-1 font-semibold">Colors (Comma Separated)</label>
+                        <input type="text" id="prodColors" placeholder="e.g. Red, Black" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-white outline-none focus:border-amber-400">
                     </div>
                     <div>
                         <label class="block text-slate-300 mb-1 font-semibold">Product Weight (Optional)</label>
@@ -94,10 +103,10 @@
                     </div>
                 </div>
 
-                <!-- Multiple Images & Video Upload -->
+                <!-- Media Uploads -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-slate-300 mb-1 font-semibold">Upload Product Pictures * (Multiple)</label>
+                        <label class="block text-slate-300 mb-1 font-semibold">Upload Pictures * (Multiple)</label>
                         <input type="file" id="prodImageFiles" accept="image/*" multiple required class="w-full p-2 bg-slate-950 border border-slate-700 rounded-lg text-slate-300 text-xs file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-600">
                     </div>
                     <div>
@@ -117,7 +126,7 @@
             </form>
         </div>
 
-        <!-- Orders Management Panel (Feature #2) -->
+        <!-- Orders Management Panel -->
         <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-4">
             <h2 class="text-sm font-black text-white uppercase tracking-wider"><i class="fa-solid fa-cart-flatbed text-amber-400 mr-1.5"></i> Received Orders Management</h2>
             
@@ -126,8 +135,8 @@
                     <thead>
                         <tr class="border-b border-slate-800 text-slate-400 text-[11px] uppercase">
                             <th class="p-3">Customer</th>
-                            <th class="p-3">Items & Details</th>
-                            <th class="p-3">Total</th>
+                            <th class="p-3">Items & Quantities</th>
+                            <th class="p-3">Total Amount</th>
                             <th class="p-3">Status</th>
                             <th class="p-3 text-center">Action</th>
                         </tr>
@@ -149,8 +158,8 @@
                         <tr class="border-b border-slate-800 text-slate-400 text-[11px] uppercase">
                             <th class="p-3">Image</th>
                             <th class="p-3">Title & Category</th>
-                            <th class="p-3">Sizes / Colors</th>
-                            <th class="p-3">Price & Stock</th>
+                            <th class="p-3">Wholesale Rates</th>
+                            <th class="p-3">Stock</th>
                             <th class="p-3 text-center">Action</th>
                         </tr>
                     </thead>
@@ -209,6 +218,8 @@
             const category = document.getElementById('prodCategory').value;
             const originalPrice = parseFloat(document.getElementById('prodOriginalPrice').value);
             const price = parseFloat(document.getElementById('prodPrice').value);
+            const bulkPrice = parseFloat(document.getElementById('prodBulkPrice').value) || 0;
+            const bulkQty = parseInt(document.getElementById('prodBulkQty').value) || 0;
             const stock = parseInt(document.getElementById('prodStock').value);
             const weight = document.getElementById('prodWeight').value.trim();
             const desc = document.getElementById('prodDesc').value.trim();
@@ -235,12 +246,12 @@
                 }
 
                 await db.collection('products').add({
-                    title, category, originalPrice, price, stock, weight: weight || "N/A",
-                    sizes, colors, images: imagesBase64, image: imagesBase64[0] || "",
+                    title, category, originalPrice, price, bulkPrice, bulkQty, stock,
+                    weight: weight || "N/A", sizes, colors, images: imagesBase64, image: imagesBase64[0] || "",
                     videoUrl: videoBase64, desc, createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                alert("Product successfully published! 🎉");
+                alert("Product published successfully! 🎉");
                 document.getElementById('addProductForm').reset();
                 loadAdminProducts();
             } catch (err) {
@@ -267,6 +278,7 @@
                     const mainImg = (p.images && p.images.length > 0) ? p.images[0] : (p.image || 'https://via.placeholder.com/100');
                     const stockVal = p.stock !== undefined ? p.stock : 10;
                     const stockBadge = stockVal > 0 ? `<span class="text-emerald-400 font-bold">${stockVal} Units</span>` : `<span class="text-rose-500 font-bold">Out of Stock</span>`;
+                    const bulkInfo = p.bulkPrice && p.bulkQty ? `<div class="text-[10px] text-emerald-400">Bulk: PKR ${p.bulkPrice} (${p.bulkQty}+ pcs)</div>` : '';
 
                     html += `
                         <tr class="hover:bg-slate-900/50 transition border-b border-slate-800">
@@ -275,14 +287,11 @@
                                 <div class="font-bold text-slate-100">${p.title}</div>
                                 <div class="text-[10px] text-amber-400 font-mono">${p.category}</div>
                             </td>
-                            <td class="p-3 text-slate-300 text-[11px]">
-                                <div><strong>Sizes:</strong> ${p.sizes ? p.sizes.join(', ') : 'N/A'}</div>
-                                <div><strong>Colors:</strong> ${p.colors ? p.colors.join(', ') : 'N/A'}</div>
-                            </td>
                             <td class="p-3">
-                                <div class="font-bold text-amber-300">PKR ${p.price}</div>
-                                <div class="text-[10px] text-slate-400">Stock: ${stockBadge}</div>
+                                <div class="font-bold text-amber-300">Single: PKR ${p.price}</div>
+                                ${bulkInfo}
                             </td>
+                            <td class="p-3 text-slate-300">${stockBadge}</td>
                             <td class="p-3 text-center">
                                 <button onclick="deleteProduct('${id}')" class="bg-rose-600 hover:bg-rose-700 text-white px-2.5 py-1 rounded text-[11px] font-bold transition shadow">
                                     <i class="fa-solid fa-trash"></i> Delete
@@ -310,7 +319,7 @@
                 snapshot.forEach(doc => {
                     const o = doc.data();
                     const id = doc.id;
-                    let itemsStr = o.items ? o.items.map(i => `${i.title} (Qty: ${i.qty || 1})`).join('<br>') : 'Item Details N/A';
+                    let itemsStr = o.items ? o.items.map(i => `${i.title} (x${i.qty || 1}) - ${i.selectedSize || 'N/A'}/${i.selectedColor || 'N/A'}`).join('<br>') : 'Details N/A';
 
                     html += `
                         <tr class="hover:bg-slate-900/50 transition border-b border-slate-800">
@@ -329,9 +338,7 @@
                                 </select>
                             </td>
                             <td class="p-3 text-center">
-                                <button onclick="deleteOrder('${id}')" class="bg-rose-600 hover:bg-rose-700 text-white px-2 py-1 rounded text-[10px] font-bold">
-                                    Delete
-                                </button>
+                                <button onclick="deleteOrder('${id}')" class="bg-rose-600 hover:bg-rose-700 text-white px-2 py-1 rounded text-[10px] font-bold">Delete</button>
                             </td>
                         </tr>
                     `;
@@ -344,11 +351,11 @@
 
         async function updateOrderStatus(id, newStatus) {
             await db.collection('orders').doc(id).update({ status: newStatus });
-            alert("Order status updated to " + newStatus);
+            alert("Order status updated!");
         }
 
         async function deleteOrder(id) {
-            if (confirm("Delete this order record?")) {
+            if (confirm("Delete order?")) {
                 await db.collection('orders').doc(id).delete();
                 loadAdminOrders();
             }
