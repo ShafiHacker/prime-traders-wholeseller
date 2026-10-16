@@ -21,11 +21,13 @@
                 </div>
             </div>
 
-            <!-- Quick Action Links -->
+            <!-- Quick Action Links & Cart Icon -->
             <div class="flex items-center gap-3">
-                <a href="index.html" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-house"></i> Home
-                </a>
+                <button onclick="toggleCartModal()" class="relative bg-slate-800 hover:bg-slate-700 text-amber-400 px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 border border-slate-700">
+                    <i class="fa-solid fa-cart-shopping text-sm"></i>
+                    <span>Cart</span>
+                    <span id="cartBadgeCount" class="bg-amber-500 text-slate-950 text-[10px] font-black px-1.5 py-0.2 rounded-full">0</span>
+                </button>
                 <a href="login.html" class="bg-amber-500 hover:bg-amber-600 text-slate-950 px-3 py-1.5 rounded-lg text-xs font-black transition flex items-center gap-1.5 shadow-lg">
                     <i class="fa-solid fa-user-shield"></i> Admin / Vendor Login
                 </a>
@@ -41,12 +43,12 @@
             <div class="flex flex-col md:flex-row justify-between items-center gap-4">
                 <div>
                     <h2 class="text-lg font-black text-white">Product Catalog & Wholesale Inventory</h2>
-                    <p class="text-xs text-slate-400">Browse hot trending products with wholesale pricing, high-res images, and video demos.</p>
+                    <p class="text-xs text-slate-400">Browse hot trending products with wholesale pricing, discount offers, and video demos.</p>
                 </div>
                 <!-- Search Bar -->
                 <div class="relative w-full md:w-80">
                     <i class="fa-solid fa-search absolute left-3 top-3 text-slate-500 text-xs"></i>
-                    <input type="text" id="searchInput" oninput="filterProducts()" placeholder="Search products or SKU..." class="w-full pl-9 pr-4 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white outline-none focus:border-amber-400 transition">
+                    <input type="text" id="searchInput" oninput="filterProducts()" placeholder="Search products..." class="w-full pl-9 pr-4 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white outline-none focus:border-amber-400 transition">
                 </div>
             </div>
 
@@ -62,7 +64,6 @@
 
         <!-- Products Grid Showcase -->
         <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            <!-- Dynamic Cards Will Load Here -->
             <div class="col-span-full text-center py-12 text-slate-500 text-xs font-semibold">
                 <i class="fa-solid fa-spinner fa-spin text-amber-400 text-xl mb-2"></i><br>Loading catalog inventory...
             </div>
@@ -70,30 +71,84 @@
 
     </main>
 
-    <!-- Product Details / Video Modal -->
+    <!-- Product Details Modal -->
     <div id="productModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 space-y-4 shadow-2xl relative">
             <button onclick="closeProductModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white bg-slate-800 p-2 rounded-full w-8 h-8 flex items-center justify-center text-xs">
                 <i class="fa-solid fa-xmark"></i>
             </button>
 
-            <div id="modalContent" class="space-y-4 text-xs">
-                <!-- Dynamically Populated Details -->
+            <div id="modalContent" class="space-y-4 text-xs"></div>
+        </div>
+    </div>
+
+    <!-- Shopping Cart Modal -->
+    <div id="cartModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl relative">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="text-sm font-black text-amber-400 flex items-center gap-2"><i class="fa-solid fa-cart-shopping"></i> My Wholesale Cart</h3>
+                <button onclick="toggleCartModal()" class="text-slate-400 hover:text-white text-xs"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div id="cartItemsList" class="space-y-3 max-h-60 overflow-y-auto pr-1 text-xs divide-y divide-slate-800">
+                <p class="text-slate-500 text-center py-6">Your cart is currently empty.</p>
+            </div>
+
+            <div class="border-t border-slate-800 pt-3 space-y-3">
+                <div class="flex justify-between text-xs font-bold">
+                    <span>Total Amount:</span>
+                    <span id="cartTotalPrice" class="text-amber-400">PKR 0</span>
+                </div>
+                <button onclick="checkoutCart()" class="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black rounded-xl text-xs uppercase shadow transition">
+                    Proceed to Buy Now
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="bg-slate-900 border-t border-slate-800 py-4 text-center text-slate-500 text-[11px]">
-        &copy; 2026 Prime Traders Wholeseller Portal. All rights reserved.
-    </footer>
+    <!-- Buy Now Checkout Form Modal -->
+    <div id="checkoutModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl relative text-xs">
+            <button onclick="closeCheckoutModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white bg-slate-800 p-2 rounded-full w-8 h-8 flex items-center justify-center text-xs">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
 
-    <!-- Firebase & Catalog Logic Script -->
+            <div class="border-b border-slate-800 pb-2">
+                <h3 class="text-sm font-black text-amber-400 uppercase"><i class="fa-solid fa-bag-shopping mr-1.5"></i> Order Checkout</h3>
+                <p class="text-[10px] text-slate-400">Fill details to confirm your order.</p>
+            </div>
+
+            <form onsubmit="submitDirectOrder(event)" class="space-y-3">
+                <div>
+                    <label class="block text-slate-300 mb-1 font-semibold">Full Name *</label>
+                    <input type="text" id="custName" placeholder="Enter your full name" required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-white outline-none focus:border-amber-400">
+                </div>
+                <div>
+                    <label class="block text-slate-300 mb-1 font-semibold">Phone Number *</label>
+                    <input type="tel" id="custPhone" placeholder="03XXXXXXXXX" required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-white outline-none focus:border-amber-400">
+                </div>
+                <div>
+                    <label class="block text-slate-300 mb-1 font-semibold">Complete Address *</label>
+                    <textarea id="custAddress" rows="2" placeholder="House/Shop #, Street, Area, City" required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-white outline-none focus:border-amber-400"></textarea>
+                </div>
+
+                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-[11px] space-y-1">
+                    <div class="text-slate-400 font-bold">Order Summary:</div>
+                    <div id="checkoutOrderDetails" class="text-slate-200"></div>
+                </div>
+
+                <button type="submit" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-xs uppercase shadow transition">
+                    Confirm Order (Buy Now)
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script>
-        // Firebase Config (Shared with main project)
         const firebaseConfig = {
           apiKey: "AIzaSyCRkKoE48FjYIjYfUNFEYzcxNueKUm6YOM",
           authDomain: "prime-traders-f3eec.firebaseapp.com",
@@ -107,9 +162,10 @@
         const db = firebase.firestore();
 
         let allProducts = [];
+        let cart = [];
         let selectedCategory = 'All';
+        let currentCheckoutItems = [];
 
-        // Load Products on Startup
         async function fetchCatalogProducts() {
             try {
                 const snapshot = await db.collection('products').get();
@@ -118,57 +174,243 @@
                     allProducts.push({ id: doc.id, ...doc.data() });
                 });
 
-                // Fallback Mock Data if Firestore is empty so catalog looks rich immediately
                 if (allProducts.length === 0) {
                     allProducts = [
-                        { id: '1', title: 'Women 2 Piece Pret Stitched Shalwar Kameez', category: 'Fashion & Apparel', price: 1575, sku: 'PT-FASH-01', image: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&q=80&w=500', videoUrl: '', desc: 'Premium quality stitched 2-piece outfit designed for modern casual and party wear.' },
-                        { id: '2', title: 'Wireless RGB Gaming Headset with Mic', category: 'Electronics & Gadgets', price: 2499, sku: 'PT-ELEC-02', image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80&w=500', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', desc: 'High bass surround sound wireless headset with dynamic RGB lighting and noise cancellation.' },
-                        { id: '3', title: 'Multipurpose Kitchen Wall Mounted Spice Rack', category: 'Home & Kitchen', price: 899, sku: 'PT-HOME-03', image: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&q=80&w=500', videoUrl: '', desc: 'Organize your kitchen space efficiently with heavy-duty rustproof wall organizers.' },
-                        { id: '4', title: 'Smart Bluetooth Fitness Tracking Smartwatch', category: 'Accessories', price: 1950, sku: 'PT-ACC-04', image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=500', videoUrl: '', desc: 'Heart rate monitor, step counter, sleep tracker, and full touch HD color display.' }
+                        { id: '1', title: 'Women 2 Piece Pret Stitched Suit', category: 'Fashion & Apparel', originalPrice: 2200, price: 1575, image: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&q=80&w=500', desc: 'Premium stitched 2-piece outfit.' },
+                        { id: '2', title: 'Wireless RGB Gaming Headset', category: 'Electronics & Gadgets', originalPrice: 3500, price: 2499, image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80&w=500', desc: 'High bass surround sound headset.' }
                     ];
                 }
-
                 renderProducts(allProducts);
             } catch (err) {
-                console.error("Error fetching products:", err);
-                document.getElementById('productGrid').innerHTML = `<div class="col-span-full text-center text-rose-400 py-8">Failed to load inventory. Please check connection.</div>`;
+                console.error(err);
+                document.getElementById('productGrid').innerHTML = `<div class="col-span-full text-center text-rose-400 py-8">Failed to load inventory.</div>`;
             }
         }
 
         function renderProducts(products) {
             const grid = document.getElementById('productGrid');
             if (!products.length) {
-                grid.innerHTML = `<div class="col-span-full text-center text-slate-400 py-12">No products found in this category.</div>`;
+                grid.innerHTML = `<div class="col-span-full text-center text-slate-400 py-12">No products found.</div>`;
                 return;
             }
 
             let html = '';
             products.forEach(p => {
+                const orig = p.originalPrice ? `<span class="line-through text-slate-500 text-xs font-normal mr-1.5">PKR ${p.originalPrice}</span>` : '';
                 html += `
                     <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden hover:border-amber-400/60 transition shadow-lg flex flex-col justify-between">
                         <div>
                             <div class="relative h-48 bg-slate-950 overflow-hidden cursor-pointer" onclick="openProductModal('${p.id}')">
                                 <img src="${p.image || 'https://via.placeholder.com/400'}" alt="${p.title}" class="w-full h-full object-cover hover:scale-105 transition duration-300">
-                                <span class="absolute top-2 left-2 bg-slate-950/80 backdrop-blur-md text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded text-[10px] font-bold font-mono">${p.sku || 'PT-SKU'}</span>
                             </div>
                             <div class="p-3.5 space-y-2">
                                 <span class="text-[10px] font-bold text-amber-500 uppercase tracking-wider">${p.category || 'General'}</span>
                                 <h3 class="font-bold text-slate-100 text-xs line-clamp-2 cursor-pointer hover:text-amber-400" onclick="openProductModal('${p.id}')">${p.title}</h3>
-                                <div class="text-sm font-black text-amber-300">PKR ${p.price || 0} <span class="text-[10px] text-slate-400 font-normal">Wholesale</span></div>
+                                <div class="text-sm font-black text-amber-300">
+                                    ${orig}PKR ${p.price || 0}
+                                </div>
                             </div>
                         </div>
-                        <div class="p-3.5 pt-0 grid grid-cols-2 gap-2">
-                            <button onclick="openProductModal('${p.id}')" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-lg text-[11px] transition">
-                                <i class="fa-solid fa-eye mr-1"></i> Details
-                            </button>
-                            <a href="https://wa.me/923032091411?text=Hello%20Prime%20Traders,%20I%20want%20to%20order%20this%20wholesale%20product:%0A*SKU:*%20${encodeURIComponent(p.sku || 'N/A')}%0A*Title:*%20${encodeURIComponent(p.title)}%0A*Price:*%20PKR%20${p.price}" target="_blank" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-[11px] text-center transition flex items-center justify-center gap-1 shadow">
-                                <i class="fa-brands fa-whatsapp"></i> Order
-                            </a>
+                        <div class="p-3.5 pt-0 space-y-2">
+                            <div class="grid grid-cols-2 gap-2">
+                                <button onclick="addToCart('${p.id}')" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold rounded-lg text-[11px] transition flex items-center justify-center gap-1 border border-slate-700">
+                                    <i class="fa-solid fa-cart-plus"></i> Add to Cart
+                                </button>
+                                <button onclick="buyNowSingle('${p.id}')" class="w-full py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black rounded-lg text-[11px] text-center transition flex items-center justify-center gap-1 shadow">
+                                    <i class="fa-solid fa-bolt"></i> Buy Now
+                                </button>
+                            </div>
                         </div>
                     </div>
                 `;
             });
             grid.innerHTML = html;
+        }
+
+        function addToCart(id) {
+            const prod = allProducts.find(p => p.id === id);
+            if (!prod) return;
+
+            const existing = cart.find(item => item.id === id);
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({ ...prod, qty: 1 });
+            }
+            updateCartUI();
+            alert(`"${prod.title}" added to your cart! 🛒`);
+        }
+
+        function updateCartUI() {
+            const count = cart.reduce((sum, item) => sum + item.qty, 0);
+            document.getElementById('cartBadgeCount').innerText = count;
+
+            const container = document.getElementById('cartItemsList');
+            if (cart.length === 0) {
+                container.innerHTML = `<p class="text-slate-500 text-center py-6">Your cart is currently empty.</p>`;
+                document.getElementById('cartTotalPrice').innerText = `PKR 0`;
+                return;
+            }
+
+            let total = 0;
+            let html = '';
+            cart.forEach((item, index) => {
+                const subtotal = item.price * item.qty;
+                total += subtotal;
+                html += `
+                    <div class="flex justify-between items-center pt-2">
+                        <div class="flex items-center gap-2">
+                            <img src="${item.image || 'https://via.placeholder.com/50'}" class="w-8 h-8 rounded object-cover">
+                            <div>
+                                <div class="font-bold text-slate-100 line-clamp-1">${item.title}</div>
+                                <div class="text-[10px] text-amber-400">PKR ${item.price} x ${item.qty}</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-slate-200">PKR ${subtotal}</span>
+                            <button onclick="removeFromCart(${index})" class="text-rose-500 hover:text-rose-400"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+            document.getElementById('cartTotalPrice').innerText = `PKR ${total}`;
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+        }
+
+        function toggleCartModal() {
+            document.getElementById('cartModal').classList.toggle('hidden');
+        }
+
+        function buyNowSingle(id) {
+            const prod = allProducts.find(p => p.id === id);
+            if (!prod) return;
+            currentCheckoutItems = [{ ...prod, qty: 1 }];
+            openCheckoutModal();
+        }
+
+        function checkoutCart() {
+            if (cart.length === 0) {
+                alert("Cart is empty!");
+                return;
+            }
+            currentCheckoutItems = [...cart];
+            toggleCartModal();
+            openCheckoutModal();
+        }
+
+        function openCheckoutModal() {
+            let total = 0;
+            let summaryHtml = '';
+            currentCheckoutItems.forEach(item => {
+                const sub = item.price * item.qty;
+                total += sub;
+                summaryHtml += `<div>• ${item.title} (x${item.qty}) - PKR ${sub}</div>`;
+            });
+            summaryHtml += `<div class="font-black text-amber-400 border-t border-slate-800 pt-1 mt-1">Total: PKR ${total}</div>`;
+
+            document.getElementById('checkoutOrderDetails').innerHTML = summaryHtml;
+            document.getElementById('checkoutModal').classList.remove('hidden');
+        }
+
+        function closeCheckoutModal() {
+            document.getElementById('checkoutModal').classList.add('hidden');
+        }
+
+        async function submitDirectOrder(e) {
+            e.preventDefault();
+            const name = document.getElementById('custName').value.trim();
+            const phone = document.getElementById('custPhone').value.trim();
+            const address = document.getElementById('custAddress').value.trim();
+
+            let total = 0;
+            let itemsSummary = currentCheckoutItems.map(item => {
+                total += (item.price * item.qty);
+                return `${item.title} (Qty: ${item.qty})`;
+            }).join(', ');
+
+            try {
+                await db.collection('orders').add({
+                    customerName: name,
+                    customerPhone: phone,
+                    customerAddress: address,
+                    items: currentCheckoutItems,
+                    totalAmount: total,
+                    status: 'Pending',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                alert("Thank you! Your order has been placed successfully. 🎉");
+                cart = [];
+                updateCartUI();
+                closeCheckoutModal();
+                closeProductModal();
+            } catch (err) {
+                alert("Error placing order: " + err.message);
+            }
+        }
+
+        function openProductModal(id) {
+            const p = allProducts.find(item => item.id === id);
+            if (!p) return;
+
+            const orig = p.originalPrice ? `<span class="line-through text-slate-500 text-xs mr-1 font-normal">PKR ${p.originalPrice}</span>` : '';
+
+            const modalHtml = `
+                <div class="flex justify-between items-start">
+                    <div>
+                        <span class="text-[10px] font-bold text-amber-400 bg-amber-950/50 border border-amber-500/30 px-2 py-0.5 rounded">${p.category}</span>
+                        <h2 class="text-sm font-bold text-white mt-1">${p.title}</h2>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-base font-black text-amber-300">${orig}PKR ${p.price}</div>
+                        <span class="text-[10px] text-emerald-400 font-bold">In Stock (Wholesale)</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-slate-950 rounded-xl overflow-hidden h-64 border border-slate-800">
+                        <img src="${p.image || 'https://via.placeholder.com/400'}" class="w-full h-full object-cover">
+                    </div>
+                    ${p.videoUrl ? `
+                        <div class="bg-slate-950 rounded-xl overflow-hidden h-64 border border-slate-800 flex items-center justify-center">
+                            <video controls class="w-full h-full object-cover">
+                                <source src="${p.videoUrl}" type="video/mp4">
+                            </video>
+                        </div>
+                    ` : `
+                        <div class="bg-slate-950 rounded-xl p-4 border border-slate-800 flex flex-col justify-center text-slate-400 text-center">
+                            <i class="fa-solid fa-video-slash text-2xl mb-2 text-slate-600"></i>
+                            <p class="text-xs">No video demonstration attached.</p>
+                        </div>
+                    `}
+                </div>
+
+                <div>
+                    <h3 class="font-bold text-slate-300 mb-1 text-xs">Product Description:</h3>
+                    <p class="text-xs text-slate-400 bg-slate-950 p-3 rounded-lg border border-slate-800 leading-relaxed">${p.desc || 'No description provided.'}</p>
+                </div>
+
+                <div class="pt-2 flex gap-3">
+                    <button onclick="addToCart('${p.id}')" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold rounded-xl text-center text-xs shadow transition border border-slate-700 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-cart-plus"></i> Add to Cart
+                    </button>
+                    <button onclick="buyNowSingle('${p.id}')" class="flex-1 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black rounded-xl text-center text-xs shadow transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-bolt"></i> Buy Now
+                    </button>
+                </div>
+            `;
+
+            document.getElementById('modalContent').innerHTML = modalHtml;
+            document.getElementById('productModal').classList.remove('hidden');
+        }
+
+        function closeProductModal() {
+            document.getElementById('productModal').classList.add('hidden');
         }
 
         function setCategory(cat, btn) {
@@ -184,70 +426,12 @@
             const query = document.getElementById('searchInput').value.toLowerCase();
             const filtered = allProducts.filter(p => {
                 const matchCat = selectedCategory === 'All' || p.category === selectedCategory;
-                const matchQuery = (p.title && p.title.toLowerCase().includes(query)) || (p.sku && p.sku.toLowerCase().includes(query));
+                const matchQuery = p.title && p.title.toLowerCase().includes(query);
                 return matchCat && matchQuery;
             });
             renderProducts(filtered);
         }
 
-        function openProductModal(id) {
-            const p = allProducts.find(item => item.id === id);
-            if (!p) return;
-
-            const modalHtml = `
-                <div class="flex justify-between items-start">
-                    <div>
-                        <span class="text-[10px] font-bold text-amber-400 bg-amber-950/50 border border-amber-500/30 px-2 py-0.5 rounded">${p.category}</span>
-                        <h2 class="text-sm font-bold text-white mt-1">${p.title}</h2>
-                        <p class="text-[11px] text-slate-400 font-mono mt-0.5">SKU: ${p.sku || 'N/A'}</p>
-                    </div>
-                    <div class="text-right">
-                        <div class="text-base font-black text-amber-300">PKR ${p.price}</div>
-                        <span class="text-[10px] text-emerald-400 font-bold">In Stock (Wholesale)</span>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="bg-slate-950 rounded-xl overflow-hidden h-64 border border-slate-800">
-                        <img src="${p.image || 'https://via.placeholder.com/400'}" class="w-full h-full object-cover">
-                    </div>
-                    ${p.videoUrl ? `
-                        <div class="bg-slate-950 rounded-xl overflow-hidden h-64 border border-slate-800 flex items-center justify-center">
-                            <video controls class="w-full h-full object-cover">
-                                <source src="${p.videoUrl}" type="video/mp4">
-                                Your browser does not support video tag.
-                            </video>
-                        </div>
-                    ` : `
-                        <div class="bg-slate-950 rounded-xl p-4 border border-slate-800 flex flex-col justify-center text-slate-400 text-center">
-                            <i class="fa-solid fa-video-slash text-2xl mb-2 text-slate-600"></i>
-                            <p class="text-xs">No video demonstration attached for this product.</p>
-                        </div>
-                    `}
-                </div>
-
-                <div>
-                    <h3 class="font-bold text-slate-300 mb-1 text-xs">Product Description & Specifications:</h3>
-                    <p class="text-xs text-slate-400 bg-slate-950 p-3 rounded-lg border border-slate-800 leading-relaxed">${p.desc || 'No description provided.'}</p>
-                </div>
-
-                <div class="pt-2 flex gap-3">
-                    <a href="https://wa.me/923032091411?text=Hello%20Prime%20Traders,%20I%20want%20to%20order:%0A*SKU:*%20${encodeURIComponent(p.sku || 'N/A')}%0A*Title:*%20${encodeURIComponent(p.title)}%0A*Price:*%20PKR%20${p.price}" target="_blank" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-center text-xs shadow transition flex items-center justify-center gap-2">
-                        <i class="fa-brands fa-whatsapp text-sm"></i> Order via WhatsApp
-                    </a>
-                    <button onclick="closeProductModal()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl text-xs">Close</button>
-                </div>
-            `;
-
-            document.getElementById('modalContent').innerHTML = modalHtml;
-            document.getElementById('productModal').classList.remove('hidden');
-        }
-
-        function closeProductModal() {
-            document.getElementById('productModal').classList.add('hidden');
-        }
-
-        // Initialize Fetch
         window.onload = () => {
             fetchCatalogProducts();
         };
