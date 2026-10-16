@@ -103,11 +103,18 @@
                     </div>
                 </div>
 
-                <!-- Multiple Images Upload (With auto compression for large files up to 10MB+) -->
-                <div>
-                    <label class="block text-slate-300 mb-1 font-semibold">Upload Pictures * (Select Multiple at Once)</label>
-                    <input type="file" id="prodImageFiles" accept="image/*" multiple required class="w-full p-2 bg-slate-950 border border-slate-700 rounded-lg text-slate-300 text-xs file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-600">
-                    <p class="text-[10px] text-amber-400 mt-1">Aap multiple pictures ek sath select kar sakte hain. Badi files automatically compress ho jayengi.</p>
+                <!-- Multiple Images & Video Upload Section -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-slate-300 mb-1 font-semibold">Upload Pictures * (Select Multiple)</label>
+                        <input type="file" id="prodImageFiles" accept="image/*" multiple required class="w-full p-2 bg-slate-950 border border-slate-700 rounded-lg text-slate-300 text-xs file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-600">
+                        <p class="text-[10px] text-amber-400 mt-1">Ek sath multiple pictures select karein, Badi pictures automatically compress hongi.</p>
+                    </div>
+                    <div>
+                        <label class="block text-slate-300 mb-1 font-semibold">Upload Video Demo (Optional - Short Video File)</label>
+                        <input type="file" id="prodVideoFile" accept="video/*" class="w-full p-2 bg-slate-950 border border-slate-700 rounded-lg text-slate-300 text-xs file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-600">
+                        <p class="text-[10px] text-slate-400 mt-1">Koshish karein short demo clip (chhoti file) ho taake upload fast ho.</p>
+                    </div>
                 </div>
 
                 <div>
@@ -194,7 +201,17 @@
             }
         });
 
-        // Function to compress image file so it easily fits Firestore limits while keeping high quality
+        // Helper to convert small video file to Base64
+        function convertFileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        // Function to compress image files to fit Firestore size limit
         function compressImageFile(file) {
             return new Promise((resolve) => {
                 const reader = new FileReader();
@@ -206,7 +223,7 @@
                         const canvas = document.createElement('canvas');
                         let width = img.width;
                         let height = img.height;
-                        const maxWidth = 800; // Optimal width for web display
+                        const maxWidth = 800;
 
                         if (width > maxWidth) {
                             height = Math.round((height * maxWidth) / width);
@@ -217,8 +234,6 @@
                         canvas.height = height;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
-                        
-                        // Compress to JPEG with 0.75 quality
                         resolve(canvas.toDataURL('image/jpeg', 0.75));
                     };
                 };
@@ -229,7 +244,7 @@
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
             btn.disabled = true;
-            btn.innerText = "Compressing & Uploading Pictures...";
+            btn.innerText = "Processing & Publishing...";
 
             const title = document.getElementById('prodTitle').value.trim();
             const category = document.getElementById('prodCategory').value;
@@ -248,6 +263,7 @@
             const colors = rawColors ? rawColors.split(',').map(c => c.trim()).filter(c => c) : [];
 
             const imageFiles = document.getElementById('prodImageFiles').files;
+            const videoFile = document.getElementById('prodVideoFile').files[0];
 
             try {
                 let imagesBase64 = [];
@@ -256,16 +272,22 @@
                     imagesBase64.push(compressedB64);
                 }
 
+                let videoBase64 = "";
+                if (videoFile) {
+                    videoBase64 = await convertFileToBase64(videoFile);
+                }
+
                 await db.collection('products').add({
                     title, category, originalPrice, price, bulkPrice, bulkQty, stock,
                     weight: weight || "N/A", sizes, colors, 
                     images: imagesBase64, 
                     image: imagesBase64[0] || "",
+                    videoUrl: videoBase64,
                     desc, 
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                alert("Product published successfully with all pictures! 🎉");
+                alert("Product with images and video published successfully! 🎉");
                 document.getElementById('addProductForm').reset();
                 loadAdminProducts();
             } catch (err) {
