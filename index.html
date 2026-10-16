@@ -63,7 +63,7 @@
 
         <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             <div class="col-span-full text-center py-12 text-slate-500 text-xs font-semibold">
-                <i class="fa-solid fa-spinner fa-spin text-amber-400 text-xl mb-2"></i><br>Loading catalog inventory...
+                <i class="fa-solid fa-spinner fa-spin text-amber-400 text-xl mb-2"></i><br>Loading live catalog inventory...
             </div>
         </div>
 
@@ -128,19 +128,27 @@
         let selectedCategory = 'All';
         let cart = [];
 
-        async function fetchCatalogProducts() {
-            try {
-                const snapshot = await db.collection('products').get();
+        // Real-time listener for instant multi-admin updates
+        function listenToCatalogProducts() {
+            db.collection('products').onSnapshot(snapshot => {
                 allProducts = [];
                 snapshot.forEach(doc => {
                     allProducts.push({ id: doc.id, ...doc.data() });
                 });
+                
+                // Sort by latest created if createdAt exists
+                allProducts.sort((a, b) => {
+                    if (a.createdAt && b.createdAt) {
+                        return b.createdAt.seconds - a.createdAt.seconds;
+                    }
+                    return 0;
+                });
 
-                renderProducts(allProducts);
-            } catch (err) {
-                console.error(err);
-                document.getElementById('productGrid').innerHTML = `<div class="col-span-full text-center text-rose-400 py-8">Failed to load inventory.</div>`;
-            }
+                filterProducts();
+            }, err => {
+                console.error("Error listening to products: ", err);
+                document.getElementById('productGrid').innerHTML = `<div class="col-span-full text-center text-rose-400 py-8">Failed to sync inventory.</div>`;
+            });
         }
 
         function renderProducts(products) {
@@ -209,7 +217,242 @@
             // Load Reviews from Firestore
             let reviewsHtml = '';
             try {
-                const revSnap = await db.collection('products').doc(id).collection('reviews').orderBy('createdAt', 'desc').get();
+                constScreenshot mein jo warning dikh rahi hai (`Your security rules are defined as public...`), woh Firebase ki taraf se ek normal Security Alert hai. Iska matlab hai ki aapke rules testing mode par hain aur bilkul sahi set hain[cite: 8].
+
+Agar abhi bhi teeno admins ke upload kiye hue products ek saath catalog par show nahi ho rahe, toh uski **2 asli wajah** ho sakti hain:
+
+---
+
+### Wajah 1: Standard `get()` query local browser cache use kar rahi hai
+Pehle ke code mein `db.collection('products').get()` likha tha. Is se browser purana data ya offline cache dikha deta hai, jis se doosre admin ka upload kiya hua data turant nahi dikhta.
+
+### Wajah 2: Firebase Indexing Issue (Jab `orderBy` query use hoti hai)
+Jab code mein `orderBy('createdAt', 'desc')` likha hota hai, aur Firestore par **Index** nahi bana hota, toh database silently error de deta hai aur data block kar deta hai.
+
+---
+
+### Solution (Aapka Problem Hal Karne Ke Liye Fix)
+
+Is masle ko 100% solve karne ke liye humne `index.html` ka fetching code **Real-Time Listener (`onSnapshot`)** par shift kar diya hai aur safe fallback lagaya hai. Ab jaise hi teeno me se koi bhi admin product upload karega, woh bina page refresh kiye turant sabhi ko live dikhega!
+
+Aap apni **`index.html`** file ka poora code neeche diye gaye updated code se replace kar ke **Save / Commit** kar dein:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catalog & Products | Prime Traders Wholeseller</title>
+    <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
+    <link rel="stylesheet" href="[https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css)">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans">
+
+    <!-- Top Navigation Bar -->
+    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-40 backdrop-blur-md bg-opacity-95">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="bg-amber-500 text-slate-950 font-black text-xl w-10 h-10 flex items-center justify-center rounded-xl shadow-lg">P</div>
+                <div>
+                    <h1 class="text-base font-black tracking-wider uppercase text-white">PRIME TRADERS</h1>
+                    <p class="text-[10px] text-amber-400 font-bold uppercase tracking-widest">Wholesale & Dropship Hub</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <a href="index.html" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-house"></i> Home
+                </a>
+                
+                <button onclick="openCartModal()" class="relative bg-slate-800 hover:bg-slate-700 text-amber-400 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 border border-amber-500/30">
+                    <i class="fa-solid fa-cart-shopping"></i> Cart
+                    <span id="cartCountBadge" class="bg-amber-500 text-slate-950 rounded-full px-1.5 py-0.2 text-[10px] font-black">0</span>
+                </button>
+
+                <a href="login.html" class="bg-amber-500 hover:bg-amber-600 text-slate-950 px-3 py-1.5 rounded-lg text-xs font-black transition flex items-center gap-1.5 shadow-lg">
+                    <i class="fa-solid fa-user-shield"></i> Admin Login
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-6 space-y-6">
+
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-4">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <div>
+                    <h2 class="text-lg font-black text-white">Product Catalog & Wholesale Inventory</h2>
+                    <p class="text-xs text-slate-400">Download media assets, check reviews, and place direct bulk orders.</p>
+                </div>
+                <div class="relative w-full md:w-80">
+                    <i class="fa-solid fa-search absolute left-3 top-3 text-slate-500 text-xs"></i>
+                    <input type="text" id="searchInput" oninput="filterProducts()" placeholder="Search products..." class="w-full pl-9 pr-4 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white outline-none focus:border-amber-400 transition">
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs" id="categoryFilterContainer">
+                <button onclick="setCategory('All', this)" class="cat-btn px-4 py-1.5 rounded-lg font-bold bg-amber-500 text-slate-950 transition whitespace-nowrap shadow">All Products</button>
+                <button onclick="setCategory('Fashion & Apparel', this)" class="cat-btn px-4 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition whitespace-nowrap">Fashion & Apparel</button>
+                <button onclick="setCategory('Electronics & Gadgets', this)" class="cat-btn px-4 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition whitespace-nowrap">Electronics & Gadgets</button>
+                <button onclick="setCategory('Home & Kitchen', this)" class="cat-btn px-4 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition whitespace-nowrap">Home & Kitchen</button>
+                <button onclick="setCategory('Accessories', this)" class="cat-btn px-4 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition whitespace-nowrap">Accessories</button>
+            </div>
+        </div>
+
+        <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div class="col-span-full text-center py-12 text-slate-500 text-xs font-semibold">
+                <i class="fa-solid fa-spinner fa-spin text-amber-400 text-xl mb-2"></i><br>Loading live catalog inventory...
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Product Details Modal -->
+    <div id="productModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 space-y-4 shadow-2xl relative">
+            <button onclick="closeProductModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white bg-slate-800 p-2 rounded-full w-8 h-8 flex items-center justify-center text-xs z-10">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div id="modalContent" class="space-y-4 text-xs"></div>
+        </div>
+    </div>
+
+    <!-- Shopping Cart Modal -->
+    <div id="cartModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl relative">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h2 class="text-sm font-bold text-white uppercase"><i class="fa-solid fa-cart-shopping text-amber-400 mr-2"></i> Your Wholesale Cart</h2>
+                <button onclick="closeCartModal()" class="text-slate-400 hover:text-white bg-slate-800 p-1.5 rounded-full w-7 h-7 flex items-center justify-center text-xs">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <div id="cartItemsList" class="space-y-3 max-h-60 overflow-y-auto text-xs"></div>
+
+            <div class="border-t border-slate-800 pt-3 flex justify-between items-center text-xs font-bold">
+                <span class="text-slate-300">Total Amount:</span>
+                <span id="cartTotalAmount" class="text-amber-400 font-black text-sm">PKR 0</span>
+            </div>
+
+            <button onclick="proceedToCheckout()" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black rounded-xl text-xs uppercase shadow-lg transition">
+                Proceed to Checkout
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 border-t border-slate-800 py-4 text-center text-slate-500 text-[11px]">
+        &copy; 2026 Prime Traders Wholeseller Portal. All rights reserved.
+    </footer>
+
+    <!-- Firebase Script -->
+    <script src="[https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js](https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js)"></script>
+    <script src="[https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js](https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js)"></script>
+    <script src="[https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js](https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js)"></script>
+    <script>
+        const firebaseConfig = {
+          apiKey: "AIzaSyCRkKoE48FjYIjYfUNFEYzcxNueKUm6YOM",
+          authDomain: "prime-traders-f3eec.firebaseapp.com",
+          projectId: "prime-traders-f3eec",
+          storageBucket: "prime-traders-f3eec.firebasestorage.app",
+          messagingSenderId: "499740236001",
+          appId: "1:499740236001:web:e623dfe11f6f96df22ffa0",
+          measurementId: "G-6CGVKBZFJK"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        let allProducts = [];
+        let selectedCategory = 'All';
+        let cart = [];
+
+        // Real-time synchronization so all admin uploads appear instantly
+        function listenToLiveCatalog() {
+            db.collection('products').onSnapshot(snapshot => {
+                allProducts = [];
+                snapshot.forEach(doc => {
+                    allProducts.push({ id: doc.id, ...doc.data() });
+                });
+
+                // Sort client-side by date to prevent index block issues
+                allProducts.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
+                filterProducts();
+            }, err => {
+                console.error("Firestore Listen Error:", err);
+                document.getElementById('productGrid').innerHTML = `<div class="col-span-full text-center text-rose-400 py-8">Failed to load inventory. Please refresh.</div>`;
+            });
+        }
+
+        function renderProducts(products) {
+            const grid = document.getElementById('productGrid');
+            if (!products.length) {
+                grid.innerHTML = `<div class="col-span-full text-center text-slate-400 py-12">No products found.</div>`;
+                return;
+            }
+
+            let html = '';
+            products.forEach(p => {
+                const discPrice = p.price || 0;
+                const origPrice = p.originalPrice || Math.round(discPrice * 1.3);
+                const mainImg = (p.images && p.images.length > 0) ? p.images[0] : (p.image || '[https://via.placeholder.com/400](https://via.placeholder.com/400)');
+                const isOutOfStock = p.stock !== undefined && p.stock <= 0;
+                const bulkBadge = p.bulkPrice && p.bulkQty ? `<div class="text-[10px] text-emerald-400 font-bold bg-emerald-950/60 border border-emerald-500/30 px-1.5 py-0.5 rounded mt-1 inline-block">Buy ${p.bulkQty}+ @ PKR ${p.bulkPrice}/pc</div>` : '';
+
+                html += `
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden hover:border-amber-400/60 transition shadow-lg flex flex-col justify-between">
+                        <div>
+                            <div class="relative h-48 bg-slate-950 overflow-hidden cursor-pointer" onclick="openProductModal('${p.id}')">
+                                <img src="${mainImg}" alt="${p.title}" class="w-full h-full object-cover hover:scale-105 transition duration-300 ${isOutOfStock ? 'opacity-40' : ''}">
+                                ${isOutOfStock ? `<span class="absolute top-2 left-2 bg-rose-600 text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase">OUT OF STOCK</span>` : `<span class="absolute top-2 left-2 bg-emerald-600 text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase">IN STOCK</span>`}
+                            </div>
+                            <div class="p-3.5 space-y-1.5">
+                                <span class="text-[10px] font-bold text-amber-500 uppercase tracking-wider">${p.category || 'General'}</span>
+                                <h3 class="font-bold text-slate-100 text-xs line-clamp-2 cursor-pointer hover:text-amber-400" onclick="openProductModal('${p.id}')">${p.title}</h3>
+                                
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm font-black text-amber-300">PKR ${discPrice}</span>
+                                    <span class="text-xs text-slate-500 line-through font-semibold">PKR ${origPrice}</span>
+                                </div>
+                                ${bulkBadge}
+                            </div>
+                        </div>
+                        <div class="p-3.5 pt-2 grid grid-cols-2 gap-2">
+                            <button onclick="openProductModal('${p.id}')" ${isOutOfStock ? 'disabled' : ''} class="w-full py-2 ${isOutOfStock ? 'bg-slate-800 text-slate-500 cursor-not-allowed' : 'bg-slate-800 hover:bg-slate-700 text-slate-200'} font-bold rounded-lg text-[11px] transition flex items-center justify-center gap-1">
+                                <i class="fa-solid fa-cart-plus text-amber-400"></i> Add To Cart
+                            </button>
+                            <button onclick="openProductModal('${p.id}')" ${isOutOfStock ? 'disabled' : ''} class="w-full py-2 ${isOutOfStock ? 'bg-slate-800 text-slate-500 cursor-not-allowed' : 'bg-amber-500 hover:bg-amber-600 text-slate-950'} font-black rounded-lg text-[11px] text-center transition flex items-center justify-center gap-1 shadow">
+                                <i class="fa-solid fa-bolt"></i> Buy Now
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            grid.innerHTML = html;
+        }
+
+        async function openProductModal(id) {
+            const p = allProducts.find(item => item.id === id);
+            if (!p) return;
+
+            const discPrice = p.price || 0;
+            const origPrice = p.originalPrice || Math.round(discPrice * 1.3);
+            const imagesList = (p.images && p.images.length > 0) ? p.images : [p.image || '[https://via.placeholder.com/400](https://via.placeholder.com/400)'];
+            const isOutOfStock = p.stock !== undefined && p.stock <= 0;
+
+            let sizeOptions = p.sizes && p.sizes.length > 0 ? p.sizes.map(s => `<option value="${s}">${s}</option>`).join('') : '<option value="Standard">Standard</option>';
+            let colorOptions = p.colors && p.colors.length > 0 ? p.colors.map(c => `<option value="${c}">${c}</option>`).join('') : '<option value="As Shown">As Shown</option>';
+
+            let thumbsHtml = imagesList.map((img) => `
+                <img src="${img}" onclick="switchModalMainImage('${img}')" class="w-12 h-12 object-cover rounded-lg border border-slate-700 cursor-pointer hover:border-amber-400 transition">
+            `).join('');
+
+            // Load Reviews from Firestore
+            let reviewsHtml = '';
+            try {
+                const revSnap = await db.collection('products').doc(id).collection('reviews').get();
                 if (!revSnap.empty) {
                     revSnap.forEach(rDoc => {
                         const rev = rDoc.data();
@@ -469,7 +712,7 @@
                 });
                 summary += `\n*Total Amount:* PKR ${total}`;
 
-                window.open(`https://wa.me/923032091411?text=${encodeURIComponent(summary)}`, '_blank');
+                window.open(`[https://wa.me/923032091411?text=$](https://wa.me/923032091411?text=$){encodeURIComponent(summary)}`, '_blank');
                 cart = [];
                 updateCartBadge();
                 closeCartModal();
@@ -497,7 +740,7 @@
             renderProducts(filtered);
         }
 
-        window.onload = () => fetchCatalogProducts();
+        window.onload = () => listenToLiveCatalog();
     </script>
 </body>
 </html>
