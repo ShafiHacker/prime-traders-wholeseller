@@ -68,10 +68,10 @@
                     </div>
                 </div>
 
-                <!-- Sizes & Colors Selection -->
+                <!-- Sizes & Colors -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-slate-300 mb-1 font-semibold">Available Sizes (Check all applicable)</label>
+                        <label class="block text-slate-300 mb-1 font-semibold">Available Sizes</label>
                         <div class="flex items-center gap-3 bg-slate-950 p-2.5 rounded-lg border border-slate-700 text-slate-300">
                             <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" name="prodSize" value="S" class="accent-amber-500"> S</label>
                             <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" name="prodSize" value="M" class="accent-amber-500"> M</label>
@@ -82,20 +82,19 @@
                     </div>
                     <div>
                         <label class="block text-slate-300 mb-1 font-semibold">Available Colors (Comma Separated)</label>
-                        <input type="text" id="prodColors" placeholder="e.g. Red, Black, Blue, White" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-white outline-none focus:border-amber-400">
+                        <input type="text" id="prodColors" placeholder="e.g. Red, Black, Blue" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-white outline-none focus:border-amber-400">
                     </div>
                 </div>
 
-                <!-- Media Uploads (Multiple Pictures Support) -->
+                <!-- Multiple Images & Video Upload -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-slate-300 mb-1 font-semibold">Upload Product Pictures * (Multiple Select Allowed)</label>
+                        <label class="block text-slate-300 mb-1 font-semibold">Upload Product Pictures * (Multiple)</label>
                         <input type="file" id="prodImageFiles" accept="image/*" multiple required class="w-full p-2 bg-slate-950 border border-slate-700 rounded-lg text-slate-300 text-xs file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-600">
-                        <p class="text-[10px] text-slate-500 mt-1">Hold Ctrl / Shift to select multiple images at once.</p>
                     </div>
                     <div>
                         <label class="block text-slate-300 mb-1 font-semibold">Upload Video Demo (Optional)</label>
-                        <input type="file" id="prodVideoFile" accept="video/*" class="w-full p-2 bg-slate-950 border border-slate-700 rounded-lg text-slate-300 text-xs file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-white hover:file:bg-slate-700">
+                        <input type="file" id="prodVideoFile" accept="video/*" class="w-full p-2 bg-slate-950 border border-slate-700 rounded-lg text-slate-300 text-xs file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-600">
                     </div>
                 </div>
 
@@ -110,7 +109,7 @@
             </form>
         </div>
 
-        <!-- Existing Products Management Table -->
+        <!-- Management Table -->
         <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-4">
             <h2 class="text-sm font-black text-white uppercase tracking-wider"><i class="fa-solid fa-boxes-stacked text-amber-400 mr-1.5"></i> Manage Uploaded Products</h2>
             
@@ -136,7 +135,7 @@
 
     </main>
 
-    <!-- Firebase SDKs & Script -->
+    <!-- Firebase & Script -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -183,15 +182,12 @@
             const price = parseFloat(document.getElementById('prodPrice').value);
             const desc = document.getElementById('prodDesc').value.trim();
 
-            // Sizes
             const sizeBoxes = document.querySelectorAll('input[name="prodSize"]:checked');
             const sizes = Array.from(sizeBoxes).map(cb => cb.value);
 
-            // Colors
             const rawColors = document.getElementById('prodColors').value;
             const colors = rawColors ? rawColors.split(',').map(c => c.trim()).filter(c => c) : [];
 
-            // Images (Multiple)
             const imageFiles = document.getElementById('prodImageFiles').files;
             const videoFile = document.getElementById('prodVideoFile').files[0];
 
@@ -259,8 +255,8 @@
                                 <div class="text-[10px] text-amber-400 font-mono">${p.category}</div>
                             </td>
                             <td class="p-3 text-slate-300 text-[11px]">
-                                <div><strong class="text-slate-400">Sizes:</strong> ${sizeList}</div>
-                                <div><strong class="text-slate-400">Colors:</strong> ${colorList}</div>
+                                <div><strong>Sizes:</strong> ${sizeList}</div>
+                                <div><strong>Colors:</strong> ${colorList}</div>
                             </td>
                             <td class="p-3">
                                 <div class="font-bold text-amber-300">PKR ${p.price}</div>
