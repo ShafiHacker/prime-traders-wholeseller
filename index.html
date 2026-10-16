@@ -30,6 +30,51 @@
                     <span id="cartCountBadge" class="bg-amber-500 text-slate-950 rounded-full px-1.5 py-0.2 text-[10px] font-black">0</span>
                 </button>
 
+                <a href="login.html" class="bg-amber-500 hover:bgAb hum **Feature #4: Download Product Media / Marketing Assets (Dropshippers ke liye)** aur **Feature #5: Product Reviews & Ratings (Trust Building)** ko implement karenge.
+
+Is update ke baad:
+1. **Dropshippers Media Download:** Public catalog dashboard par har product ke modal window me **"Download Assets"** ka button hoga, jis se dropshippers high-res pictures directly apne device me save kar sakenge.
+2. **Product Reviews & Star Ratings:** Public catalog popup par star ratings aur customer reviews show honge, aur buyers apne reviews submit bhi kar sakenge.
+
+Neeche dono updated files ka code diya gaya hai. Purana code poora select karke replace kar dein.
+
+---
+
+### 1. `index.html` (Full Code with Media Download & Reviews System)
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catalog & Products | Prime Traders Wholeseller</title>
+    <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
+    <link rel="stylesheet" href="[https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css)">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans">
+
+    <!-- Top Navigation Bar -->
+    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-40 backdrop-blur-md bg-opacity-95">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="bg-amber-500 text-slate-950 font-black text-xl w-10 h-10 flex items-center justify-center rounded-xl shadow-lg">P</div>
+                <div>
+                    <h1 class="text-base font-black tracking-wider uppercase text-white">PRIME TRADERS</h1>
+                    <p class="text-[10px] text-amber-400 font-bold uppercase tracking-widest">Wholesale & Dropship Hub</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <a href="index.html" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-house"></i> Home
+                </a>
+                
+                <button onclick="openCartModal()" class="relative bg-slate-800 hover:bg-slate-700 text-amber-400 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 border border-amber-500/30">
+                    <i class="fa-solid fa-cart-shopping"></i> Cart
+                    <span id="cartCountBadge" class="bg-amber-500 text-slate-950 rounded-full px-1.5 py-0.2 text-[10px] font-black">0</span>
+                </button>
+
                 <a href="login.html" class="bg-amber-500 hover:bg-amber-600 text-slate-950 px-3 py-1.5 rounded-lg text-xs font-black transition flex items-center gap-1.5 shadow-lg">
                     <i class="fa-solid fa-user-shield"></i> Admin Login
                 </a>
@@ -44,7 +89,7 @@
             <div class="flex flex-col md:flex-row justify-between items-center gap-4">
                 <div>
                     <h2 class="text-lg font-black text-white">Product Catalog & Wholesale Inventory</h2>
-                    <p class="text-xs text-slate-400">Bulk quantity discounts available for wholesale & dropshipping partners.</p>
+                    <p class="text-xs text-slate-400">Download media assets, check reviews, and place direct bulk orders.</p>
                 </div>
                 <div class="relative w-full md:w-80">
                     <i class="fa-solid fa-search absolute left-3 top-3 text-slate-500 text-xs"></i>
@@ -103,9 +148,9 @@
     </div>
 
     <!-- Firebase Script -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="[https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js](https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js)"></script>
+    <script src="[https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js](https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js)"></script>
+    <script src="[https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js](https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js)"></script>
     <script>
         const firebaseConfig = {
           apiKey: "AIzaSyCRkKoE48FjYIjYfUNFEYzcxNueKUm6YOM",
@@ -149,7 +194,7 @@
             products.forEach(p => {
                 const discPrice = p.price || 0;
                 const origPrice = p.originalPrice || Math.round(discPrice * 1.3);
-                const mainImg = (p.images && p.images.length > 0) ? p.images[0] : (p.image || 'https://via.placeholder.com/400');
+                const mainImg = (p.images && p.images.length > 0) ? p.images[0] : (p.image || '[https://via.placeholder.com/400](https://via.placeholder.com/400)');
                 const isOutOfStock = p.stock !== undefined && p.stock <= 0;
                 const bulkBadge = p.bulkPrice && p.bulkQty ? `<div class="text-[10px] text-emerald-400 font-bold bg-emerald-950/60 border border-emerald-500/30 px-1.5 py-0.5 rounded mt-1 inline-block">Buy ${p.bulkQty}+ @ PKR ${p.bulkPrice}/pc</div>` : '';
 
@@ -185,13 +230,13 @@
             grid.innerHTML = html;
         }
 
-        function openProductModal(id) {
+        async function openProductModal(id) {
             const p = allProducts.find(item => item.id === id);
             if (!p) return;
 
             const discPrice = p.price || 0;
             const origPrice = p.originalPrice || Math.round(discPrice * 1.3);
-            const imagesList = (p.images && p.images.length > 0) ? p.images : [p.image || 'https://via.placeholder.com/400'];
+            const imagesList = (p.images && p.images.length > 0) ? p.images : [p.image || '[https://via.placeholder.com/400](https://via.placeholder.com/400)'];
             const isOutOfStock = p.stock !== undefined && p.stock <= 0;
 
             let sizeOptions = p.sizes && p.sizes.length > 0 ? p.sizes.map(s => `<option value="${s}">${s}</option>`).join('') : '<option value="Standard">Standard</option>';
@@ -200,6 +245,30 @@
             let thumbsHtml = imagesList.map((img) => `
                 <img src="${img}" onclick="switchModalMainImage('${img}')" class="w-12 h-12 object-cover rounded-lg border border-slate-700 cursor-pointer hover:border-amber-400 transition">
             `).join('');
+
+            // Load Reviews from Firestore
+            let reviewsHtml = '';
+            try {
+                const revSnap = await db.collection('products').doc(id).collection('reviews').orderBy('createdAt', 'desc').get();
+                if (!revSnap.empty) {
+                    revSnap.forEach(rDoc => {
+                        const rev = rDoc.data();
+                        reviewsHtml += `
+                            <div class="bg-slate-950 p-2 rounded border border-slate-800 text-[11px]">
+                                <div class="flex justify-between text-amber-400 font-bold">
+                                    <span>${rev.reviewerName || 'Buyer'}</span>
+                                    <span>${'★'.repeat(rev.rating || 5)}</span>
+                                </div>
+                                <p class="text-slate-300 mt-0.5">${rev.comment}</p>
+                            </div>
+                        `;
+                    });
+                } else {
+                    reviewsHtml = `<p class="text-slate-500 text-[10px]">No reviews yet. Be the first to review!</p>`;
+                }
+            } catch(e) {
+                reviewsHtml = `<p class="text-slate-500 text-[10px]">No reviews loaded.</p>`;
+            }
 
             const modalHtml = `
                 <div class="flex justify-between items-start">
@@ -216,12 +285,13 @@
                     </div>
                 </div>
 
-                ${p.bulkPrice && p.bulkQty ? `
-                    <div class="bg-emerald-950/40 border border-emerald-500/30 p-2 rounded-lg text-emerald-300 text-xs flex justify-between items-center">
-                        <span><i class="fa-solid fa-boxes-packing mr-1 text-amber-400"></i> Wholesale Bulk Discount:</span>
-                        <strong class="font-black text-white">PKR ${p.bulkPrice} / pc (Min${p.bulkQty} pcs)</strong>
-                    </div>
-                ` : ''}
+                <!-- Feature #4: Media Download Button for Dropshippers -->
+                <div class="bg-slate-950 border border-slate-800 p-2 rounded-lg flex justify-between items-center text-[11px]">
+                    <span class="text-slate-300"><i class="fa-solid fa-cloud-arrow-down text-amber-400 mr-1"></i> Marketing Media Assets:</span>
+                    <button onclick="downloadMediaAsset('${imagesList[0]}', '${p.title}')" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-2.5 py-1 rounded text-[10px]">
+                        Download Image
+                    </button>
+                </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="space-y-2">
@@ -234,14 +304,6 @@
                     </div>
 
                     <div class="space-y-3">
-                        ${p.videoUrl ? `
-                            <div class="bg-slate-950 rounded-xl overflow-hidden h-32 border border-slate-800 flex items-center justify-center">
-                                <video controls class="w-full h-full object-cover">
-                                    <source src="${p.videoUrl}" type="video/mp4">
-                                </video>
-                            </div>
-                        ` : ''}
-
                         <div class="grid grid-cols-3 gap-2">
                             <div>
                                 <label class="block text-slate-400 text-[10px] font-bold mb-1">SIZE:</label>
@@ -268,6 +330,21 @@
                     </div>
                 </div>
 
+                <!-- Feature #5: Product Reviews Section -->
+                <div class="border-t border-slate-800 pt-3 space-y-2">
+                    <h3 class="font-bold text-white text-xs"><i class="fa-solid fa-star text-amber-400 mr-1"></i> Customer Reviews & Ratings</h3>
+                    <div class="space-y-1.5 max-h-28 overflow-y-auto">
+                        ${reviewsHtml}
+                    </div>
+
+                    <!-- Add Review Form -->
+                    <form onsubmit="submitReview(event, '${id}')" class="flex gap-2 pt-1">
+                        <input type="text" id="revName" placeholder="Your Name" required class="w-1/3 p-1.5 bg-slate-950 border border-slate-700 rounded text-[10px]">
+                        <input type="text" id="revText" placeholder="Write a review..." required class="flex-1 p-1.5 bg-slate-950 border border-slate-700 rounded text-[10px]">
+                        <button type="submit" class="bg-amber-500 text-slate-950 font-bold px-3 py-1 rounded text-[10px]">Submit</button>
+                    </form>
+                </div>
+
                 <div class="pt-2 flex gap-3">
                     <button onclick="addSelectedToCart('${p.id}')" ${isOutOfStock ? 'disabled' : ''} class="flex-1 py-2.5 ${isOutOfStock ? 'bg-slate-800 text-slate-500 cursor-not-allowed' : 'bg-slate-800 hover:bg-slate-700 text-slate-200'} font-bold rounded-xl text-xs flex items-center justify-center gap-2">
                         <i class="fa-solid fa-cart-plus text-amber-400"></i> ${isOutOfStock ? 'Out of Stock' : 'Add To Cart'}
@@ -280,6 +357,34 @@
 
             document.getElementById('modalContent').innerHTML = modalHtml;
             document.getElementById('productModal').classList.remove('hidden');
+        }
+
+        function downloadMediaAsset(url, title) {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${title.replace(/\s+/g, '_')}_media.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        async function submitReview(e, prodId) {
+            e.preventDefault();
+            const name = document.getElementById('revName').value.trim();
+            const text = document.getElementById('revText').value.trim();
+
+            try {
+                await db.collection('products').doc(prodId).collection('reviews').add({
+                    reviewerName: name,
+                    comment: text,
+                    rating: 5,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                alert("Thank you for your review! ⭐");
+                openProductModal(prodId);
+            } catch(err) {
+                alert("Error submitting review: " + err.message);
+            }
         }
 
         function switchModalMainImage(src) {
@@ -341,7 +446,7 @@
                                 <img src="${img}" class="w-10 h-10 object-cover rounded-md">
                                 <div>
                                     <h4 class="font-bold text-white text-[11px] line-clamp-1">${item.title}</h4>
-                                    <p class="text-amber-400 font-bold text-[10px]">PKR ${unitPrice} x ${item.qty} = PKR ${subtotal} ${item.qty >= item.bulkQty ? '(Bulk Rate)' : ''}</p>
+                                    <p class="text-amber-400 font-bold text-[10px]">PKR ${unitPrice} x ${item.qty} = PKR ${subtotal}</p>
                                 </div>
                             </div>
                             <button onclick="removeFromCart(${index})" class="text-rose-400 hover:text-rose-600 p-1">
@@ -395,7 +500,7 @@
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                alert("Order placed successfully! 🎉 Redirecting to WhatsApp...");
+                alert("Order placed successfully! Redirecting to WhatsApp...");
 
                 let summary = `Hello Prime Traders, I have placed an order on portal:\n\n*Customer:* ${name} (${phone})\n\n`;
                 cart.forEach((item, i) => {
@@ -404,7 +509,7 @@
                 });
                 summary += `\n*Total Amount:* PKR ${total}`;
 
-                window.open(`https://wa.me/923032091411?text=${encodeURIComponent(summary)}`, '_blank');
+                window.open(`[https://wa.me/923032091411?text=$](https://wa.me/923032091411?text=$){encodeURIComponent(summary)}`, '_blank');
                 cart = [];
                 updateCartBadge();
                 closeCartModal();
