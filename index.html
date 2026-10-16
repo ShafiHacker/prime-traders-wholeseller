@@ -30,51 +30,6 @@
                     <span id="cartCountBadge" class="bg-amber-500 text-slate-950 rounded-full px-1.5 py-0.2 text-[10px] font-black">0</span>
                 </button>
 
-                <a href="login.html" class="bg-amber-500 hover:bgAb hum **Feature #4: Download Product Media / Marketing Assets (Dropshippers ke liye)** aur **Feature #5: Product Reviews & Ratings (Trust Building)** ko implement karenge.
-
-Is update ke baad:
-1. **Dropshippers Media Download:** Public catalog dashboard par har product ke modal window me **"Download Assets"** ka button hoga, jis se dropshippers high-res pictures directly apne device me save kar sakenge.
-2. **Product Reviews & Star Ratings:** Public catalog popup par star ratings aur customer reviews show honge, aur buyers apne reviews submit bhi kar sakenge.
-
-Neeche dono updated files ka code diya gaya hai. Purana code poora select karke replace kar dein.
-
----
-
-### 1. `index.html` (Full Code with Media Download & Reviews System)
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catalog & Products | Prime Traders Wholeseller</title>
-    <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
-    <link rel="stylesheet" href="[https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css)">
-</head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans">
-
-    <!-- Top Navigation Bar -->
-    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-40 backdrop-blur-md bg-opacity-95">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="bg-amber-500 text-slate-950 font-black text-xl w-10 h-10 flex items-center justify-center rounded-xl shadow-lg">P</div>
-                <div>
-                    <h1 class="text-base font-black tracking-wider uppercase text-white">PRIME TRADERS</h1>
-                    <p class="text-[10px] text-amber-400 font-bold uppercase tracking-widest">Wholesale & Dropship Hub</p>
-                </div>
-            </div>
-
-            <div class="flex items-center gap-3">
-                <a href="index.html" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-house"></i> Home
-                </a>
-                
-                <button onclick="openCartModal()" class="relative bg-slate-800 hover:bg-slate-700 text-amber-400 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 border border-amber-500/30">
-                    <i class="fa-solid fa-cart-shopping"></i> Cart
-                    <span id="cartCountBadge" class="bg-amber-500 text-slate-950 rounded-full px-1.5 py-0.2 text-[10px] font-black">0</span>
-                </button>
-
                 <a href="login.html" class="bg-amber-500 hover:bg-amber-600 text-slate-950 px-3 py-1.5 rounded-lg text-xs font-black transition flex items-center gap-1.5 shadow-lg">
                     <i class="fa-solid fa-user-shield"></i> Admin Login
                 </a>
@@ -147,10 +102,15 @@ Neeche dono updated files ka code diya gaya hai. Purana code poora select karke 
         </div>
     </div>
 
+    <!-- Footer -->
+    <footer class="bg-slate-900 border-t border-slate-800 py-4 text-center text-slate-500 text-[11px]">
+        &copy; 2026 Prime Traders Wholeseller Portal. All rights reserved.
+    </footer>
+
     <!-- Firebase Script -->
-    <script src="[https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js](https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js)"></script>
-    <script src="[https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js](https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js)"></script>
-    <script src="[https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js](https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js)"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script>
         const firebaseConfig = {
           apiKey: "AIzaSyCRkKoE48FjYIjYfUNFEYzcxNueKUm6YOM",
@@ -194,7 +154,7 @@ Neeche dono updated files ka code diya gaya hai. Purana code poora select karke 
             products.forEach(p => {
                 const discPrice = p.price || 0;
                 const origPrice = p.originalPrice || Math.round(discPrice * 1.3);
-                const mainImg = (p.images && p.images.length > 0) ? p.images[0] : (p.image || '[https://via.placeholder.com/400](https://via.placeholder.com/400)');
+                const mainImg = (p.images && p.images.length > 0) ? p.images[0] : (p.image || 'https://via.placeholder.com/400');
                 const isOutOfStock = p.stock !== undefined && p.stock <= 0;
                 const bulkBadge = p.bulkPrice && p.bulkQty ? `<div class="text-[10px] text-emerald-400 font-bold bg-emerald-950/60 border border-emerald-500/30 px-1.5 py-0.5 rounded mt-1 inline-block">Buy ${p.bulkQty}+ @ PKR ${p.bulkPrice}/pc</div>` : '';
 
@@ -236,7 +196,7 @@ Neeche dono updated files ka code diya gaya hai. Purana code poora select karke 
 
             const discPrice = p.price || 0;
             const origPrice = p.originalPrice || Math.round(discPrice * 1.3);
-            const imagesList = (p.images && p.images.length > 0) ? p.images : [p.image || '[https://via.placeholder.com/400](https://via.placeholder.com/400)'];
+            const imagesList = (p.images && p.images.length > 0) ? p.images : [p.image || 'https://via.placeholder.com/400'];
             const isOutOfStock = p.stock !== undefined && p.stock <= 0;
 
             let sizeOptions = p.sizes && p.sizes.length > 0 ? p.sizes.map(s => `<option value="${s}">${s}</option>`).join('') : '<option value="Standard">Standard</option>';
@@ -285,7 +245,7 @@ Neeche dono updated files ka code diya gaya hai. Purana code poora select karke 
                     </div>
                 </div>
 
-                <!-- Feature #4: Media Download Button for Dropshippers -->
+                <!-- Media Download Button for Dropshippers -->
                 <div class="bg-slate-950 border border-slate-800 p-2 rounded-lg flex justify-between items-center text-[11px]">
                     <span class="text-slate-300"><i class="fa-solid fa-cloud-arrow-down text-amber-400 mr-1"></i> Marketing Media Assets:</span>
                     <button onclick="downloadMediaAsset('${imagesList[0]}', '${p.title}')" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-2.5 py-1 rounded text-[10px]">
@@ -330,7 +290,7 @@ Neeche dono updated files ka code diya gaya hai. Purana code poora select karke 
                     </div>
                 </div>
 
-                <!-- Feature #5: Product Reviews Section -->
+                <!-- Product Reviews Section -->
                 <div class="border-t border-slate-800 pt-3 space-y-2">
                     <h3 class="font-bold text-white text-xs"><i class="fa-solid fa-star text-amber-400 mr-1"></i> Customer Reviews & Ratings</h3>
                     <div class="space-y-1.5 max-h-28 overflow-y-auto">
@@ -509,7 +469,7 @@ Neeche dono updated files ka code diya gaya hai. Purana code poora select karke 
                 });
                 summary += `\n*Total Amount:* PKR ${total}`;
 
-                window.open(`[https://wa.me/923032091411?text=$](https://wa.me/923032091411?text=$){encodeURIComponent(summary)}`, '_blank');
+                window.open(`https://wa.me/923032091411?text=${encodeURIComponent(summary)}`, '_blank');
                 cart = [];
                 updateCartBadge();
                 closeCartModal();
