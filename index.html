@@ -52,13 +52,9 @@
                 </div>
             </div>
 
-            <!-- Dynamic Category Filter Buttons -->
+            <!-- Fully Dynamic Category Filter Buttons Container -->
             <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs" id="categoryFilterContainer">
                 <button onclick="setCategory('All', this)" class="cat-btn px-4 py-1.5 rounded-lg font-bold bg-amber-500 text-slate-950 transition whitespace-nowrap shadow">All Products</button>
-                <button onclick="setCategory('Fashion & Apparel', this)" class="cat-btn px-4 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition whitespace-nowrap">Fashion & Apparel</button>
-                <button onclick="setCategory('Electronics & Gadgets', this)" class="cat-btn px-4 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition whitespace-nowrap">Electronics & Gadgets</button>
-                <button onclick="setCategory('Home & Kitchen', this)" class="cat-btn px-4 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition whitespace-nowrap">Home & Kitchen</button>
-                <button onclick="setCategory('Accessories', this)" class="cat-btn px-4 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition whitespace-nowrap">Accessories</button>
             </div>
         </div>
 
@@ -132,16 +128,46 @@
         function listenToLiveCatalog() {
             db.collection('products').onSnapshot(snapshot => {
                 allProducts = [];
+                const dynamicCategories = new Set();
+
                 snapshot.forEach(doc => {
-                    allProducts.push({ id: doc.id, ...doc.data() });
+                    const data = doc.data();
+                    allProducts.push({ id: doc.id, ...data });
+                    if (data.category && data.category.trim() !== '') {
+                        dynamicCategories.add(data.category.trim());
+                    }
                 });
 
                 allProducts.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+                
+                // Render category buttons dynamically from database
+                renderDynamicCategoryButtons(Array.from(dynamicCategories));
                 filterProducts();
             }, err => {
                 console.error("Firestore Error:", err);
                 document.getElementById('productGrid').innerHTML = `<div class="col-span-full text-center text-rose-400 py-8">Failed to sync inventory.</div>`;
             });
+        }
+
+        function renderDynamicCategoryButtons(categories) {
+            const container = document.getElementById('categoryFilterContainer');
+            
+            // Standard default categories to ensure baseline buttons exist
+            const baseCategories = ['Fashion & Apparel', 'Electronics & Gadgets', 'Home & Kitchen', 'Accessories'];
+            
+            // Merge base categories with any new ones uploaded
+            const finalCategoryList = Array.from(new Set([...baseCategories, ...categories]));
+
+            let html = `<button onclick="setCategory('All', this)" class="cat-btn px-4 py-1.5 rounded-lg font-bold ${selectedCategory === 'All' ? 'bg-amber-500 text-slate-950' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'} transition whitespace-nowrap shadow">All Products</button>`;
+
+            finalCategoryList.forEach(cat => {
+                const isSelected = selectedCategory === cat;
+                html += `
+                    <button onclick="setCategory('${cat}', this)" class="cat-btn px-4 py-1.5 rounded-lg font-bold ${isSelected ? 'bg-amber-500 text-slate-950' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'} transition whitespace-nowrap">${cat}</button>
+                `;
+            });
+
+            container.innerHTML = html;
         }
 
         function renderProducts(products) {
