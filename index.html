@@ -515,7 +515,6 @@
             document.getElementById('checkoutModal').classList.add('hidden');
         }
 
-        // Direct saving into `parcels` collection so it shows up in `admin.html` (Main Control Panel)
         async function submitCheckoutOrder(e) {
             e.preventDefault();
             const btn = document.getElementById('confirmOrderBtn');
@@ -530,12 +529,11 @@
             let total = 0;
             cart.forEach(i => total += (calculateItemPrice(i) * i.qty));
 
-            // Generate auto tracking ID for express logistics
             const autoTrackingId = Math.floor(1000000000 + Math.random() * 9000000000).toString();
             const fullDestinationAddress = `${city} - ${address}`;
 
             try {
-                // Save directly to 'parcels' collection which feeds `admin.html` dashboard
+                // Save to 'parcels' collection so it appears instantly on admin.html dashboard
                 await db.collection('parcels').add({
                     trackingId: autoTrackingId,
                     customerName: name,
@@ -549,7 +547,19 @@
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                alert(`🎉 Order Placed Successfully!\n\nTracking ID: ${autoTrackingId}\nCOD Amount: PKR ${total}\n\nYeh order ab seedha aapke main Express Logistics Dashboard (admin.html) mein show ho raha hai jahan aap rider assign kar sakte hain.`);
+                // Also save to 'orders' collection for wholeseller orders management view
+                await db.collection('orders').add({
+                    trackingId: autoTrackingId,
+                    customerName: name,
+                    customerPhone: phone,
+                    customerAddress: fullDestinationAddress,
+                    totalAmount: total,
+                    status: 'Pending',
+                    items: cart,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                alert(`🎉 Order Placed Successfully!\n\nTracking ID: ${autoTrackingId}\nCOD Amount: PKR ${total}\n\nOrder booked successfully in main logistics dashboard!`);
 
                 cart = [];
                 updateCartBadge();
@@ -581,6 +591,7 @@
             renderProducts(filtered);
         }
 
+        // Initialize live catalog listener on page load
         window.onload = () => listenToLiveCatalog();
     </script>
 </body>
