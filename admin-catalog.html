@@ -37,7 +37,7 @@
         <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-4">
             <div class="border-b border-slate-800 pb-3 flex justify-between items-center">
                 <h2 class="text-sm font-black text-white uppercase tracking-wider"><i class="fa-solid fa-plus-circle text-amber-400 mr-1.5"></i> Add New Wholesale Product</h2>
-                <span class="text-[10px] text-amber-400 bg-amber-950/50 border border-amber-500/30 px-2 py-0.5 rounded font-bold">Admin Privileged</span>
+                <span class="text-[10px] text-amber-400 bg-amber-950/50 border border-amber-500/30 px-2 py-0.5 rounded font-bold">Admin Central Access</span>
             </div>
 
             <form id="addProductForm" onsubmit="handleAddNewProduct(event)" class="space-y-4 text-xs">
@@ -103,17 +103,20 @@
                     </div>
                 </div>
 
-                <!-- Multiple Images & Video Upload Section -->
+                <!-- Mobile & Laptop Compatible Image Picker + Video -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-slate-300 mb-1 font-semibold">Upload Pictures * (Select Multiple)</label>
-                        <input type="file" id="prodImageFiles" accept="image/*" multiple required class="w-full p-2 bg-slate-950 border border-slate-700 rounded-lg text-slate-300 text-xs file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-600">
-                        <p class="text-[10px] text-amber-400 mt-1">Ek sath multiple pictures select karein, Badi pictures automatically compress hongi.</p>
+                        <label class="block text-slate-300 mb-1 font-semibold">Upload Pictures * (Laptop & Mobile Compatible)</label>
+                        <input type="file" id="prodImageFiles" accept="image/*" multiple onchange="handleImageSelection(event)" class="w-full p-2 bg-slate-950 border border-slate-700 rounded-lg text-slate-300 text-xs file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-600">
+                        <p class="text-[10px] text-amber-400 mt-1">Neeche images me se individual picture cross (×) karke delete kar sakte hain.</p>
+                        
+                        <!-- Live Image Attachment Preview with Delete Cross Button -->
+                        <div id="imagePreviewContainer" class="flex flex-wrap gap-2 mt-3"></div>
                     </div>
+
                     <div>
-                        <label class="block text-slate-300 mb-1 font-semibold">Upload Video Demo (Optional - Short Video File)</label>
+                        <label class="block text-slate-300 mb-1 font-semibold">Upload Video Demo (Optional)</label>
                         <input type="file" id="prodVideoFile" accept="video/*" class="w-full p-2 bg-slate-950 border border-slate-700 rounded-lg text-slate-300 text-xs file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-600">
-                        <p class="text-[10px] text-slate-400 mt-1">Koshish karein short demo clip (chhoti file) ho taake upload fast ho.</p>
                     </div>
                 </div>
 
@@ -123,7 +126,7 @@
                 </div>
 
                 <button type="submit" id="submitBtn" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black rounded-lg text-xs uppercase shadow-lg transition tracking-wider">
-                    Publish Product to Catalog
+                    Publish Product to Central Catalog
                 </button>
             </form>
         </div>
@@ -152,7 +155,7 @@
 
         <!-- Management Table for Products -->
         <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-4">
-            <h2 class="text-sm font-black text-white uppercase tracking-wider"><i class="fa-solid fa-boxes-stacked text-amber-400 mr-1.5"></i> Manage Uploaded Products</h2>
+            <h2 class="text-sm font-black text-white uppercase tracking-wider"><i class="fa-solid fa-boxes-stacked text-amber-400 mr-1.5"></i> Manage Central Products</h2>
             
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
@@ -174,7 +177,7 @@
 
     </main>
 
-    <!-- Firebase SDKs & Script -->
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -192,6 +195,8 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
+        let selectedImageFiles = [];
+
         auth.onAuthStateChanged((user) => {
             if (!user) {
                 window.location.href = "login.html";
@@ -201,7 +206,39 @@
             }
         });
 
-        // Helper to convert small video file to Base64
+        // Individual Image Selection & Preview Handler
+        async function handleImageSelection(e) {
+            const files = Array.from(e.target.files);
+            for (let f of files) {
+                const base64 = await compressImageFile(f);
+                selectedImageFiles.push(base64);
+            }
+            renderImagePreviews();
+            e.target.value = ""; // Reset input so new attachments can be added
+        }
+
+        function renderImagePreviews() {
+            const container = document.getElementById('imagePreviewContainer');
+            if (selectedImageFiles.length === 0) {
+                container.innerHTML = "";
+                return;
+            }
+
+            container.innerHTML = selectedImageFiles.map((b64, idx) => `
+                <div class="relative w-14 h-14 rounded-lg overflow-hidden border border-amber-500/50 group">
+                    <img src="${b64}" class="w-full h-full object-cover">
+                    <button type="button" onclick="removeSingleImage(${idx})" class="absolute top-0.5 right-0.5 bg-rose-600 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-bold shadow hover:bg-rose-700">
+                        ×
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function removeSingleImage(index) {
+            selectedImageFiles.splice(index, 1);
+            renderImagePreviews();
+        }
+
         function convertFileToBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -211,7 +248,6 @@
             });
         }
 
-        // Function to compress image files to fit Firestore size limit
         function compressImageFile(file) {
             return new Promise((resolve) => {
                 const reader = new FileReader();
@@ -242,9 +278,14 @@
 
         async function handleAddNewProduct(e) {
             e.preventDefault();
+            if (selectedImageFiles.length === 0) {
+                alert("Please attach at least 1 image file.");
+                return;
+            }
+
             const btn = document.getElementById('submitBtn');
             btn.disabled = true;
-            btn.innerText = "Processing & Publishing...";
+            btn.innerText = "Publishing to Portal...";
 
             const title = document.getElementById('prodTitle').value.trim();
             const category = document.getElementById('prodCategory').value;
@@ -262,16 +303,9 @@
             const rawColors = document.getElementById('prodColors').value;
             const colors = rawColors ? rawColors.split(',').map(c => c.trim()).filter(c => c) : [];
 
-            const imageFiles = document.getElementById('prodImageFiles').files;
             const videoFile = document.getElementById('prodVideoFile').files[0];
 
             try {
-                let imagesBase64 = [];
-                for (let i = 0; i < imageFiles.length; i++) {
-                    const compressedB64 = await compressImageFile(imageFiles[i]);
-                    imagesBase64.push(compressedB64);
-                }
-
                 let videoBase64 = "";
                 if (videoFile) {
                     videoBase64 = await convertFileToBase64(videoFile);
@@ -280,21 +314,23 @@
                 await db.collection('products').add({
                     title, category, originalPrice, price, bulkPrice, bulkQty, stock,
                     weight: weight || "N/A", sizes, colors, 
-                    images: imagesBase64, 
-                    image: imagesBase64[0] || "",
+                    images: selectedImageFiles, 
+                    image: selectedImageFiles[0] || "",
                     videoUrl: videoBase64,
                     desc, 
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                alert("Product with images and video published successfully! 🎉");
+                alert("Product published successfully! 🎉");
                 document.getElementById('addProductForm').reset();
+                selectedImageFiles = [];
+                renderImagePreviews();
                 loadAdminProducts();
             } catch (err) {
                 alert("Error: " + err.message);
             } finally {
                 btn.disabled = false;
-                btn.innerText = "Publish Product to Catalog";
+                btn.innerText = "Publish Product to Central Catalog";
             }
         }
 
