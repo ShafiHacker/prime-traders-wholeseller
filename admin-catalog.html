@@ -220,18 +220,17 @@
             }
         });
 
-        // Smart Category Detection based on keywords in title
         function autoDetectCategory(titleText) {
             const title = titleText.toLowerCase();
             const select = document.getElementById('prodCategory');
 
-            if (title.includes('spice') || title.includes('jar') || title.includes('rack') || title.includes('kitchen') || title.includes('lamp') || title.includes('bottle') || title.includes('organizer')) {
+            if (title.includes('spice') || title.includes('jar') || title.includes('rack') || title.includes('kitchen') || title.includes('lamp') || title.includes('bottle') || title.includes('organizer') || title.includes('box')) {
                 select.value = "Home & Kitchen";
             } else if (title.includes('shirt') || title.includes('pant') || title.includes('dress') || title.includes('cloth') || title.includes('wear') || title.includes('shoe')) {
                 select.value = "Fashion & Apparel";
-            } else if (title.includes('fan') || title.includes('usb') || title.includes('charger') || title.includes('led') || title.includes('gadget') || title.includes('cable') || title.includes('earbuds') || title.includes('phone')) {
+            } else if (title.includes('fan') || title.includes('usb') || title.includes('charger') || title.includes('led') || title.includes('gadget') || title.includes('cable') || title.includes('earbuds') || title.includes('phone') || title.includes('holder')) {
                 select.value = "Electronics & Gadgets";
-            } else if (title.includes('bag') || title.includes('watch') || title.includes('glass') || title.includes('belt') || title.includes('wallet')) {
+            } else if (title.includes('bag') || title.includes('watch') || title.includes('glass') || title.includes('belt') || title.includes('wallet') || title.includes('brush')) {
                 select.value = "Accessories";
             }
             handleCategoryChange(select.value);
@@ -403,7 +402,6 @@
             document.getElementById('editingProductId').value = id;
             document.getElementById('prodTitle').value = p.title || '';
             
-            // Handle Category setting
             const select = document.getElementById('prodCategory');
             let matched = false;
             for (let option of select.options) {
@@ -455,23 +453,30 @@
             document.getElementById('cancelEditBtn').classList.add('hidden');
         }
 
-        async function loadAdminProducts() {
+        function loadAdminProducts() {
             const tbody = document.getElementById('adminProductTableBody');
-            try {
-                const snapshot = await db.collection('products').orderBy('createdAt', 'desc').get();
+            
+            // Using safe real-time snapshot listener without rigid server ordering to avoid index exceptions
+            db.collection('products').onSnapshot(snapshot => {
                 loadedProductsMap = {};
-
                 if (snapshot.empty) {
                     tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500">No products uploaded yet.</td></tr>`;
                     return;
                 }
 
+                let productsList = [];
+                snapshot.forEach(doc => {
+                    productsList.push({ id: doc.id, ...doc.data() });
+                });
+
+                // Client side sorting by date
+                productsList.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
                 let html = '';
                 const categoriesSet = new Set();
 
-                snapshot.forEach(doc => {
-                    const p = doc.data();
-                    const id = doc.id;
+                productsList.forEach(p => {
+                    const id = p.id;
                     loadedProductsMap[id] = p;
                     if (p.category) categoriesSet.add(p.category);
 
@@ -513,7 +518,7 @@
                 });
                 tbody.innerHTML = html;
 
-                // Sync new categories to select dropdown
+                // Sync new dynamic categories to form dropdown
                 const select = document.getElementById('prodCategory');
                 categoriesSet.forEach(cat => {
                     let exists = Array.from(select.options).some(opt => opt.value === cat);
@@ -524,25 +529,30 @@
                         select.insertBefore(newOpt, select.options[select.options.length - 1]);
                     }
                 });
-
-            } catch (err) {
+            }, err => {
+                console.error("Error loading products:", err);
                 tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-rose-400">Error loading products.</td></tr>`;
-            }
+            });
         }
 
-        async function loadAdminOrders() {
+        function loadAdminOrders() {
             const tbody = document.getElementById('adminOrdersTableBody');
-            try {
-                const snapshot = await db.collection('orders').orderBy('createdAt', 'desc').get();
+            db.collection('orders').onSnapshot(snapshot => {
                 if (snapshot.empty) {
                     tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500">No orders received yet.</td></tr>`;
                     return;
                 }
 
-                let html = '';
+                let ordersList = [];
                 snapshot.forEach(doc => {
-                    const o = doc.data();
-                    const id = doc.id;
+                    ordersList.push({ id: doc.id, ...doc.data() });
+                });
+
+                ordersList.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
+                let html = '';
+                ordersList.forEach(o => {
+                    const id = o.id;
                     let itemsStr = o.items ? o.items.map(i => `${i.title} (x${i.qty || 1}) - ${i.selectedSize || 'N/A'}/${i.selectedColor || 'N/A'}`).join('<br>') : 'Details N/A';
 
                     html += `
@@ -568,9 +578,10 @@
                     `;
                 });
                 tbody.innerHTML = html;
-            } catch (err) {
+            }, err => {
+                console.error("Error loading orders:", err);
                 tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-rose-400">Error loading orders.</td></tr>`;
-            }
+            });
         }
 
         async function updateOrderStatus(id, newStatus) {
@@ -581,14 +592,12 @@
         async function deleteOrder(id) {
             if (confirm("Delete order?")) {
                 await db.collection('orders').doc(id).delete();
-                loadAdminOrders();
             }
         }
 
         async function deleteProduct(id) {
             if (confirm("Delete product?")) {
                 await db.collection('products').doc(id).delete();
-                loadAdminProducts();
             }
         }
 
