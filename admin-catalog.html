@@ -33,14 +33,19 @@
     <!-- Main Container -->
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-6 space-y-6">
 
-        <!-- Add Product Form Box -->
+        <!-- Add / Edit Product Form Box -->
         <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-4">
             <div class="border-b border-slate-800 pb-3 flex justify-between items-center">
-                <h2 class="text-sm font-black text-white uppercase tracking-wider"><i class="fa-solid fa-plus-circle text-amber-400 mr-1.5"></i> Add New Wholesale Product</h2>
-                <span class="text-[10px] text-amber-400 bg-amber-950/50 border border-amber-500/30 px-2 py-0.5 rounded font-bold">Admin Central Access</span>
+                <h2 id="formHeading" class="text-sm font-black text-white uppercase tracking-wider"><i class="fa-solid fa-plus-circle text-amber-400 mr-1.5"></i> Add New Wholesale Product</h2>
+                <div class="flex items-center gap-2">
+                    <button id="cancelEditBtn" onclick="resetProductForm()" class="hidden bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded text-[10px] font-bold transition">Cancel Edit</button>
+                    <span class="text-[10px] text-amber-400 bg-amber-950/50 border border-amber-500/30 px-2 py-0.5 rounded font-bold">Admin Central Access</span>
+                </div>
             </div>
 
-            <form id="addProductForm" onsubmit="handleAddNewProduct(event)" class="space-y-4 text-xs">
+            <form id="addProductForm" onsubmit="handleSaveProduct(event)" class="space-y-4 text-xs">
+                <input type="hidden" id="editingProductId" value="">
+                
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-slate-300 mb-1 font-semibold">Product Title *</label>
@@ -151,9 +156,9 @@
             </div>
         </div>
 
-        <!-- Management Table for Products with Uploader Info -->
+        <!-- Management Table for Products with Edit & Delete -->
         <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-4">
-            <h2 class="text-sm font-black text-white uppercase tracking-wider"><i class="fa-solid fa-boxes-stacked text-amber-400 mr-1.5"></i> Manage Central Products (Verified by Uploader)</h2>
+            <h2 class="text-sm font-black text-white uppercase tracking-wider"><i class="fa-solid fa-boxes-stacked text-amber-400 mr-1.5"></i> Manage Central Products (Edit & Delete)</h2>
             
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
@@ -161,10 +166,10 @@
                         <tr class="border-b border-slate-800 text-slate-400 text-[11px] uppercase">
                             <th class="p-3">Images</th>
                             <th class="p-3">Title & Category</th>
-                            <th class="p-3">Added By (Admin)</th>
+                            <th class="p-3">Added By</th>
                             <th class="p-3">Wholesale Rates</th>
                             <th class="p-3">Stock</th>
-                            <th class="p-3 text-center">Action</th>
+                            <th class="p-3 text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="adminProductTableBody" class="divide-y divide-slate-800 text-xs">
@@ -196,6 +201,7 @@
 
         let selectedImageFiles = [];
         let currentAdminEmail = "";
+        let loadedProductsMap = {}; // Store products for editing reference
 
         auth.onAuthStateChanged((user) => {
             if (!user) {
@@ -277,7 +283,7 @@
             });
         }
 
-        async function handleAddNewProduct(e) {
+        async function handleSaveProduct(e) {
             e.preventDefault();
             if (selectedImageFiles.length === 0) {
                 alert("Please attach at least 1 image file.");
@@ -285,8 +291,9 @@
             }
 
             const btn = document.getElementById('submitBtn');
+            const editingId = document.getElementById('editingProductId').value;
             btn.disabled = true;
-            btn.innerText = "Publishing to Portal...";
+            btn.innerText = editingId ? "Updating Product..." : "Publishing to Portal...";
 
             const title = document.getElementById('prodTitle').value.trim();
             const category = document.getElementById('prodCategory').value;
@@ -312,21 +319,32 @@
                     videoBase64 = await convertFileToBase64(videoFile);
                 }
 
-                await db.collection('products').add({
+                const productData = {
                     title, category, originalPrice, price, bulkPrice, bulkQty, stock,
                     weight: weight || "N/A", sizes, colors, 
                     images: selectedImageFiles, 
                     image: selectedImageFiles[0] || "",
-                    videoUrl: videoBase64,
-                    desc, 
-                    addedByAdmin: currentAdminEmail, // Storing uploader admin info
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
+                    desc,
+                    addedByAdmin: currentAdminEmail,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
 
-                alert("Product published successfully! 🎉");
-                document.getElementById('addProductForm').reset();
-                selectedImageFiles = [];
-                renderImagePreviews();
+                if (videoBase64) {
+                    productData.videoUrl = videoBase64;
+                }
+
+                if (editingId) {
+                    // Update existing product
+                    await db.collection('products').doc(editingId).update(productData);
+                    alert("Product updated successfully! 🔄");
+                } else {
+                    // Create new product
+                    productData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                    await db.collection('products').add(productData);
+                    alert("Product published successfully! 🎉");
+                }
+
+                resetProductForm();
                 loadAdminProducts();
             } catch (err) {
                 alert("Error: " + err.message);
@@ -336,10 +354,55 @@
             }
         }
 
+        function editProduct(id) {
+            const p = loadedProductsMap[id];
+            if (!p) return;
+
+            document.getElementById('editingProductId').value = id;
+            document.getElementById('prodTitle').value = p.title || '';
+            document.getElementById('prodCategory').value = p.category || 'Fashion & Apparel';
+            document.getElementById('prodOriginalPrice').value = p.originalPrice || '';
+            document.getElementById('prodPrice').value = p.price || '';
+            document.getElementById('prodBulkPrice').value = p.bulkPrice || '';
+            document.getElementById('prodBulkQty').value = p.bulkQty || '';
+            document.getElementById('prodStock').value = p.stock || '';
+            document.getElementById('prodWeight').value = p.weight !== 'N/A' ? p.weight : '';
+            document.getElementById('prodColors').value = p.colors ? p.colors.join(', ') : '';
+            document.getElementById('prodDesc').value = p.desc || '';
+
+            // Check size checkboxes
+            document.querySelectorAll('input[name="prodSize"]').forEach(cb => {
+                cb.checked = p.sizes && p.sizes.includes(cb.value);
+            });
+
+            // Load existing images into preview
+            selectedImageFiles = p.images || (p.image ? [p.image] : []);
+            renderImagePreviews();
+
+            // Update UI headers
+            document.getElementById('formHeading').innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-400 mr-1.5"></i> Edit Product: ${p.title}`;
+            document.getElementById('submitBtn').innerText = "Update Product Changes";
+            document.getElementById('cancelEditBtn').classList.remove('hidden');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function resetProductForm() {
+            document.getElementById('addProductForm').reset();
+            document.getElementById('editingProductId').value = '';
+            selectedImageFiles = [];
+            renderImagePreviews();
+            document.getElementById('formHeading').innerHTML = `<i class="fa-solid fa-plus-circle text-amber-400 mr-1.5"></i> Add New Wholesale Product`;
+            document.getElementById('submitBtn').innerText = "Publish Product to Central Catalog";
+            document.getElementById('cancelEditBtn').classList.add('hidden');
+        }
+
         async function loadAdminProducts() {
             const tbody = document.getElementById('adminProductTableBody');
             try {
                 const snapshot = await db.collection('products').orderBy('createdAt', 'desc').get();
+                loadedProductsMap = {};
+
                 if (snapshot.empty) {
                     tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500">No products uploaded yet.</td></tr>`;
                     return;
@@ -349,6 +412,8 @@
                 snapshot.forEach(doc => {
                     const p = doc.data();
                     const id = doc.id;
+                    loadedProductsMap[id] = p;
+
                     const mainImg = (p.images && p.images.length > 0) ? p.images[0] : (p.image || 'https://via.placeholder.com/100');
                     const imgCount = p.images ? p.images.length : 1;
                     const stockVal = p.stock !== undefined ? p.stock : 10;
@@ -374,7 +439,10 @@
                                 ${bulkInfo}
                             </td>
                             <td class="p-3 text-slate-300">${stockBadge}</td>
-                            <td class="p-3 text-center">
+                            <td class="p-3 text-center space-x-1">
+                                <button onclick="editProduct('${id}')" class="bg-amber-500 hover:bg-amber-600 text-slate-950 px-2.5 py-1 rounded text-[11px] font-bold transition shadow">
+                                    <i class="fa-solid fa-pen"></i> Edit
+                                </button>
                                 <button onclick="deleteProduct('${id}')" class="bg-rose-600 hover:bg-rose-700 text-white px-2.5 py-1 rounded text-[11px] font-bold transition shadow">
                                     <i class="fa-solid fa-trash"></i> Delete
                                 </button>
