@@ -16,7 +16,7 @@
                 <div class="bg-amber-500 text-slate-950 font-black text-xl w-10 h-10 flex items-center justify-center rounded-xl shadow-lg">P</div>
                 <div>
                     <h1 class="text-base font-black tracking-wider uppercase text-white">ADMIN MANAGEMENT PANEL</h1>
-                    <p class="text-[10px] text-amber-400 font-bold uppercase tracking-widest">Prime Traders Wholeseller</p>
+                    <p id="adminUserDisplay" class="text-[10px] text-amber-400 font-bold uppercase tracking-widest">Checking admin session...</p>
                 </div>
             </div>
             <div class="flex items-center gap-3">
@@ -103,14 +103,12 @@
                     </div>
                 </div>
 
-                <!-- Mobile & Laptop Compatible Image Picker + Video -->
+                <!-- Image Picker & Video -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-slate-300 mb-1 font-semibold">Upload Pictures * (Laptop & Mobile Compatible)</label>
                         <input type="file" id="prodImageFiles" accept="image/*" multiple onchange="handleImageSelection(event)" class="w-full p-2 bg-slate-950 border border-slate-700 rounded-lg text-slate-300 text-xs file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-600">
-                        <p class="text-[10px] text-amber-400 mt-1">Neeche images me se individual picture cross (×) karke delete kar sakte hain.</p>
-                        
-                        <!-- Live Image Attachment Preview with Delete Cross Button -->
+                        <p class="text-[10px] text-amber-400 mt-1">Individual pictures can be removed using the cross (×) button.</p>
                         <div id="imagePreviewContainer" class="flex flex-wrap gap-2 mt-3"></div>
                     </div>
 
@@ -153,9 +151,9 @@
             </div>
         </div>
 
-        <!-- Management Table for Products -->
+        <!-- Management Table for Products with Uploader Info -->
         <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-4">
-            <h2 class="text-sm font-black text-white uppercase tracking-wider"><i class="fa-solid fa-boxes-stacked text-amber-400 mr-1.5"></i> Manage Central Products</h2>
+            <h2 class="text-sm font-black text-white uppercase tracking-wider"><i class="fa-solid fa-boxes-stacked text-amber-400 mr-1.5"></i> Manage Central Products (Verified by Uploader)</h2>
             
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
@@ -163,13 +161,14 @@
                         <tr class="border-b border-slate-800 text-slate-400 text-[11px] uppercase">
                             <th class="p-3">Images</th>
                             <th class="p-3">Title & Category</th>
+                            <th class="p-3">Added By (Admin)</th>
                             <th class="p-3">Wholesale Rates</th>
                             <th class="p-3">Stock</th>
                             <th class="p-3 text-center">Action</th>
                         </tr>
                     </thead>
                     <tbody id="adminProductTableBody" class="divide-y divide-slate-800 text-xs">
-                        <tr><td colspan="5" class="p-4 text-center text-slate-500">Loading products...</td></tr>
+                        <tr><td colspan="6" class="p-4 text-center text-slate-500">Loading products...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -196,17 +195,19 @@
         const db = firebase.firestore();
 
         let selectedImageFiles = [];
+        let currentAdminEmail = "";
 
         auth.onAuthStateChanged((user) => {
             if (!user) {
                 window.location.href = "login.html";
             } else {
+                currentAdminEmail = user.email || "Admin User";
+                document.getElementById('adminUserDisplay').innerText = `Logged in as: ${currentAdminEmail}`;
                 loadAdminProducts();
                 loadAdminOrders();
             }
         });
 
-        // Individual Image Selection & Preview Handler
         async function handleImageSelection(e) {
             const files = Array.from(e.target.files);
             for (let f of files) {
@@ -214,7 +215,7 @@
                 selectedImageFiles.push(base64);
             }
             renderImagePreviews();
-            e.target.value = ""; // Reset input so new attachments can be added
+            e.target.value = "";
         }
 
         function renderImagePreviews() {
@@ -318,6 +319,7 @@
                     image: selectedImageFiles[0] || "",
                     videoUrl: videoBase64,
                     desc, 
+                    addedByAdmin: currentAdminEmail, // Storing uploader admin info
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
@@ -339,7 +341,7 @@
             try {
                 const snapshot = await db.collection('products').orderBy('createdAt', 'desc').get();
                 if (snapshot.empty) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500">No products uploaded yet.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500">No products uploaded yet.</td></tr>`;
                     return;
                 }
 
@@ -352,6 +354,7 @@
                     const stockVal = p.stock !== undefined ? p.stock : 10;
                     const stockBadge = stockVal > 0 ? `<span class="text-emerald-400 font-bold">${stockVal} Units</span>` : `<span class="text-rose-500 font-bold">Out of Stock</span>`;
                     const bulkInfo = p.bulkPrice && p.bulkQty ? `<div class="text-[10px] text-emerald-400">Bulk: PKR ${p.bulkPrice} (${p.bulkQty}+ pcs)</div>` : '';
+                    const uploaderBadge = p.addedByAdmin ? `<span class="bg-amber-950/60 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded font-mono text-[10px]">${p.addedByAdmin}</span>` : `<span class="text-slate-500 text-[10px]">Unknown Admin</span>`;
 
                     html += `
                         <tr class="hover:bg-slate-900/50 transition border-b border-slate-800">
@@ -365,6 +368,7 @@
                                 <div class="font-bold text-slate-100">${p.title}</div>
                                 <div class="text-[10px] text-amber-400 font-mono">${p.category}</div>
                             </td>
+                            <td class="p-3">${uploaderBadge}</td>
                             <td class="p-3">
                                 <div class="font-bold text-amber-300">Single: PKR ${p.price}</div>
                                 ${bulkInfo}
@@ -380,7 +384,7 @@
                 });
                 tbody.innerHTML = html;
             } catch (err) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-rose-400">Error loading products.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-rose-400">Error loading products.</td></tr>`;
             }
         }
 
