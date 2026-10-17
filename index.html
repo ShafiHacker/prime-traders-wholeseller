@@ -52,12 +52,9 @@
                 </div>
             </div>
 
+            <!-- Dynamic Category Filter Buttons -->
             <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs" id="categoryFilterContainer">
                 <button onclick="setCategory('All', this)" class="cat-btn px-4 py-1.5 rounded-lg font-bold bg-amber-500 text-slate-950 transition whitespace-nowrap shadow">All Products</button>
-                <button onclick="setCategory('Fashion & Apparel', this)" class="cat-btn px-4 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition whitespace-nowrap">Fashion & Apparel</button>
-                <button onclick="setCategory('Electronics & Gadgets', this)" class="cat-btn px-4 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition whitespace-nowrap">Electronics & Gadgets</button>
-                <button onclick="setCategory('Home & Kitchen', this)" class="cat-btn px-4 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition whitespace-nowrap">Home & Kitchen</button>
-                <button onclick="setCategory('Accessories', this)" class="cat-btn px-4 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition whitespace-nowrap">Accessories</button>
             </div>
         </div>
 
@@ -131,16 +128,36 @@
         function listenToLiveCatalog() {
             db.collection('products').onSnapshot(snapshot => {
                 allProducts = [];
+                const categoriesSet = new Set(['Fashion & Apparel', 'Electronics & Gadgets', 'Home & Kitchen', 'Accessories']);
+
                 snapshot.forEach(doc => {
-                    allProducts.push({ id: doc.id, ...doc.data() });
+                    const data = doc.data();
+                    allProducts.push({ id: doc.id, ...data });
+                    if (data.category) categoriesSet.add(data.category);
                 });
 
                 allProducts.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+                
+                renderCategoryButtons(Array.from(categoriesSet));
                 filterProducts();
             }, err => {
                 console.error("Firestore Error:", err);
                 document.getElementById('productGrid').innerHTML = `<div class="col-span-full text-center text-rose-400 py-8">Failed to sync inventory.</div>`;
             });
+        }
+
+        function renderCategoryButtons(categories) {
+            const container = document.getElementById('categoryFilterContainer');
+            let html = `<button onclick="setCategory('All', this)" class="cat-btn px-4 py-1.5 rounded-lg font-bold ${selectedCategory === 'All' ? 'bg-amber-500 text-slate-950' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'} transition whitespace-nowrap shadow">All Products</button>`;
+
+            categories.forEach(cat => {
+                const isSelected = selectedCategory === cat;
+                html += `
+                    <button onclick="setCategory('${cat}', this)" class="cat-btn px-4 py-1.5 rounded-lg font-bold ${isSelected ? 'bg-amber-500 text-slate-950' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'} transition whitespace-nowrap">${cat}</button>
+                `;
+            });
+
+            container.innerHTML = html;
         }
 
         function renderProducts(products) {
