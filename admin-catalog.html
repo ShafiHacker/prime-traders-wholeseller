@@ -49,16 +49,22 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-slate-300 mb-1 font-semibold">Product Title *</label>
-                        <input type="text" id="prodTitle" placeholder="e.g. Crystal Lamp" required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-white outline-none focus:border-amber-400">
+                        <input type="text" id="prodTitle" oninput="autoDetectCategory(this.value)" placeholder="e.g. Spice Rack Organizer Metal" required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-white outline-none focus:border-amber-400">
                     </div>
                     <div>
                         <label class="block text-slate-300 mb-1 font-semibold">Category *</label>
-                        <select id="prodCategory" required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-white outline-none focus:border-amber-400">
+                        <select id="prodCategory" onchange="handleCategoryChange(this.value)" required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-white outline-none focus:border-amber-400">
                             <option value="Fashion & Apparel">Fashion & Apparel</option>
                             <option value="Electronics & Gadgets">Electronics & Gadgets</option>
                             <option value="Home & Kitchen">Home & Kitchen</option>
                             <option value="Accessories">Accessories</option>
+                            <option value="__NEW__">+ Add Custom Category...</option>
                         </select>
+
+                        <!-- Custom Category Input Box -->
+                        <div id="customCategoryBox" class="hidden mt-2">
+                            <input type="text" id="customCategoryInput" placeholder="Type new category name..." class="w-full p-2 bg-slate-950 border border-amber-500/50 rounded-lg text-amber-300 outline-none">
+                        </div>
                     </div>
                 </div>
 
@@ -156,7 +162,7 @@
             </div>
         </div>
 
-        <!-- Management Table for Products with Edit & Delete -->
+        <!-- Management Table for Products -->
         <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-4">
             <h2 class="text-sm font-black text-white uppercase tracking-wider"><i class="fa-solid fa-boxes-stacked text-amber-400 mr-1.5"></i> Manage Central Products (Edit & Delete)</h2>
             
@@ -201,7 +207,7 @@
 
         let selectedImageFiles = [];
         let currentAdminEmail = "";
-        let loadedProductsMap = {}; // Store products for editing reference
+        let loadedProductsMap = {};
 
         auth.onAuthStateChanged((user) => {
             if (!user) {
@@ -213,6 +219,33 @@
                 loadAdminOrders();
             }
         });
+
+        // Smart Category Detection based on keywords in title
+        function autoDetectCategory(titleText) {
+            const title = titleText.toLowerCase();
+            const select = document.getElementById('prodCategory');
+
+            if (title.includes('spice') || title.includes('jar') || title.includes('rack') || title.includes('kitchen') || title.includes('lamp') || title.includes('bottle') || title.includes('organizer')) {
+                select.value = "Home & Kitchen";
+            } else if (title.includes('shirt') || title.includes('pant') || title.includes('dress') || title.includes('cloth') || title.includes('wear') || title.includes('shoe')) {
+                select.value = "Fashion & Apparel";
+            } else if (title.includes('fan') || title.includes('usb') || title.includes('charger') || title.includes('led') || title.includes('gadget') || title.includes('cable') || title.includes('earbuds') || title.includes('phone')) {
+                select.value = "Electronics & Gadgets";
+            } else if (title.includes('bag') || title.includes('watch') || title.includes('glass') || title.includes('belt') || title.includes('wallet')) {
+                select.value = "Accessories";
+            }
+            handleCategoryChange(select.value);
+        }
+
+        function handleCategoryChange(val) {
+            const customBox = document.getElementById('customCategoryBox');
+            if (val === '__NEW__') {
+                customBox.classList.remove('hidden');
+                document.getElementById('customCategoryInput').focus();
+            } else {
+                customBox.classList.add('hidden');
+            }
+        }
 
         async function handleImageSelection(e) {
             const files = Array.from(e.target.files);
@@ -296,7 +329,18 @@
             btn.innerText = editingId ? "Updating Product..." : "Publishing to Portal...";
 
             const title = document.getElementById('prodTitle').value.trim();
-            const category = document.getElementById('prodCategory').value;
+            let category = document.getElementById('prodCategory').value;
+            if (category === '__NEW__') {
+                const customCat = document.getElementById('customCategoryInput').value.trim();
+                if (customCat) {
+                    category = customCat;
+                } else {
+                    alert("Please enter custom category name.");
+                    btn.disabled = false;
+                    return;
+                }
+            }
+
             const originalPrice = parseFloat(document.getElementById('prodOriginalPrice').value);
             const price = parseFloat(document.getElementById('prodPrice').value);
             const bulkPrice = parseFloat(document.getElementById('prodBulkPrice').value) || 0;
@@ -334,11 +378,9 @@
                 }
 
                 if (editingId) {
-                    // Update existing product
                     await db.collection('products').doc(editingId).update(productData);
                     alert("Product updated successfully! 🔄");
                 } else {
-                    // Create new product
                     productData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
                     await db.collection('products').add(productData);
                     alert("Product published successfully! 🎉");
@@ -360,7 +402,25 @@
 
             document.getElementById('editingProductId').value = id;
             document.getElementById('prodTitle').value = p.title || '';
-            document.getElementById('prodCategory').value = p.category || 'Fashion & Apparel';
+            
+            // Handle Category setting
+            const select = document.getElementById('prodCategory');
+            let matched = false;
+            for (let option of select.options) {
+                if (option.value === p.category) {
+                    select.value = p.category;
+                    matched = true;
+                    break;
+                }
+            }
+            if (!matched && p.category) {
+                const newOpt = document.createElement('option');
+                newOpt.value = p.category;
+                newOpt.innerText = p.category;
+                select.insertBefore(newOpt, select.options[select.options.length - 1]);
+                select.value = p.category;
+            }
+
             document.getElementById('prodOriginalPrice').value = p.originalPrice || '';
             document.getElementById('prodPrice').value = p.price || '';
             document.getElementById('prodBulkPrice').value = p.bulkPrice || '';
@@ -370,16 +430,13 @@
             document.getElementById('prodColors').value = p.colors ? p.colors.join(', ') : '';
             document.getElementById('prodDesc').value = p.desc || '';
 
-            // Check size checkboxes
             document.querySelectorAll('input[name="prodSize"]').forEach(cb => {
                 cb.checked = p.sizes && p.sizes.includes(cb.value);
             });
 
-            // Load existing images into preview
             selectedImageFiles = p.images || (p.image ? [p.image] : []);
             renderImagePreviews();
 
-            // Update UI headers
             document.getElementById('formHeading').innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-400 mr-1.5"></i> Edit Product: ${p.title}`;
             document.getElementById('submitBtn').innerText = "Update Product Changes";
             document.getElementById('cancelEditBtn').classList.remove('hidden');
@@ -390,6 +447,7 @@
         function resetProductForm() {
             document.getElementById('addProductForm').reset();
             document.getElementById('editingProductId').value = '';
+            document.getElementById('customCategoryBox').classList.add('hidden');
             selectedImageFiles = [];
             renderImagePreviews();
             document.getElementById('formHeading').innerHTML = `<i class="fa-solid fa-plus-circle text-amber-400 mr-1.5"></i> Add New Wholesale Product`;
@@ -409,10 +467,13 @@
                 }
 
                 let html = '';
+                const categoriesSet = new Set();
+
                 snapshot.forEach(doc => {
                     const p = doc.data();
                     const id = doc.id;
                     loadedProductsMap[id] = p;
+                    if (p.category) categoriesSet.add(p.category);
 
                     const mainImg = (p.images && p.images.length > 0) ? p.images[0] : (p.image || 'https://via.placeholder.com/100');
                     const imgCount = p.images ? p.images.length : 1;
@@ -451,6 +512,19 @@
                     `;
                 });
                 tbody.innerHTML = html;
+
+                // Sync new categories to select dropdown
+                const select = document.getElementById('prodCategory');
+                categoriesSet.forEach(cat => {
+                    let exists = Array.from(select.options).some(opt => opt.value === cat);
+                    if (!exists && cat) {
+                        const newOpt = document.createElement('option');
+                        newOpt.value = cat;
+                        newOpt.innerText = cat;
+                        select.insertBefore(newOpt, select.options[select.options.length - 1]);
+                    }
+                });
+
             } catch (err) {
                 tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-rose-400">Error loading products.</td></tr>`;
             }
