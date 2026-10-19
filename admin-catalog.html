@@ -33,7 +33,82 @@
     <!-- Main Container -->
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-6 space-y-6">
 
-        <!-- CATEGORIES GRID VIEW (Step 2 Update) -->
+        <!-- STEP 3: LOGISTICS & COURIER PERFORMANCE DASHBOARD CARDS -->
+        <div class="space-y-3">
+            <h2 class="text-xs font-black text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                <i class="fa-solid fa-chart-line text-amber-400"></i> Logistics & Courier Performance Summary
+            </h2>
+            
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+                <!-- Total Parcels -->
+                <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-2xl shadow flex items-center justify-between">
+                    <div>
+                        <span class="text-[10px] font-bold text-slate-400 block uppercase">Total Parcels</span>
+                        <span id="statTotalParcels" class="text-lg font-black text-white">0</span>
+                    </div>
+                    <div class="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center">
+                        <i class="fa-solid fa-box"></i>
+                    </div>
+                </div>
+
+                <!-- Delivered -->
+                <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-2xl shadow flex items-center justify-between">
+                    <div>
+                        <span class="text-[10px] font-bold text-slate-400 block uppercase">Delivered</span>
+                        <span id="statDelivered" class="text-lg font-black text-emerald-400">0</span>
+                    </div>
+                    <div class="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+                </div>
+
+                <!-- Processing / In Process -->
+                <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-2xl shadow flex items-center justify-between">
+                    <div>
+                        <span class="text-[10px] font-bold text-slate-400 block uppercase">Processing</span>
+                        <span id="statProcessing" class="text-lg font-black text-amber-300">0</span>
+                    </div>
+                    <div class="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 flex items-center justify-center">
+                        <i class="fa-solid fa-clock"></i>
+                    </div>
+                </div>
+
+                <!-- Returned -->
+                <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-2xl shadow flex items-center justify-between">
+                    <div>
+                        <span class="text-[10px] font-bold text-slate-400 block uppercase">Returned</span>
+                        <span id="statReturned" class="text-lg font-black text-rose-400">0</span>
+                    </div>
+                    <div class="w-9 h-9 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 flex items-center justify-center">
+                        <i class="fa-solid fa-rotate-left"></i>
+                    </div>
+                </div>
+
+                <!-- Total COD Volume -->
+                <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-2xl shadow flex items-center justify-between">
+                    <div>
+                        <span class="text-[10px] font-bold text-slate-400 block uppercase">COD Value</span>
+                        <span id="statTotalCod" class="text-xs font-black text-amber-400">PKR 0</span>
+                    </div>
+                    <div class="w-9 h-9 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 flex items-center justify-center">
+                        <i class="fa-solid fa-wallet"></i>
+                    </div>
+                </div>
+
+                <!-- Success Rate -->
+                <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-2xl shadow flex items-center justify-between">
+                    <div>
+                        <span class="text-[10px] font-bold text-slate-400 block uppercase">Success Rate</span>
+                        <span id="statSuccessRate" class="text-sm font-black text-emerald-400">0%</span>
+                    </div>
+                    <div class="w-9 h-9 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 flex items-center justify-center">
+                        <i class="fa-solid fa-percent"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CATEGORIES GRID VIEW -->
         <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-4">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
                 <div>
@@ -624,11 +699,43 @@
             });
         }
 
+        function updateLogisticsSummaryCards(ordersList) {
+            const totalParcels = ordersList.length;
+            let delivered = 0;
+            let processing = 0;
+            let returned = 0;
+            let totalCod = 0;
+
+            ordersList.forEach(o => {
+                const st = (o.status || 'Pending').toLowerCase();
+                const amt = parseFloat(o.totalAmount || o.totalCod || 0) || 0;
+                totalCod += amt;
+
+                if (st.includes('delivered') || st.includes('completed')) {
+                    delivered++;
+                } else if (st.includes('returned') || st.includes('cancel') || st.includes('rejected')) {
+                    returned++;
+                } else {
+                    processing++;
+                }
+            });
+
+            const successRate = totalParcels > 0 ? ((delivered / totalParcels) * 100).toFixed(1) : 0;
+
+            document.getElementById('statTotalParcels').innerText = totalParcels;
+            document.getElementById('statDelivered').innerText = delivered;
+            document.getElementById('statProcessing').innerText = processing;
+            document.getElementById('statReturned').innerText = returned;
+            document.getElementById('statTotalCod').innerText = `PKR ${totalCod}`;
+            document.getElementById('statSuccessRate').innerText = `${successRate}%`;
+        }
+
         function loadAdminOrders() {
             const tbody = document.getElementById('adminOrdersTableBody');
             db.collection('orders').onSnapshot(snapshot => {
                 if (snapshot.empty) {
                     tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500">No orders received yet.</td></tr>`;
+                    updateLogisticsSummaryCards([]);
                     return;
                 }
 
@@ -638,6 +745,8 @@
                 });
 
                 ordersList.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
+                updateLogisticsSummaryCards(ordersList);
 
                 let html = '';
                 ordersList.forEach(o => {
