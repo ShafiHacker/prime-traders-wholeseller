@@ -453,10 +453,20 @@
             document.getElementById('cancelEditBtn').classList.add('hidden');
         }
 
+        async function deleteProduct(id) {
+            if (confirm("Are you sure you want to delete this product?")) {
+                try {
+                    await db.collection('products').doc(id).delete();
+                    alert("Product deleted successfully.");
+                } catch(e) {
+                    alert("Error deleting product: " + e.message);
+                }
+            }
+        }
+
         function loadAdminProducts() {
             const tbody = document.getElementById('adminProductTableBody');
             
-            // Using safe real-time snapshot listener without rigid server ordering to avoid index exceptions
             db.collection('products').onSnapshot(snapshot => {
                 loadedProductsMap = {};
                 if (snapshot.empty) {
@@ -469,7 +479,6 @@
                     productsList.push({ id: doc.id, ...doc.data() });
                 });
 
-                // Client side sorting by date
                 productsList.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
 
                 let html = '';
@@ -518,7 +527,6 @@
                 });
                 tbody.innerHTML = html;
 
-                // Sync new dynamic categories to form dropdown
                 const select = document.getElementById('prodCategory');
                 categoriesSet.forEach(cat => {
                     let exists = Array.from(select.options).some(opt => opt.value === cat);
@@ -553,51 +561,35 @@
                 let html = '';
                 ordersList.forEach(o => {
                     const id = o.id;
-                    let itemsStr = o.items ? o.items.map(i => `${i.title} (x${i.qty || 1}) - ${i.selectedSize || 'N/A'}/${i.selectedColor || 'N/A'}`).join('<br>') : 'Details N/A';
+                    let itemsStr = o.items ? o.items.map(i => `${i.title} (x${i.qty || 1}) - Size: ${i.selectedSize || 'N/A'}, Color: ${i.selectedColor || 'N/A'}`).join('<br>') : (o.itemDetail || 'Details N/A');
 
                     html += `
                         <tr class="hover:bg-slate-900/50 transition border-b border-slate-800">
-                            <td class="p-3">
-                                <div class="font-bold text-white">${o.customerName || 'Guest'}</div>
-                                <div class="text-[10px] text-amber-400">${o.customerPhone || 'N/A'}</div>
-                                <div class="text-[10px] text-slate-400">${o.customerAddress || ''}</div>
+                            <td class="p-3 font-bold text-white">
+                                ${o.customerName || o.custName || 'N/A'}
+                                <div class="text-[10px] text-amber-400">${o.customerPhone || o.custPhone || ''}</div>
+                                <div class="text-[10px] text-slate-400">${o.customerAddress || o.custAddress || ''}</div>
                             </td>
-                            <td class="p-3 text-[11px] text-slate-300">${itemsStr}</td>
-                            <td class="p-3 font-bold text-amber-300">PKR ${o.totalAmount || 0}</td>
+                            <td class="p-3 text-slate-300">${itemsStr}</td>
+                            <td class="p-3 font-bold text-amber-300">PKR ${o.totalAmount || o.totalCod || 0}</td>
                             <td class="p-3">
-                                <select onchange="updateOrderStatus('${id}', this.value)" class="bg-slate-950 border border-slate-700 text-xs rounded p-1 text-slate-200">
-                                    <option value="Pending" ${o.status === 'Pending' ? 'selected' : ''}>Pending</option>
-                                    <option value="Dispatched" ${o.status === 'Dispatched' ? 'selected' : ''}>Dispatched</option>
-                                    <option value="Delivered" ${o.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
-                                </select>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-900/50 text-amber-300 border border-amber-500/30">${o.status || 'Pending'}</span>
                             </td>
                             <td class="p-3 text-center">
-                                <button onclick="deleteOrder('${id}')" class="bg-rose-600 hover:bg-rose-700 text-white px-2 py-1 rounded text-[10px] font-bold">Delete</button>
+                                <button onclick="deleteAdminOrder('${id}')" class="bg-rose-600 hover:bg-rose-700 text-white px-2 py-1 rounded text-[10px] font-bold shadow">Delete</button>
                             </td>
                         </tr>
                     `;
                 });
                 tbody.innerHTML = html;
             }, err => {
-                console.error("Error loading orders:", err);
-                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-rose-400">Error loading orders.</td></tr>`;
+                console.error("Orders error:", err);
             });
         }
 
-        async function updateOrderStatus(id, newStatus) {
-            await db.collection('orders').doc(id).update({ status: newStatus });
-            alert("Order status updated!");
-        }
-
-        async function deleteOrder(id) {
-            if (confirm("Delete order?")) {
+        async function deleteAdminOrder(id) {
+            if (confirm("Delete this order?")) {
                 await db.collection('orders').doc(id).delete();
-            }
-        }
-
-        async function deleteProduct(id) {
-            if (confirm("Delete product?")) {
-                await db.collection('products').doc(id).delete();
             }
         }
 
