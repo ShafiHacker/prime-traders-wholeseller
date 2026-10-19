@@ -27,7 +27,6 @@ function listenToLiveCatalog() {
 
         allProducts.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
         
-        renderDynamicCategoryButtons(Array.from(dynamicCategories));
         renderPublicCategoriesGrid(allProducts);
         filterProducts();
     }, err => {
@@ -88,44 +87,6 @@ function setCategoryFromGrid(catName) {
     selectedCategory = catName;
     filterProducts();
     window.scrollTo({ top: 400, behavior: 'smooth' });
-}
-
-function renderDynamicCategoryButtons(categories) {
-    const container = document.getElementById('categoryFilterContainer');
-    if (!container) return;
-    const baseCategories = [
-        'Fashion & Apparel', 
-        'Electronics & Gadgets', 
-        'Home & Kitchen', 
-        'Accessories', 
-        'Computer Accessories', 
-        'Dish Set', 
-        'Medicine Box', 
-        'Mobile Accessories'
-    ];
-    const finalCategoryList = Array.from(new Set([...baseCategories, ...categories]));
-
-    let html = `<button onclick="setCategory('All', this)" class="cat-btn px-4 py-1.5 rounded-lg font-bold ${selectedCategory === 'All' ? 'bg-amber-500 text-slate-950' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'} transition whitespace-nowrap shadow">All Products</button>`;
-
-    finalCategoryList.forEach(cat => {
-        const isSelected = selectedCategory === cat;
-        html += `
-            <button onclick="setCategory('${cat}', this)" class="cat-btn px-4 py-1.5 rounded-lg font-bold ${isSelected ? 'bg-amber-500 text-slate-950' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'} transition whitespace-nowrap">${cat}</button>
-        `;
-    });
-
-    container.innerHTML = html;
-}
-
-function setCategory(cat, btn) {
-    selectedCategory = cat;
-    document.querySelectorAll('.cat-btn').forEach(b => {
-        b.className = "cat-btn px-4 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition whitespace-nowrap";
-    });
-    if (btn) {
-        btn.className = "cat-btn px-4 py-1.5 rounded-lg font-bold bg-amber-500 text-slate-950 transition whitespace-nowrap shadow";
-    }
-    filterProducts();
 }
 
 function filterProducts() {
