@@ -4,16 +4,16 @@ let selectedCategory = 'All';
 let cart = [];
 
 // Safely initialize Firestore db instance
-const storeDb = window.firebase ? firebase.firestore() : null;
+const database = window.db || (window.firebase ? firebase.firestore() : null);
 
 function listenToLiveCatalog() {
-    if (!storeDb) {
+    if (!database) {
         console.error("Firebase Firestore is not initialized!");
-        document.getElementById('productGrid').innerHTML = `<div class="col-span-full text-center text-rose-400 py-8">Firebase connection error.</div>`;
+        document.getElementById('productGrid').innerHTML = `<div class="col-span-full text-center text-rose-400 py-8">Firebase connection error. Please check configuration.</div>`;
         return;
     }
 
-    storeDb.collection('products').onSnapshot(snapshot => {
+    database.collection('products').onSnapshot(snapshot => {
         allProducts = [];
         const dynamicCategories = new Set();
 
@@ -205,7 +205,7 @@ async function openProductModal(id) {
 
     let reviewsHtml = '';
     try {
-        const revSnap = await storeDb.collection('products').doc(id).collection('reviews').get();
+        const revSnap = await database.collection('products').doc(id).collection('reviews').get();
         if (!revSnap.empty) {
             revSnap.forEach(rDoc => {
                 const rev = rDoc.data();
@@ -327,7 +327,7 @@ async function submitReview(e, prodId) {
     const text = document.getElementById('revText').value.trim();
 
     try {
-        await storeDb.collection('products').doc(prodId).collection('reviews').add({
+        await database.collection('products').doc(prodId).collection('reviews').add({
             reviewerName: name,
             comment: text,
             rating: 5,
@@ -461,7 +461,7 @@ async function submitCheckoutOrder(e) {
     const fullDestinationAddress = `${city} - ${address}`;
 
     try {
-        await storeDb.collection('parcels').add({
+        await database.collection('parcels').add({
             trackId: autoTrackingId,
             custName: name,
             custPhone: phone,
@@ -474,7 +474,7 @@ async function submitCheckoutOrder(e) {
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
 
-        await storeDb.collection('orders').add({
+        await database.collection('orders').add({
             customerName: name,
             customerPhone: phone,
             customerAddress: fullDestinationAddress,
