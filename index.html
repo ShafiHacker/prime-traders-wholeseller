@@ -182,9 +182,12 @@
 
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    allProducts.push({ id: doc.id, ...data });
-                    if (data.category && data.category.trim() !== '') {
-                        dynamicCategories.add(data.category.trim());
+                    // Only include active products (isActive is true or undefined)
+                    if (data.isActive !== false) {
+                        allProducts.push({ id: doc.id, ...data });
+                        if (data.category && data.category.trim() !== '') {
+                            dynamicCategories.add(data.category.trim());
+                        }
                     }
                 });
 
@@ -552,7 +555,6 @@
             const fullDestinationAddress = `${city} - ${address}`;
 
             try {
-                // Save to 'parcels' collection so it appears instantly on admin.html dashboard
                 await db.collection('parcels').add({
                     trackId: autoTrackingId,
                     custName: name,
@@ -566,7 +568,6 @@
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                // Also save to 'orders' collection for wholesome tracking
                 await db.collection('orders').add({
                     customerName: name,
                     customerPhone: phone,
@@ -590,7 +591,6 @@
             }
         }
 
-        // Initialize Live Catalog on page load
         listenToLiveCatalog();
     </script>
 </body>
