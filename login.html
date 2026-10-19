@@ -27,7 +27,12 @@
 
             <div>
                 <label class="block text-slate-300 font-bold mb-1">Password</label>
-                <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full p-3 bg-slate-950 border border-slate-700 rounded-xl text-white outline-none focus:border-amber-400 transition">
+                <div class="relative">
+                    <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full p-3 pr-10 bg-slate-950 border border-slate-700 rounded-xl text-white outline-none focus:border-amber-400 transition">
+                    <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-3.5 text-slate-400 hover:text-white text-sm">
+                        <i id="togglePasswordIcon" class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
             </div>
 
             <div id="authMsg" class="hidden text-rose-400 text-center font-bold"></div>
@@ -68,6 +73,21 @@
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
+
+        // Toggle Password Visibility
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('loginPassword');
+            const toggleIcon = document.getElementById('togglePasswordIcon');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
 
         // Login Handler
         async function handleLogin(e) {
