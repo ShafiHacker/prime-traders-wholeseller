@@ -33,6 +33,21 @@
     <!-- Main Container -->
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-6 space-y-6">
 
+        <!-- CATEGORIES GRID VIEW (Step 2 Update) -->
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <div>
+                    <h2 class="text-sm font-black text-white uppercase tracking-wider"><i class="fa-solid fa-layer-group text-amber-400 mr-1.5"></i> Categories Overview</h2>
+                    <p class="text-[11px] text-slate-400">Total products count by category</p>
+                </div>
+            </div>
+            <div id="categoriesGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                <div class="col-span-full text-center py-4 text-slate-500 text-xs font-semibold">
+                    <i class="fa-solid fa-spinner fa-spin text-amber-400 mr-1"></i> Calculating categories...
+                </div>
+            </div>
+        </div>
+
         <!-- Add / Edit Product Form Box -->
         <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-4">
             <div class="border-b border-slate-800 pb-3 flex justify-between items-center">
@@ -58,6 +73,10 @@
                             <option value="Electronics & Gadgets">Electronics & Gadgets</option>
                             <option value="Home & Kitchen">Home & Kitchen</option>
                             <option value="Accessories">Accessories</option>
+                            <option value="Computer Accessories">Computer Accessories</option>
+                            <option value="Dish Set">Dish Set</option>
+                            <option value="Medicine Box">Medicine Box</option>
+                            <option value="Mobile Accessories">Mobile Accessories</option>
                             <option value="__NEW__">+ Add Custom Category...</option>
                         </select>
 
@@ -368,7 +387,7 @@
                     images: selectedImageFiles, 
                     image: selectedImageFiles[0] || "",
                     desc,
-                    isActive: true, // Default active on create
+                    isActive: true,
                     addedByAdmin: currentAdminEmail,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 };
@@ -378,7 +397,6 @@
                 }
 
                 if (editingId) {
-                    // Keep existing isActive state when editing
                     const existingProd = loadedProductsMap[editingId];
                     if (existingProd && existingProd.isActive !== undefined) {
                         productData.isActive = existingProd.isActive;
@@ -479,6 +497,43 @@
             }
         }
 
+        function renderCategoriesGrid(productsList) {
+            const counts = {};
+            productsList.forEach(p => {
+                const cat = p.category || 'General';
+                counts[cat] = (counts[cat] || 0) + 1;
+            });
+
+            const grid = document.getElementById('categoriesGrid');
+            const defaultCats = [
+                'Fashion & Apparel', 
+                'Electronics & Gadgets', 
+                'Home & Kitchen', 
+                'Accessories',
+                'Computer Accessories',
+                'Dish Set',
+                'Medicine Box',
+                'Mobile Accessories'
+            ];
+
+            const allCats = Array.from(new Set([...defaultCats, ...Object.keys(counts)]));
+
+            let html = '';
+            allCats.forEach(cat => {
+                const num = counts[cat] || 0;
+                html += `
+                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center flex flex-col items-center justify-center space-y-1 hover:border-amber-500/50 transition shadow">
+                        <div class="w-8 h-8 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-xs">
+                            <i class="fa-solid fa-box-open"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-200 text-[11px] line-clamp-1">${cat}</h3>
+                        <span class="bg-amber-950/60 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded text-[9px] font-bold">${num} products</span>
+                    </div>
+                `;
+            });
+            grid.innerHTML = html;
+        }
+
         function loadAdminProducts() {
             const tbody = document.getElementById('adminProductTableBody');
             
@@ -486,6 +541,7 @@
                 loadedProductsMap = {};
                 if (snapshot.empty) {
                     tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500">No products uploaded yet.</td></tr>`;
+                    renderCategoriesGrid([]);
                     return;
                 }
 
@@ -495,6 +551,8 @@
                 });
 
                 productsList.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
+                renderCategoriesGrid(productsList);
 
                 let html = '';
                 const categoriesSet = new Set();
@@ -508,7 +566,7 @@
                     const imgCount = p.images ? p.images.length : 1;
                     const stockVal = p.stock !== undefined ? p.stock : 10;
                     
-                    const isActive = p.isActive !== false; // Default true if undefined
+                    const isActive = p.isActive !== false;
                     const statusBadge = isActive 
                         ? `<button onclick="toggleProductStatus('${id}', true)" class="bg-emerald-950/80 text-emerald-400 border border-emerald-500/30 px-2.5 py-1 rounded-full text-[10px] font-bold hover:bg-rose-950 hover:text-rose-400 transition" title="Click to Unactive">Active (Visible)</button>`
                         : `<button onclick="toggleProductStatus('${id}', false)" class="bg-rose-950/80 text-rose-400 border border-rose-500/30 px-2.5 py-1 rounded-full text-[10px] font-bold hover:bg-emerald-950 hover:text-emerald-400 transition" title="Click to Active">Inactive (Hidden)</button>`;
