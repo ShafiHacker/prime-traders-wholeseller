@@ -164,7 +164,7 @@
 
         <!-- Management Table for Products -->
         <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-4">
-            <h2 class="text-sm font-black text-white uppercase tracking-wider"><i class="fa-solid fa-boxes-stacked text-amber-400 mr-1.5"></i> Manage Central Products (Edit & Delete)</h2>
+            <h2 class="text-sm font-black text-white uppercase tracking-wider"><i class="fa-solid fa-boxes-stacked text-amber-400 mr-1.5"></i> Manage Central Products (Edit, Delete & Active/Inactive)</h2>
             
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
@@ -174,7 +174,7 @@
                             <th class="p-3">Title & Category</th>
                             <th class="p-3">Added By</th>
                             <th class="p-3">Wholesale Rates</th>
-                            <th class="p-3">Stock</th>
+                            <th class="p-3">Status / Stock</th>
                             <th class="p-3 text-center">Actions</th>
                         </tr>
                     </thead>
@@ -368,6 +368,7 @@
                     images: selectedImageFiles, 
                     image: selectedImageFiles[0] || "",
                     desc,
+                    isActive: true, // Default active on create
                     addedByAdmin: currentAdminEmail,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 };
@@ -377,6 +378,11 @@
                 }
 
                 if (editingId) {
+                    // Keep existing isActive state when editing
+                    const existingProd = loadedProductsMap[editingId];
+                    if (existingProd && existingProd.isActive !== undefined) {
+                        productData.isActive = existingProd.isActive;
+                    }
                     await db.collection('products').doc(editingId).update(productData);
                     alert("Product updated successfully! 🔄");
                 } else {
@@ -392,6 +398,15 @@
             } finally {
                 btn.disabled = false;
                 btn.innerText = "Publish Product to Central Catalog";
+            }
+        }
+
+        async function toggleProductStatus(id, currentStatus) {
+            const newStatus = currentStatus === false ? true : false;
+            try {
+                await db.collection('products').doc(id).update({ isActive: newStatus });
+            } catch (e) {
+                alert("Error updating status: " + e.message);
             }
         }
 
@@ -492,12 +507,17 @@
                     const mainImg = (p.images && p.images.length > 0) ? p.images[0] : (p.image || 'https://via.placeholder.com/100');
                     const imgCount = p.images ? p.images.length : 1;
                     const stockVal = p.stock !== undefined ? p.stock : 10;
-                    const stockBadge = stockVal > 0 ? `<span class="text-emerald-400 font-bold">${stockVal} Units</span>` : `<span class="text-rose-500 font-bold">Out of Stock</span>`;
+                    
+                    const isActive = p.isActive !== false; // Default true if undefined
+                    const statusBadge = isActive 
+                        ? `<button onclick="toggleProductStatus('${id}', true)" class="bg-emerald-950/80 text-emerald-400 border border-emerald-500/30 px-2.5 py-1 rounded-full text-[10px] font-bold hover:bg-rose-950 hover:text-rose-400 transition" title="Click to Unactive">Active (Visible)</button>`
+                        : `<button onclick="toggleProductStatus('${id}', false)" class="bg-rose-950/80 text-rose-400 border border-rose-500/30 px-2.5 py-1 rounded-full text-[10px] font-bold hover:bg-emerald-950 hover:text-emerald-400 transition" title="Click to Active">Inactive (Hidden)</button>`;
+
                     const bulkInfo = p.bulkPrice && p.bulkQty ? `<div class="text-[10px] text-emerald-400">Bulk: PKR ${p.bulkPrice} (${p.bulkQty}+ pcs)</div>` : '';
                     const uploaderBadge = p.addedByAdmin ? `<span class="bg-amber-950/60 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded font-mono text-[10px]">${p.addedByAdmin}</span>` : `<span class="text-slate-500 text-[10px]">Unknown Admin</span>`;
 
                     html += `
-                        <tr class="hover:bg-slate-900/50 transition border-b border-slate-800">
+                        <tr class="hover:bg-slate-900/50 transition border-b border-slate-800 ${!isActive ? 'opacity-60 bg-slate-950/30' : ''}">
                             <td class="p-3">
                                 <div class="flex items-center gap-1">
                                     <img src="${mainImg}" class="w-10 h-10 object-cover rounded-lg border border-slate-700">
@@ -510,10 +530,13 @@
                             </td>
                             <td class="p-3">${uploaderBadge}</td>
                             <td class="p-3">
-                                <div class="font-bold text-amber-305">Single: PKR ${p.price}</div>
+                                <div class="font-bold text-amber-300">Single: PKR ${p.price}</div>
                                 ${bulkInfo}
                             </td>
-                            <td class="p-3 text-slate-300">${stockBadge}</td>
+                            <td class="p-3 space-y-1">
+                                <div>${statusBadge}</div>
+                                <div class="text-[11px] text-slate-400">Stock: ${stockVal} units</div>
+                            </td>
                             <td class="p-3 text-center space-x-1">
                                 <button onclick="editProduct('${id}')" class="bg-amber-500 hover:bg-amber-600 text-slate-950 px-2.5 py-1 rounded text-[11px] font-bold transition shadow">
                                     <i class="fa-solid fa-pen"></i> Edit
