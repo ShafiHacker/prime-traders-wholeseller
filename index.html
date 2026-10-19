@@ -215,6 +215,25 @@
             container.innerHTML = html;
         }
 
+        function setCategory(cat, btn) {
+            selectedCategory = cat;
+            document.querySelectorAll('.cat-btn').forEach(b => {
+                b.className = "cat-btn px-4 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition whitespace-nowrap";
+            });
+            btn.className = "cat-btn px-4 py-1.5 rounded-lg font-bold bg-amber-500 text-slate-950 transition whitespace-nowrap shadow";
+            filterProducts();
+        }
+
+        function filterProducts() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = allProducts.filter(p => {
+                const matchesCat = selectedCategory === 'All' || p.category === selectedCategory;
+                const matchesQuery = p.title.toLowerCase().includes(query) || (p.desc && p.desc.toLowerCase().includes(query));
+                return matchesCat && matchesQuery;
+            });
+            renderProducts(filtered);
+        }
+
         function renderProducts(products) {
             const grid = document.getElementById('productGrid');
             if (!products.length) {
@@ -535,35 +554,34 @@
             try {
                 // Save to 'parcels' collection so it appears instantly on admin.html dashboard
                 await db.collection('parcels').add({
-                    trackingId: autoTrackingId,
-                    customerName: name,
-                    customerPhone: phone,
-                    customerDetails: `${name}\n${phone}`,
-                    destinationCity: city,
-                    destinationAddress: fullDestinationAddress,
-                    codAmount: total,
-                    status: 'Pending',
+                    trackId: autoTrackingId,
+                    custName: name,
+                    custPhone: phone,
+                    custCity: city,
+                    custAddress: fullDestinationAddress,
+                    totalCod: total,
                     items: cart,
+                    status: 'Pending',
+                    approvedByAdmin: false,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                // Also save to 'orders' collection for wholeseller orders management view
+                // Also save to 'orders' collection for wholesome tracking
                 await db.collection('orders').add({
-                    trackingId: autoTrackingId,
                     customerName: name,
                     customerPhone: phone,
                     customerAddress: fullDestinationAddress,
+                    items: cart,
                     totalAmount: total,
                     status: 'Pending',
-                    items: cart,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                alert(`🎉 Order Placed Successfully!\n\nTracking ID: ${autoTrackingId}\nCOD Amount: PKR ${total}\n\nOrder booked successfully in main logistics dashboard!`);
-
+                alert(`Order successfully submit ho gaya hai! 🎉\nTracking ID: ${autoTrackingId}`);
                 cart = [];
                 updateCartBadge();
                 closeCheckoutModal();
+                document.getElementById('checkoutModal').querySelector('form').reset();
             } catch (err) {
                 alert("Error submitting order: " + err.message);
             } finally {
@@ -572,27 +590,8 @@
             }
         }
 
-        function setCategory(cat, btn) {
-            selectedCategory = cat;
-            document.querySelectorAll('.cat-btn').forEach(b => {
-                b.className = "cat-btn px-4 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition whitespace-nowrap";
-            });
-            btn.className = "cat-btn px-4 py-1.5 rounded-lg font-bold bg-amber-500 text-slate-950 transition whitespace-nowrap shadow";
-            filterProducts();
-        }
-
-        function filterProducts() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = allProducts.filter(p => {
-                const matchCat = selectedCategory === 'All' || p.category === selectedCategory;
-                const matchQuery = p.title && p.title.toLowerCase().includes(query);
-                return matchCat && matchQuery;
-            });
-            renderProducts(filtered);
-        }
-
-        // Initialize live catalog listener on page load
-        window.onload = () => listenToLiveCatalog();
+        // Initialize Live Catalog on page load
+        listenToLiveCatalog();
     </script>
 </body>
 </html>
