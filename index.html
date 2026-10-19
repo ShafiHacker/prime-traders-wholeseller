@@ -58,6 +58,21 @@
             </div>
         </div>
 
+        <!-- CATEGORIES OVERVIEW GRID (Public Page Shift) -->
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <div>
+                    <h2 class="text-sm font-black text-white uppercase tracking-wider"><i class="fa-solid fa-layer-group text-amber-400 mr-1.5"></i> Categories Overview</h2>
+                    <p class="text-[11px] text-slate-400">Total products count by category</p>
+                </div>
+            </div>
+            <div id="publicCategoriesGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                <div class="col-span-full text-center py-4 text-slate-500 text-xs font-semibold">
+                    <i class="fa-solid fa-spinner fa-spin text-amber-400 mr-1"></i> Calculating categories...
+                </div>
+            </div>
+        </div>
+
         <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             <div class="col-span-full text-center py-12 text-slate-500 text-xs font-semibold">
                 <i class="fa-solid fa-spinner fa-spin text-amber-400 text-xl mb-2"></i><br>Loading live catalog inventory...
