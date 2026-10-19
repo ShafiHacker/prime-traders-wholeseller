@@ -182,7 +182,6 @@
 
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    // Only include active products (isActive is true or undefined)
                     if (data.isActive !== false) {
                         allProducts.push({ id: doc.id, ...data });
                         if (data.category && data.category.trim() !== '') {
@@ -203,7 +202,16 @@
 
         function renderDynamicCategoryButtons(categories) {
             const container = document.getElementById('categoryFilterContainer');
-            const baseCategories = ['Fashion & Apparel', 'Electronics & Gadgets', 'Home & Kitchen', 'Accessories'];
+            const baseCategories = [
+                'Fashion & Apparel', 
+                'Electronics & Gadgets', 
+                'Home & Kitchen', 
+                'Accessories', 
+                'Computer Accessories', 
+                'Dish Set', 
+                'Medicine Box', 
+                'Mobile Accessories'
+            ];
             const finalCategoryList = Array.from(new Set([...baseCategories, ...categories]));
 
             let html = `<button onclick="setCategory('All', this)" class="cat-btn px-4 py-1.5 rounded-lg font-bold ${selectedCategory === 'All' ? 'bg-amber-500 text-slate-950' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'} transition whitespace-nowrap shadow">All Products</button>`;
