@@ -21,11 +21,57 @@ function listenToLiveCatalog() {
         allProducts.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
         
         renderDynamicCategoryButtons(Array.from(dynamicCategories));
+        renderPublicCategoriesGrid(allProducts);
         filterProducts();
     }, err => {
         console.error("Firestore Error:", err);
         document.getElementById('productGrid').innerHTML = `<div class="col-span-full text-center text-rose-400 py-8">Failed to sync inventory.</div>`;
     });
+}
+
+function renderPublicCategoriesGrid(productsList) {
+    const counts = {};
+    productsList.forEach(p => {
+        const cat = p.category || 'General';
+        counts[cat] = (counts[cat] || 0) + 1;
+    });
+
+    const grid = document.getElementById('publicCategoriesGrid');
+    if (!grid) return;
+
+    const defaultCats = [
+        'Fashion & Apparel', 
+        'Electronics & Gadgets', 
+        'Home & Kitchen', 
+        'Accessories',
+        'Computer Accessories',
+        'Dish Set',
+        'Medicine Box',
+        'Mobile Accessories'
+    ];
+
+    const allCats = Array.from(new Set([...defaultCats, ...Object.keys(counts)]));
+
+    let html = '';
+    allCats.forEach(cat => {
+        const num = counts[cat] || 0;
+        html += `
+            <div onclick="setCategoryFromGrid('${cat}')" class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center flex flex-col items-center justify-center space-y-1 hover:border-amber-500/50 transition shadow cursor-pointer">
+                <div class="w-8 h-8 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-xs">
+                    <i class="fa-solid fa-box-open"></i>
+                </div>
+                <h3 class="font-bold text-slate-200 text-[11px] line-clamp-1">${cat}</h3>
+                <span class="bg-amber-950/60 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded text-[9px] font-bold">${num} products</span>
+            </div>
+        `;
+    });
+    grid.innerHTML = html;
+}
+
+function setCategoryFromGrid(catName) {
+    selectedCategory = catName;
+    filterProducts();
+    window.scrollTo({ top: 400, behavior: 'smooth' });
 }
 
 function renderDynamicCategoryButtons(categories) {
@@ -60,14 +106,15 @@ function setCategory(cat, btn) {
     document.querySelectorAll('.cat-btn').forEach(b => {
         b.className = "cat-btn px-4 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition whitespace-nowrap";
     });
-    btn.className = "cat-btn px-4 py-1.5 rounded-lg font-bold bg-amber-500 text-slate-950 transition whitespace-nowrap shadow";
+    if (btn) {
+        btn.className = "cat-btn px-4 py-1.5 rounded-lg font-bold bg-amber-500 text-slate-950 transition whitespace-nowrap shadow";
+    }
     filterProducts();
 }
 
 function filterProducts() {
     const searchInput = document.getElementById('searchInput');
-    if (!searchInput) return;
-    const query = searchInput.value.toLowerCase();
+    const query = searchInput ? searchInput.value.toLowerCase() : '';
     const filtered = allProducts.filter(p => {
         const matchesCat = selectedCategory === 'All' || p.category === selectedCategory;
         const matchesQuery = p.title.toLowerCase().includes(query) || (p.desc && p.desc.toLowerCase().includes(query));
