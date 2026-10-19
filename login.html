@@ -7,39 +7,46 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center p-4 font-sans">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center font-sans p-4">
 
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-8 max-w-md w-full space-y-6 shadow-2xl relative">
-        <div class="text-center space-y-2">
-            <div class="bg-amber-500 text-slate-950 font-black text-2xl w-12 h-12 flex items-center justify-center rounded-2xl mx-auto shadow-lg">P</div>
-            <h1 class="text-lg font-black text-white uppercase tracking-wider">ADMIN / VENDOR PORTAL</h1>
-            <p class="text-xs text-slate-400">Sign in to manage wholesale catalog inventory</p>
+    <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl max-w-md w-full shadow-2xl space-y-6 text-center">
+        
+        <div class="inline-flex bg-amber-500 text-slate-950 font-black text-2xl w-14 h-14 items-center justify-center rounded-2xl shadow-lg mb-1">
+            P
+        </div>
+        <div>
+            <h1 class="text-lg font-black tracking-wider uppercase text-white">ADMIN / VENDOR PORTAL</h1>
+            <p class="text-xs text-slate-400 mt-1">Sign in to manage wholesale catalog inventory</p>
         </div>
 
-        <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4 text-xs">
+        <form onsubmit="handleLogin(event)" class="space-y-4 text-left text-xs">
             <div>
-                <label class="block text-slate-300 mb-1 font-semibold">Admin Email</label>
-                <input type="email" id="loginEmail" placeholder="admin@primetraders.com" required class="w-full p-3 bg-slate-950 border border-slate-700 rounded-xl text-white outline-none focus:border-amber-400 text-xs">
+                <label class="block text-slate-300 font-bold mb-1">Admin Email</label>
+                <input type="email" id="loginEmail" required placeholder="admin@primetraders.com" class="w-full p-3 bg-slate-950 border border-slate-700 rounded-xl text-white outline-none focus:border-amber-400 transition">
             </div>
 
             <div>
-                <label class="block text-slate-300 mb-1 font-semibold">Password</label>
-                <div class="relative">
-                    <input type="password" id="loginPassword" placeholder="••••••••••••" required class="w-full p-3 pr-10 bg-slate-950 border border-slate-700 rounded-xl text-white outline-none focus:border-amber-400 text-xs">
-                    <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-3.5 text-slate-400 hover:text-amber-400 text-sm">
-                        <i id="passwordEyeIcon" class="fa-solid fa-eye"></i>
-                    </button>
-                </div>
+                <label class="block text-slate-300 font-bold mb-1">Password</label>
+                <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full p-3 bg-slate-950 border border-slate-700 rounded-xl text-white outline-none focus:border-amber-400 transition">
             </div>
 
-            <button type="submit" id="loginBtn" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black rounded-xl text-xs uppercase shadow-lg transition tracking-wider">
-                SECURE LOGIN
+            <div id="authMsg" class="hidden text-rose-400 text-center font-bold"></div>
+
+            <button type="submit" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black rounded-xl text-xs uppercase shadow-lg transition tracking-wide">
+                Secure Login
             </button>
+
+            <!-- Forgot Password Link -->
+            <div class="text-center pt-1">
+                <button type="button" onclick="handleForgotPassword()" class="text-amber-400 hover:text-amber-300 text-[11px] font-bold transition">
+                    Forgot Password? Click here to reset
+                </button>
+            </div>
         </form>
 
-        <div class="text-center border-t border-slate-800 pt-4">
-            <a href="index.html" class="text-slate-400 hover:text-amber-400 text-xs font-semibold flex items-center justify-center gap-1.5 transition">
-                <i class="fa-solid fa-arrow-left"></i> Back to Public Catalog
+        <div class="border-t border-slate-800 pt-4">
+            <a href="index.html" class="text-slate-400 hover:text-white text-xs font-bold transition flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-arrow-left text-amber-400"></i> Back to Public Catalog
             </a>
         </div>
     </div>
@@ -47,49 +54,7 @@
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-    <script>
-        const firebaseConfig = {
-          apiKey: "AIzaSyCRkKoE48FjYIjYfUNFEYzcxNueKUm6YOM",
-          authDomain: "prime-traders-f3eec.firebaseapp.com",
-          projectId: "prime-traders-f3eec",
-          storageBucket: "prime-traders-f3eec.firebasestorage.app",
-          messagingSenderId: "499740236001",
-          appId: "1:499740236001:web:e623dfe11f6f96df22ffa0",
-          measurementId: "G-6CGVKBZFJK"
-        };
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-
-        function togglePasswordVisibility() {
-            const pwdInput = document.getElementById('loginPassword');
-            const eyeIcon = document.getElementById('passwordEyeIcon');
-            if (pwdInput.type === 'password') {
-                pwdInput.type = 'text';
-                eyeIcon.className = 'fa-solid fa-eye-slash';
-            } else {
-                pwdInput.type = 'password';
-                eyeIcon.className = 'fa-solid fa-eye';
-            }
-        }
-
-        async function handleLogin(e) {
-            e.preventDefault();
-            const btn = document.getElementById('loginBtn');
-            btn.disabled = true;
-            btn.innerText = "AUTHENTICATING...";
-
-            const email = document.getElementById('loginEmail').value.trim();
-            const password = document.getElementById('loginPassword').value;
-
-            try {
-                await auth.signInWithEmailAndPassword(email, password);
-                window.location.href = "admin-catalog.html";
-            } catch (err) {
-                alert("Login Failed: " + err.message);
-                btn.disabled = false;
-                btn.innerText = "SECURE LOGIN";
-            }
-        }
-    </script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="dashboard.js?v=21.0"></script>
 </body>
 </html>
