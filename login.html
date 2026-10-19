@@ -55,6 +55,60 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="dashboard.js?v=21.0"></script>
+    <script>
+        const firebaseConfig = {
+          apiKey: "AIzaSyCRkKoE48FjYIjYfUNFEYzcxNueKUm6YOM",
+          authDomain: "prime-traders-f3eec.firebaseapp.com",
+          projectId: "prime-traders-f3eec",
+          storageBucket: "prime-traders-f3eec.firebasestorage.app",
+          messagingSenderId: "499740236001",
+          appId: "1:499740236001:web:e623dfe11f6f96df22ffa0",
+          measurementId: "G-6CGVKBZFJK"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Login Handler
+        async function handleLogin(e) {
+            if (e) e.preventDefault();
+            const email = document.getElementById('loginEmail').value.trim();
+            const pass = document.getElementById('loginPassword').value;
+            const authMsg = document.getElementById('authMsg');
+
+            try {
+                await auth.signInWithEmailAndPassword(email, pass);
+                window.location.href = "admin-catalog.html";
+            } catch (err) {
+                authMsg.innerText = "Invalid email or password.";
+                authMsg.classList.remove('hidden');
+            }
+        }
+
+        // Forgot Password Handler
+        async function handleForgotPassword() {
+            const emailInput = document.getElementById('loginEmail');
+            const email = emailInput ? emailInput.value.trim() : "";
+
+            if (!email) {
+                alert("Karam karke pehle upar 'Admin Email' wale khali box mein apna email enter karein, phir 'Forgot Password' par click karein!");
+                if (emailInput) emailInput.focus();
+                return;
+            }
+
+            try {
+                await auth.sendPasswordResetEmail(email);
+                alert(`Password reset link successfully bhej diya gaya hai!\n\nKripya apna Gmail (${email}) check karein.`);
+            } catch (error) {
+                let errMsg = error.message;
+                if (error.code === 'auth/user-not-found') {
+                    errMsg = "Is email address par koi account registered nahi hai.";
+                } else if (error.code === 'auth/invalid-email') {
+                    errMsg = "Email address theek nahi hai.";
+                }
+                alert("Error: " + errMsg);
+            }
+        }
+    </script>
 </body>
 </html>
