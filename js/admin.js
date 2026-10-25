@@ -15,24 +15,18 @@ auth.onAuthStateChanged((user) => {
     }
 });
 
-function getVendorName(email, existingVendorName) {
-    const target = (existingVendorName || email || "").toLowerCase().trim();
-    
-    if (target.includes("abubakr@primetraders.com")) {
+function getVendorName(email) {
+    const targetEmail = (email || "").toLowerCase().trim();
+    if (targetEmail.includes("abubakr@primetraders.com")) {
         return "AbuBakar";
     }
-    if (target.includes("mkashan@primetraders.com")) {
+    if (targetEmail.includes("mkashan@primetraders.com")) {
         return "Muhammad Kashan";
     }
-    if (target.includes("admin@primetraders.com") || target === "") {
+    if (targetEmail.includes("admin@primetraders.com")) {
         return "Shafi Ul Haq";
     }
-    
-    if (existingVendorName && !existingVendorName.includes("@")) {
-        return existingVendorName;
-    }
-    
-    return "Shafi Ul Haq";
+    return email || "Shafi Ul Haq";
 }
 
 function autoDetectCategory(titleText) {
@@ -183,12 +177,18 @@ async function handleSaveProduct(e) {
         }
 
         let assignedVendorName = "";
+        let originalCreator = "";
+
         if (editingId && loadedProductsMap[editingId]) {
             const existing = loadedProductsMap[editingId];
-            let prevVendor = existing.vendorName || existing.addedByAdmin || currentAdminEmail;
-            assignedVendorName = getVendorName(prevVendor, existing.vendorName);
+            // Vendor name ko 100% lock rakha gaya hai taaki edit par change na ho
+            assignedVendorName = existing.vendorName && !existing.vendorName.includes("@") 
+                ? existing.vendorName 
+                : getVendorName(existing.originalCreatorEmail || existing.addedByAdmin);
+            originalCreator = existing.originalCreatorEmail || existing.addedByAdmin || currentAdminEmail;
         } else {
             assignedVendorName = getVendorName(currentAdminEmail);
+            originalCreator = currentAdminEmail;
         }
 
         const productData = {
@@ -198,8 +198,9 @@ async function handleSaveProduct(e) {
             image: selectedImageFiles[0] || "",
             desc,
             isActive: true,
-            vendorName: assignedVendorName,
-            addedByAdmin: currentAdminEmail,
+            vendorName: assignedVendorName, // Permanent Locked Vendor Name
+            originalCreatorEmail: originalCreator, // Asal creator email locked
+            addedByAdmin: currentAdminEmail, // Sirf last updater ki email yahan update hogi
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         };
 
@@ -391,7 +392,9 @@ function loadAdminProducts() {
 
             const bulkInfo = p.bulkPrice && p.bulkQty ? `<div class="text-[10px] text-emerald-400">Bulk: PKR ${p.bulkPrice} (${p.bulkQty}+ pcs)</div>` : '';
             
-            const vendorDisplayName = getVendorName(p.addedByAdmin, p.vendorName);
+            // Asal vendor name ko secure dikhane ke liye
+            const vendorSource = p.vendorName && !p.vendorName.includes("@") ? p.vendorName : (p.originalCreatorEmail || p.addedByAdmin);
+            const vendorDisplayName = getVendorName(vendorSource);
             const uploaderEmail = p.addedByAdmin || 'N/V';
 
             html += `
