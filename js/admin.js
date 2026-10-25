@@ -15,13 +15,15 @@ auth.onAuthStateChanged((user) => {
     }
 });
 
-function getVendorName(email) {
-    if (!email) return "Unknown";
-    const cleanEmail = email.toLowerCase().trim();
-    if (cleanEmail === "admin@primtraders.com") return "Shafi Ul Haq";
-    if (cleanEmail === "abubakr@primetraders.com") return "AbuBakar";
-    if (cleanEmail === "mkashan@primetraders.com") return "Muhammad Kashan";
-    return email;
+function getVendorName(email, existingVendorName) {
+    if (existingVendorName && existingVendorName !== "admin@primtraders.com" && existingVendorName !== "abubakr@primetraders.com" && existingVendorName !== "mkashan@primetraders.com") {
+        return existingVendorName;
+    }
+    const targetEmail = (email || "").toLowerCase().trim();
+    if (targetEmail === "admin@primtraders.com") return "Shafi Ul Haq";
+    if (targetEmail === "abubakr@primetraders.com") return "AbuBakar";
+    if (targetEmail === "mkashan@primetraders.com") return "Muhammad Kashan";
+    return existingVendorName || email || "Unknown";
 }
 
 function autoDetectCategory(titleText) {
@@ -173,7 +175,8 @@ async function handleSaveProduct(e) {
 
         let assignedVendorName = getVendorName(currentAdminEmail);
         if (editingId && loadedProductsMap[editingId]) {
-            assignedVendorName = loadedProductsMap[editingId].vendorName || getVendorName(loadedProductsMap[editingId].addedByAdmin);
+            const existing = loadedProductsMap[editingId];
+            assignedVendorName = getVendorName(existing.addedByAdmin, existing.vendorName);
         }
 
         const productData = {
@@ -343,7 +346,7 @@ function loadAdminProducts() {
     db.collection('products').onSnapshot(snapshot => {
         loadedProductsMap = {};
         if (snapshot.empty) {
-            tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500">No products uploaded yet.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-500">No products uploaded yet.</td></tr>`;
             renderCategoriesGrid([]);
             return;
         }
@@ -376,13 +379,8 @@ function loadAdminProducts() {
 
             const bulkInfo = p.bulkPrice && p.bulkQty ? `<div class="text-[10px] text-emerald-400">Bulk: PKR ${p.bulkPrice} (${p.bulkQty}+ pcs)</div>` : '';
             
-            const displayVendor = p.vendorName || getVendorName(p.addedByAdmin);
-            const uploaderBadge = `
-                <div class="space-y-0.5">
-                    <span class="bg-amber-950/80 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded font-bold text-[11px] block text-center">👤 ${displayVendor}</span>
-                    <span class="text-slate-400 font-mono text-[9px] block text-center">Updated: ${p.addedByAdmin || 'N/A'}</span>
-                </div>
-            `;
+            const vendorDisplayName = getVendorName(p.addedByAdmin, p.vendorName);
+            const uploaderEmail = p.addedByAdmin || 'N/V';
 
             html += `
                 <tr class="hover:bg-slate-900/50 transition border-b border-slate-800 ${!isActive ? 'opacity-60 bg-slate-950/30' : ''}">
@@ -396,7 +394,12 @@ function loadAdminProducts() {
                         <div class="font-bold text-slate-100">${p.title}</div>
                         <div class="text-[10px] text-amber-400 font-mono">${p.category}</div>
                     </td>
-                    <td class="p-3">${uploaderBadge}</td>
+                    <td class="p-3">
+                        <span class="bg-amber-950/80 text-amber-300 border border-amber-500/40 px-2.5 py-1 rounded font-bold text-[11px] inline-block">👤 ${vendorDisplayName}</span>
+                    </td>
+                    <td class="p-3">
+                        <span class="text-slate-300 font-mono text-[10px] bg-slate-950 px-2 py-1 rounded border border-slate-800 inline-block">${uploaderEmail}</span>
+                    </td>
                     <td class="p-3">
                         <div class="font-bold text-amber-300">Single: PKR ${p.price}</div>
                         ${bulkInfo}
