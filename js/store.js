@@ -30,8 +30,9 @@ function listenToLiveCatalog() {
         renderPublicCategoriesGrid(allProducts);
         filterProducts();
     }, err => {
-        console.error("Firestore Error:", err);
-        document.getElementById('productGrid').innerHTML = `<div class="col-span-full text-center text-rose-400 py-8">Failed to sync inventory: ${err.message}</div>`;
+        console.error("Firestore Error, retrying connection...", err);
+        // Auto-reconnect after 3 seconds if connection drops or goes stale
+        setTimeout(listenToLiveCatalog, 3000);
     });
 }
 
@@ -458,5 +459,5 @@ async function submitCheckoutOrder(e) {
     }
 }
 
-// Initialize Store safely
+// Initialize Store safely with auto-retry
 listenToLiveCatalog();
