@@ -16,14 +16,20 @@ auth.onAuthStateChanged((user) => {
 });
 
 function getVendorName(email, existingVendorName) {
-    // Agar database mein pehle se koi valid naam saved hai jo email nahi hai
-    if (existingVendorName && 
-        !existingVendorName.includes("@") && 
-        existingVendorName !== "admin@primtraders.com" && 
-        existingVendorName !== "abubakr@primetraders.com" && 
-        existingVendorName !== "mkashan@primetraders.com") {
-        return existingVendorName;
+    const targetEmail = (email || existingVendorName || "").toLowerCase().trim();
+    
+    if (targetEmail.includes("admin@primetraders.com") || targetEmail === "admin@primetraders.com") {
+        return "Shafi Ul Haq";
     }
+    if (targetEmail.includes("abubakr@primetraders.com") || targetEmail === "abubakr@primetraders.com") {
+        return "AbuBakar";
+    }
+    if (targetEmail.includes("mkashan@primetraders.com") || targetEmail === "mkashan@primetraders.com") {
+        return "Muhammad Kashan";
+    }
+    
+    return "Shafi Ul Haq"; // Default fallback
+}
 
     const targetEmail = (email || existingVendorName || "").toLowerCase().trim();
     
