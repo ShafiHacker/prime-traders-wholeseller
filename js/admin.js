@@ -16,6 +16,14 @@ auth.onAuthStateChanged((user) => {
 });
 
 function getVendorName(email, existingVendorName) {
+    if (existingVendorName && 
+        !existingVendorName.includes("@") && 
+        existingVendorName !== "admin@primtraders.com" && 
+        existingVendorName !== "abubakr@primetraders.com" && 
+        existingVendorName !== "mkashan@primetraders.com") {
+        return existingVendorName;
+    }
+
     const targetEmail = (email || existingVendorName || "").toLowerCase().trim();
     
     if (targetEmail.includes("admin@primtraders.com") || targetEmail === "admin@primtraders.com") {
@@ -178,11 +186,10 @@ async function handleSaveProduct(e) {
             videoBase64 = await convertFileToBase64(videoFile);
         }
 
-        // Permanent Vendor Name Lock (Edit karne par vendor change nahi hoga)
         let assignedVendorName = "";
         if (editingId && loadedProductsMap[editingId]) {
             const existing = loadedProductsMap[editingId];
-            assignedVendorName = existing.vendorName || getVendorName(existing.addedByAdmin) || "Shafi Ul Haq";
+            assignedVendorName = existing.vendorName || getVendorName(existing.addedByAdmin) || getVendorName(currentAdminEmail);
         } else {
             assignedVendorName = getVendorName(currentAdminEmail);
         }
@@ -194,8 +201,8 @@ async function handleSaveProduct(e) {
             image: selectedImageFiles[0] || "",
             desc,
             isActive: true,
-            vendorName: assignedVendorName, // 100% Locked Permanent Vendor Name
-            addedByAdmin: currentAdminEmail, // Sirf last updater ki email update hogi
+            vendorName: assignedVendorName,
+            addedByAdmin: currentAdminEmail,
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         };
 
