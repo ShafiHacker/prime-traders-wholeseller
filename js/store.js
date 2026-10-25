@@ -162,57 +162,39 @@ async function openProductModal(id) {
     let colorOptions = p.colors && p.colors.length > 0 ? p.colors.map(c => `<option value="${c}">${c}</option>`).join('') : '<option value="As Shown">As Shown</option>';
 
     let thumbsHtml = imagesList.map((img) => `
-        <img src="${img}" onclick="switchModalMainImage('${img}')" class="w-12 h-12 object-cover rounded-lg border border-slate-700 cursor-pointer hover:border-amber-400 transition">
+        <img src="${img}" onclick="switchModalMainImage('${img}')" class="w-14 h-14 object-cover rounded-lg border border-slate-700 cursor-pointer hover:border-amber-400 transition">
     `).join('');
 
-    let reviewsHtml = '';
-    try {
-        const revSnap = await database.collection('products').doc(id).collection('reviews').get();
-        if (!revSnap.empty) {
-            revSnap.forEach(rDoc => {
-                const rev = rDoc.data();
-                reviewsHtml += `
-                    <div class="bg-slate-950 p-2 rounded border border-slate-800 text-[11px]">
-                        <div class="flex justify-between text-amber-400 font-bold">
-                            <span>${rev.reviewerName || 'Buyer'}</span>
-                            <span>${'★'.repeat(rev.rating || 5)}</span>
-                        </div>
-                        <p class="text-slate-300 mt-0.5">${rev.comment}</p>
-                    </div>
-                `;
-            });
-        } else {
-            reviewsHtml = `<p class="text-slate-500 text-[10px]">No reviews yet. Be the first to review!</p>`;
+    // Ensure wrapper container allows full responsiveness and larger sizing (max-w-4xl)
+    const modalWrapper = document.getElementById('productModal');
+    if (modalWrapper) {
+        const innerBox = modalWrapper.querySelector('div > div') || modalWrapper.children[0];
+        if (innerBox) {
+            innerBox.className = "bg-slate-900 border border-slate-700 rounded-2xl p-4 md:p-6 max-w-4xl w-full mx-4 relative max-h-[90vh] overflow-y-auto space-y-4 shadow-2xl";
         }
-    } catch(e) {
-        reviewsHtml = `<p class="text-slate-500 text-[10px]">No reviews loaded.</p>`;
     }
 
     const modalHtml = `
-        <div class="flex justify-between items-start">
+        <div class="flex justify-between items-start border-b border-slate-800 pb-3">
             <div>
                 <div class="flex items-center gap-2">
-                    <span class="text-[10px] font-bold text-amber-400 bg-amber-950/50 border border-amber-500/30 px-2 py-0.5 rounded">${p.category}</span>
-                    ${p.weight && p.weight !== 'N/A' ? `<span class="text-[10px] font-bold text-slate-300 bg-slate-800 border border-slate-700 px-2 py-0.5 rounded"><i class="fa-solid fa-weight-hanging mr-1 text-amber-400"></i>${p.weight}</span>` : ''}
+                    <span class="text-[11px] font-bold text-amber-400 bg-amber-950/50 border border-amber-500/30 px-2.5 py-0.5 rounded">${p.category}</span>
+                    ${p.weight && p.weight !== 'N/A' ? `<span class="text-[11px] font-bold text-slate-300 bg-slate-800 border border-slate-700 px-2.5 py-0.5 rounded"><i class="fa-solid fa-weight-hanging mr-1 text-amber-400"></i>${p.weight}</span>` : ''}
                 </div>
-                <h2 class="text-sm font-bold text-white mt-1">${p.title}</h2>
+                <h2 class="text-base md:text-lg font-bold text-white mt-1.5">${p.title}</h2>
             </div>
-            <div class="text-right">
-                <div class="text-base font-black text-amber-300">PKR ${discPrice}</div>
-                <div class="text-xs text-slate-500 line-through font-bold">PKR ${origPrice}</div>
+            <div class="text-right flex items-center gap-3">
+                <div>
+                    <div class="text-lg md:text-xl font-black text-amber-300">PKR ${discPrice}</div>
+                    <div class="text-xs text-slate-500 line-through font-bold">PKR ${origPrice}</div>
+                </div>
+                <button onclick="closeProductModal()" class="text-slate-400 hover:text-white p-2 text-lg"><i class="fa-solid fa-xmark"></i></button>
             </div>
         </div>
 
-        <div class="bg-slate-950 border border-slate-800 p-2 rounded-lg flex justify-between items-center text-[11px]">
-            <span class="text-slate-300"><i class="fa-solid fa-cloud-arrow-down text-amber-400 mr-1"></i> Marketing Media Assets:</span>
-            <button onclick="downloadMediaAsset('${imagesList[0]}', '${p.title}')" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-2.5 py-1 rounded text-[10px]">
-                Download Image
-            </button>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="space-y-2">
-                <div class="bg-slate-950 rounded-xl overflow-hidden h-56 border border-slate-800">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+            <div class="space-y-3">
+                <div class="bg-slate-950 rounded-xl overflow-hidden h-72 md:h-80 border border-slate-800 shadow-inner">
                     <img id="modalMainImg" src="${imagesList[0]}" class="w-full h-full object-cover">
                 </div>
                 <div class="flex gap-2 overflow-x-auto pb-1">
@@ -220,86 +202,45 @@ async function openProductModal(id) {
                 </div>
             </div>
 
-            <div class="space-y-3">
-                <div class="grid grid-cols-3 gap-2">
+            <div class="space-y-4">
+                <div class="grid grid-cols-3 gap-3">
                     <div>
-                        <label class="block text-slate-400 text-[10px] font-bold mb-1">SIZE:</label>
-                        <select id="modalSelectSize" class="w-full p-2 bg-slate-950 border border-slate-700 rounded-lg text-white font-bold outline-none">
+                        <label class="block text-slate-400 text-xs font-bold mb-1">SIZE:</label>
+                        <select id="modalSelectSize" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-white text-xs font-bold outline-none">
                             ${sizeOptions}
                         </select>
                     </div>
                     <div>
-                        <label class="block text-slate-400 text-[10px] font-bold mb-1">COLOR:</label>
-                        <select id="modalSelectColor" class="w-full p-2 bg-slate-950 border border-slate-700 rounded-lg text-white font-bold outline-none">
+                        <label class="block text-slate-400 text-xs font-bold mb-1">COLOR:</label>
+                        <select id="modalSelectColor" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-white text-xs font-bold outline-none">
                             ${colorOptions}
                         </select>
                     </div>
                     <div>
-                        <label class="block text-slate-400 text-[10px] font-bold mb-1">QTY:</label>
-                        <input type="number" id="modalSelectQty" value="1" min="1" class="w-full p-2 bg-slate-950 border border-slate-700 rounded-lg text-white font-bold outline-none">
+                        <label class="block text-slate-400 text-xs font-bold mb-1">QTY:</label>
+                        <input type="number" id="modalSelectQty" value="1" min="1" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-white text-xs font-bold outline-none">
                     </div>
                 </div>
 
                 <div>
-                    <h3 class="font-bold text-slate-300 mb-1 text-[11px]">Description:</h3>
-                    <p class="text-[11px] text-slate-400 bg-slate-950 p-2.5 rounded-lg border border-slate-800 leading-relaxed whitespace-pre-line">${p.desc || 'No description provided.'}</p>
+                    <h3 class="font-bold text-slate-300 mb-1.5 text-xs">Description:</h3>
+                    <p class="text-xs text-slate-300 bg-slate-950 p-3.5 rounded-xl border border-slate-800 leading-relaxed whitespace-pre-line max-h-44 overflow-y-auto">${p.desc || 'No description provided.'}</p>
                 </div>
             </div>
         </div>
 
-        <div class="border-t border-slate-800 pt-3 space-y-2">
-            <h3 class="font-bold text-white text-xs"><i class="fa-solid fa-star text-amber-400 mr-1"></i> Customer Reviews & Ratings</h3>
-            <div class="space-y-1.5 max-h-28 overflow-y-auto">
-                ${reviewsHtml}
-            </div>
-
-            <form onsubmit="submitReview(event, '${id}')" class="flex gap-2 pt-1">
-                <input type="text" id="revName" placeholder="Your Name" required class="w-1/3 p-1.5 bg-slate-950 border border-slate-700 rounded text-[10px]">
-                <input type="text" id="revText" placeholder="Write a review..." required class="flex-1 p-1.5 bg-slate-950 border border-slate-700 rounded text-[10px]">
-                <button type="submit" class="bg-amber-500 text-slate-950 font-bold px-3 py-1 rounded text-[10px]">Submit</button>
-            </form>
-        </div>
-
-        <div class="pt-2 flex gap-3">
-            <button onclick="addSelectedToCart('${p.id}')" ${isOutOfStock ? 'disabled' : ''} class="flex-1 py-2.5 ${isOutOfStock ? 'bg-slate-800 text-slate-500 cursor-not-allowed' : 'bg-slate-800 hover:bg-slate-700 text-slate-200'} font-bold rounded-xl text-xs flex items-center justify-center gap-2">
+        <div class="border-t border-slate-800 pt-4 flex gap-3">
+            <button onclick="addSelectedToCart('${p.id}')" ${isOutOfStock ? 'disabled' : ''} class="flex-1 py-3 ${isOutOfStock ? 'bg-slate-800 text-slate-500 cursor-not-allowed' : 'bg-slate-800 hover:bg-slate-700 text-slate-200'} font-bold rounded-xl text-xs md:text-sm flex items-center justify-center gap-2 transition">
                 <i class="fa-solid fa-cart-plus text-amber-400"></i> ${isOutOfStock ? 'Out of Stock' : 'Add To Cart'}
             </button>
-            <button onclick="buySelectedNow('${p.id}')" ${isOutOfStock ? 'disabled' : ''} class="flex-1 py-2.5 ${isOutOfStock ? 'bg-slate-800 text-slate-500 cursor-not-allowed' : 'bg-amber-500 hover:bg-amber-600 text-slate-950'} font-black rounded-xl text-center text-xs shadow transition flex items-center justify-center gap-2">
+            <button onclick="buySelectedNow('${p.id}')" ${isOutOfStock ? 'disabled' : ''} class="flex-1 py-3 ${isOutOfStock ? 'bg-slate-800 text-slate-500 cursor-not-allowed' : 'bg-amber-500 hover:bg-amber-600 text-slate-950'} font-black rounded-xl text-center text-xs md:text-sm shadow transition flex items-center justify-center gap-2">
                 <i class="fa-solid fa-bolt"></i> Buy Now
             </button>
         </div>
     `;
 
     document.getElementById('modalContent').innerHTML = modalHtml;
-    document.getElementById('productModal').classList.remove('hidden');
-}
-
-function downloadMediaAsset(url, title) {
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${title.replace(/\s+/g, '_')}_media.png`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-}
-
-async function submitReview(e, prodId) {
-    e.preventDefault();
-    const name = document.getElementById('revName').value.trim();
-    const text = document.getElementById('revText').value.trim();
-
-    try {
-        await database.collection('products').doc(prodId).collection('reviews').add({
-            reviewerName: name,
-            comment: text,
-            rating: 5,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        alert("Thank you for your review! ⭐");
-        openProductModal(prodId);
-    } catch(err) {
-        alert("Error submitting review: " + err.message);
-    }
+    modalWrapper.classList.remove('hidden');
 }
 
 function switchModalMainImage(src) {
