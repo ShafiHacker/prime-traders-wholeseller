@@ -15,6 +15,15 @@ auth.onAuthStateChanged((user) => {
     }
 });
 
+function getVendorName(email) {
+    if (!email) return "Unknown";
+    const cleanEmail = email.toLowerCase().trim();
+    if (cleanEmail === "admin@primtraders.com") return "Shafi Ul Haq";
+    if (cleanEmail === "abubakr@primetraders.com") return "AbuBakar";
+    if (cleanEmail === "mkashan@primetraders.com") return "Muhammad Kashan";
+    return email;
+}
+
 function autoDetectCategory(titleText) {
     const title = titleText.toLowerCase();
     const select = document.getElementById('prodCategory');
@@ -97,7 +106,7 @@ function compressImageFile(file) {
                 const canvas = document.createElement('canvas');
                 let width = img.width;
                 let height = img.height;
-                const maxWidth = 450; // Optimized for blazing fast speed & crystal clear look
+                const maxWidth = 450;
 
                 if (width > maxWidth) {
                     height = Math.round((height * maxWidth) / width);
@@ -108,7 +117,6 @@ function compressImageFile(file) {
                 canvas.height = height;
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, width, height);
-                // Compressed to 60% quality - looks great, loads instantly
                 resolve(canvas.toDataURL('image/jpeg', 0.60));
             };
         };
@@ -163,6 +171,11 @@ async function handleSaveProduct(e) {
             videoBase64 = await convertFileToBase64(videoFile);
         }
 
+        let assignedVendorName = getVendorName(currentAdminEmail);
+        if (editingId && loadedProductsMap[editingId]) {
+            assignedVendorName = loadedProductsMap[editingId].vendorName || getVendorName(loadedProductsMap[editingId].addedByAdmin);
+        }
+
         const productData = {
             title, category, originalPrice, price, bulkPrice, bulkQty, stock,
             weight: weight || "N/A", sizes, colors, 
@@ -170,6 +183,7 @@ async function handleSaveProduct(e) {
             image: selectedImageFiles[0] || "",
             desc,
             isActive: true,
+            vendorName: assignedVendorName,
             addedByAdmin: currentAdminEmail,
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         };
@@ -182,6 +196,9 @@ async function handleSaveProduct(e) {
             const existingProd = loadedProductsMap[editingId];
             if (existingProd && existingProd.isActive !== undefined) {
                 productData.isActive = existingProd.isActive;
+            }
+            if (existingProd && existingProd.createdAt) {
+                productData.createdAt = existingProd.createdAt;
             }
             await db.collection('products').doc(editingId).update(productData);
             alert("Product updated successfully! 🔄");
@@ -358,7 +375,14 @@ function loadAdminProducts() {
                 : `<button onclick="toggleProductStatus('${id}', false)" class="bg-rose-950/80 text-rose-400 border border-emerald-500/30 px-2.5 py-1 rounded-full text-[10px] font-bold hover:bg-emerald-950 hover:text-emerald-400 transition" title="Click to Active">Inactive (Hidden)</button>`;
 
             const bulkInfo = p.bulkPrice && p.bulkQty ? `<div class="text-[10px] text-emerald-400">Bulk: PKR ${p.bulkPrice} (${p.bulkQty}+ pcs)</div>` : '';
-            const uploaderBadge = p.addedByAdmin ? `<span class="bg-amber-950/60 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded font-mono text-[10px]">${p.addedByAdmin}</span>` : `<span class="text-slate-500 text-[10px]">Unknown Admin</span>`;
+            
+            const displayVendor = p.vendorName || getVendorName(p.addedByAdmin);
+            const uploaderBadge = `
+                <div class="space-y-0.5">
+                    <span class="bg-amber-950/80 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded font-bold text-[11px] block text-center">👤 ${displayVendor}</span>
+                    <span class="text-slate-400 font-mono text-[9px] block text-center">Updated: ${p.addedByAdmin || 'N/A'}</span>
+                </div>
+            `;
 
             html += `
                 <tr class="hover:bg-slate-900/50 transition border-b border-slate-800 ${!isActive ? 'opacity-60 bg-slate-950/30' : ''}">
