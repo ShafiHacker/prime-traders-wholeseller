@@ -16,27 +16,23 @@ auth.onAuthStateChanged((user) => {
 });
 
 function getVendorName(email, existingVendorName) {
-    if (existingVendorName && 
-        !existingVendorName.includes("@") && 
-        existingVendorName !== "admin@primtraders.com" && 
-        existingVendorName !== "abubakr@primetraders.com" && 
-        existingVendorName !== "mkashan@primetraders.com") {
-        return existingVendorName;
-    }
-
-    const targetEmail = (email || existingVendorName || "").toLowerCase().trim();
+    const target = (existingVendorName || email || "").toLowerCase().trim();
     
-    if (targetEmail.includes("admin@primtraders.com") || targetEmail === "admin@primtraders.com") {
-        return "Shafi Ul Haq";
-    }
-    if (targetEmail.includes("abubakr@primetraders.com") || targetEmail === "abubakr@primetraders.com") {
+    if (target.includes("abubakr@primetraders.com")) {
         return "AbuBakar";
     }
-    if (targetEmail.includes("mkashan@primetraders.com") || targetEmail === "mkashan@primetraders.com") {
+    if (target.includes("mkashan@primetraders.com")) {
         return "Muhammad Kashan";
     }
+    if (target.includes("admin@primetraders.com") || target === "") {
+        return "Shafi Ul Haq";
+    }
     
-    return existingVendorName || email || "Shafi Ul Haq";
+    if (existingVendorName && !existingVendorName.includes("@")) {
+        return existingVendorName;
+    }
+    
+    return "Shafi Ul Haq";
 }
 
 function autoDetectCategory(titleText) {
@@ -189,7 +185,8 @@ async function handleSaveProduct(e) {
         let assignedVendorName = "";
         if (editingId && loadedProductsMap[editingId]) {
             const existing = loadedProductsMap[editingId];
-            assignedVendorName = existing.vendorName || getVendorName(existing.addedByAdmin) || getVendorName(currentAdminEmail);
+            let prevVendor = existing.vendorName || existing.addedByAdmin || currentAdminEmail;
+            assignedVendorName = getVendorName(prevVendor, existing.vendorName);
         } else {
             assignedVendorName = getVendorName(currentAdminEmail);
         }
