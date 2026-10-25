@@ -28,15 +28,6 @@ function getVendorName(email, existingVendorName) {
         return "Muhammad Kashan";
     }
     
-    return "Shafi Ul Haq"; // Default fallback
-}
-
-    const targetEmail = (email || existingVendorName || "").toLowerCase().trim();
-    
-    if (targetEmail.includes("admin@primtraders.com") || targetEmail === "admin@primtraders.com") return "Shafi Ul Haq";
-    if (targetEmail.includes("abubakr@primetraders.com") || targetEmail === "abubakr@primetraders.com") return "AbuBakar";
-    if (targetEmail.includes("mkashan@primetraders.com") || targetEmail === "mkashan@primetraders.com") return "Muhammad Kashan";
-    
     return existingVendorName || email || "Shafi Ul Haq";
 }
 
