@@ -406,8 +406,8 @@ function loadAdminProducts() {
             });
         }
     }, err => {
-        console.error("Error loading products:", err);
-        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-rose-400">Error loading products.</td></tr>`;
+        console.error("Error loading products, retrying...", err);
+        setTimeout(loadAdminProducts, 3000);
     });
 }
 
@@ -494,7 +494,8 @@ function loadAdminOrders() {
         });
         tbody.innerHTML = html;
     }, err => {
-        console.error("Orders error:", err);
+        console.error("Orders error, retrying...", err);
+        setTimeout(loadAdminOrders, 3000);
     });
 }
 
