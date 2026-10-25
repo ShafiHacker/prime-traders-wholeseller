@@ -16,14 +16,22 @@ auth.onAuthStateChanged((user) => {
 });
 
 function getVendorName(email, existingVendorName) {
-    if (existingVendorName && existingVendorName !== "admin@primtraders.com" && existingVendorName !== "abubakr@primetraders.com" && existingVendorName !== "mkashan@primetraders.com") {
+    // Agar database mein pehle se koi valid naam saved hai jo email nahi hai
+    if (existingVendorName && 
+        !existingVendorName.includes("@") && 
+        existingVendorName !== "admin@primtraders.com" && 
+        existingVendorName !== "abubakr@primetraders.com" && 
+        existingVendorName !== "mkashan@primetraders.com") {
         return existingVendorName;
     }
-    const targetEmail = (email || "").toLowerCase().trim();
-    if (targetEmail === "admin@primtraders.com") return "Shafi Ul Haq";
-    if (targetEmail === "abubakr@primetraders.com") return "AbuBakar";
-    if (targetEmail === "mkashan@primetraders.com") return "Muhammad Kashan";
-    return existingVendorName || email || "Unknown";
+
+    const targetEmail = (email || existingVendorName || "").toLowerCase().trim();
+    
+    if (targetEmail.includes("admin@primtraders.com") || targetEmail === "admin@primtraders.com") return "Shafi Ul Haq";
+    if (targetEmail.includes("abubakr@primetraders.com") || targetEmail === "abubakr@primetraders.com") return "AbuBakar";
+    if (targetEmail.includes("mkashan@primetraders.com") || targetEmail === "mkashan@primetraders.com") return "Muhammad Kashan";
+    
+    return existingVendorName || email || "Shafi Ul Haq";
 }
 
 function autoDetectCategory(titleText) {
