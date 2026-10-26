@@ -31,7 +31,6 @@ function listenToLiveCatalog() {
         filterProducts();
     }, err => {
         console.error("Firestore Error, retrying connection...", err);
-        // Auto-reconnect after 3 seconds if connection drops or goes stale
         setTimeout(listenToLiveCatalog, 3000);
     });
 }
@@ -165,7 +164,6 @@ async function openProductModal(id) {
         <img src="${img}" onclick="switchModalMainImage('${img}')" class="w-14 h-14 object-cover rounded-lg border border-slate-700 cursor-pointer hover:border-amber-400 transition">
     `).join('');
 
-    // Ensure wrapper container allows full responsiveness and larger sizing (max-w-4xl)
     const modalWrapper = document.getElementById('productModal');
     if (modalWrapper) {
         const innerBox = modalWrapper.querySelector('div > div') || modalWrapper.children[0];
@@ -335,11 +333,82 @@ function openCheckoutModal() {
         alert("Your cart is empty!");
         return;
     }
-    let total = 0;
-    cart.forEach(i => total += (calculateItemPrice(i) * i.qty));
-    document.getElementById('checkoutOrderTotal').innerText = `PKR ${total}`;
+    
+    setupCheckoutDCInputs();
+    calculateLiveDC();
     closeCartModal();
     document.getElementById('checkoutModal').classList.remove('hidden');
+}
+
+function setupCheckoutDCInputs() {
+    const form = document.querySelector('#checkoutModal form');
+    if (!form || document.getElementById('checkoutDCBreakdown')) return;
+
+    const container = document.createElement('div');
+    container.id = 'checkoutDCBreakdown';
+    container.className = "space-y-2 bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs";
+    container.innerHTML = `
+        <div class="grid grid-cols-2 gap-2">
+            <div>
+                <label class="block text-slate-400 font-bold mb-1">Estimated Distance (KM):</label>
+                <input type="number" id="custDistanceKm" value="5" min="1" oninput="calculateLiveDC()" class="w-full p-2 bg-slate-900 border border-slate-700 rounded-lg text-white font-bold outline-none">
+            </div>
+            <div>
+                <label class="block text-slate-400 font-bold mb-1">Total Weight (KG):</label>
+                <input type="number" id="custTotalWeightKg" value="0.5" step="0.1" min="0.1" oninput="calculateLiveDC()" class="w-full p-2 bg-slate-900 border border-slate-700 rounded-lg text-white font-bold outline-none">
+            </div>
+        </div>
+        <div class="border-t border-slate-800 pt-2 space-y-1 text-slate-300">
+            <div class="flex justify-between"><span>Subtotal:</span> <span id="summarySubtotal" class="font-bold text-white">PKR 0</span></div>
+            <div class="flex justify-between"><span>Delivery Charges (DC):</span> <span id="summaryDC" class="font-bold text-amber-400">PKR 0</span></div>
+            <div class="flex justify-between text-sm border-t border-slate-800 pt-1 font-black text-amber-300">
+                <span>Total COD Amount:</span> <span id="summaryFinalTotal">PKR 0</span>
+            </div>
+        </div>
+    `;
+    
+    const submitBtn = form.querySelector('button[type="submit"]') || form.lastElementChild;
+    form.insertBefore(container, submitBtn);
+}
+
+async function calculateLiveDC() {
+    let subtotal = 0;
+    cart.forEach(i => subtotal += (calculateItemPrice(i) * i.qty));
+
+    const cityInput = document.getElementById('custCity');
+    const cityName = cityInput ? cityInput.value.trim().toLowerCase() : 'karachi';
+    const distanceKm = parseFloat(document.getElementById('custDistanceKm')?.value) || 5;
+    const weightKg = parseFloat(document.getElementById('custTotalWeightKg')?.value) || 0.5;
+
+    let baseDC = 150, perKm = 20, perKg = 50, outerCityDC = 450;
+    try {
+        const doc = await database.collection('settings').doc('logistics').get();
+        if (doc.exists) {
+            const d = doc.data();
+            baseDC = d.baseDC || 150;
+            perKm = d.perKm || 20;
+            perKg = d.perKg || 50;
+            outerCityDC = d.outerCityDC || 450;
+        }
+    } catch (e) {
+        console.error("Error fetching DC rates:", e);
+    }
+
+    let calculatedDC = 0;
+    if (cityName.includes('karachi') || cityName === '') {
+        calculatedDC = baseDC + (distanceKm * perKm) + (weightKg * perKg);
+    } else {
+        calculatedDC = outerCityDC;
+    }
+
+    const finalTotal = subtotal + calculatedDC;
+
+    if (document.getElementById('summarySubtotal')) document.getElementById('summarySubtotal').innerText = `PKR ${subtotal}`;
+    if (document.getElementById('summaryDC')) document.getElementById('summaryDC').innerText = `PKR ${calculatedDC}`;
+    if (document.getElementById('summaryFinalTotal')) document.getElementById('summaryFinalTotal').innerText = `PKR ${finalTotal}`;
+    if (document.getElementById('checkoutOrderTotal')) document.getElementById('checkoutOrderTotal').innerText = `PKR ${finalTotal}`;
+
+    return { subtotal, calculatedDC, finalTotal };
 }
 
 function closeCheckoutModal() {
@@ -356,12 +425,13 @@ async function submitCheckoutOrder(e) {
     const phone = document.getElementById('custPhone').value.trim();
     const city = document.getElementById('custCity').value.trim();
     const address = document.getElementById('custAddress').value.trim();
+    const distanceKm = parseFloat(document.getElementById('custDistanceKm')?.value) || 5;
+    const weightKg = parseFloat(document.getElementById('custTotalWeightKg')?.value) || 0.5;
 
-    let total = 0;
-    cart.forEach(i => total += (calculateItemPrice(i) * i.qty));
+    const { subtotal, calculatedDC, finalTotal } = await calculateLiveDC();
 
     const autoTrackingId = Math.floor(1000000000 + Math.random() * 9000000000).toString();
-    const fullDestinationAddress = `${city} - ${address}`;
+    const fullDestinationAddress = `${city} - ${address} (Dist: ${distanceKm}km, Wt: ${weightKg}kg)`;
 
     try {
         await database.collection('parcels').add({
@@ -370,7 +440,11 @@ async function submitCheckoutOrder(e) {
             custPhone: phone,
             custCity: city,
             custAddress: fullDestinationAddress,
-            totalCod: total,
+            subtotal: subtotal,
+            deliveryCharges: calculatedDC,
+            totalCod: finalTotal,
+            weightKg: weightKg,
+            distanceKm: distanceKm,
             items: cart,
             status: 'Pending',
             approvedByAdmin: false,
@@ -381,13 +455,15 @@ async function submitCheckoutOrder(e) {
             customerName: name,
             customerPhone: phone,
             customerAddress: fullDestinationAddress,
+            subtotal: subtotal,
+            deliveryCharges: calculatedDC,
+            totalAmount: finalTotal,
             items: cart,
-            totalAmount: total,
             status: 'Pending',
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
 
-        alert(`Order successfully submit ho gaya hai! 🎉\nTracking ID: ${autoTrackingId}`);
+        alert(`Order successfully submit ho gaya hai! 🎉\nTracking ID: ${autoTrackingId}\nTotal COD (Incl. DC): PKR ${finalTotal}`);
         cart = [];
         updateCartBadge();
         closeCheckoutModal();
@@ -400,5 +476,4 @@ async function submitCheckoutOrder(e) {
     }
 }
 
-// Initialize Store safely with auto-retry
 listenToLiveCatalog();
