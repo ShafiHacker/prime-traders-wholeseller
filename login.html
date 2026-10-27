@@ -56,6 +56,25 @@
         </div>
     </div>
 
+    <!-- Custom Popup Alert Modal (Modern UI) -->
+    <div id="customAlertModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white text-slate-900 rounded-3xl p-6 max-w-sm w-full shadow-2xl text-center space-y-4 transform transition-all scale-95 animate-in fade-in zoom-in duration-200 border border-slate-100">
+            <!-- Dynamic Icon Container -->
+            <div id="customAlertIcon" class="flex justify-center text-emerald-500 text-5xl mb-2">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <!-- Title & Message -->
+            <h3 id="customAlertTitle" class="text-xl font-black uppercase tracking-wider text-slate-900">SUCCESS</h3>
+            <p id="customAlertMessage" class="text-xs text-slate-600 font-medium leading-relaxed px-2">
+                Your request has been processed successfully.
+            </p>
+            <!-- Action Button -->
+            <button id="customAlertBtn" onclick="closeCustomAlert()" class="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-xl text-xs tracking-wider uppercase shadow-lg transition transform active:scale-95">
+                Continue
+            </button>
+        </div>
+    </div>
+
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
@@ -102,6 +121,7 @@
             } catch (err) {
                 authMsg.innerText = "Invalid email or password.";
                 authMsg.classList.remove('hidden');
+                showCustomAlert("ERROR!", "Invalid email or password.", "error");
             }
         }
 
@@ -111,14 +131,14 @@
             const email = emailInput ? emailInput.value.trim() : "";
 
             if (!email) {
-                alert("Karam karke pehle upar 'Admin Email' wale khali box mein apna email enter karein, phir 'Forgot Password' par click karein!");
+                showCustomAlert("ERROR!", "Karam karke pehle upar 'Admin Email' wale khali box mein apna email enter karein, phir 'Forgot Password' par click karein!", "error");
                 if (emailInput) emailInput.focus();
                 return;
             }
 
             try {
                 await auth.sendPasswordResetEmail(email);
-                alert(`Password reset link successfully bhej diya gaya hai!\n\nKripya apna Gmail (${email}) check karein.`);
+                showCustomAlert("SUCCESS", `Password reset link successfully bhej diya gaya hai!\n\nKripya apna Gmail (${email}) check karein.`, "success");
             } catch (error) {
                 let errMsg = error.message;
                 if (error.code === 'auth/user-not-found') {
@@ -126,8 +146,49 @@
                 } else if (error.code === 'auth/invalid-email') {
                     errMsg = "Email address theek nahi hai.";
                 }
-                alert("Error: " + errMsg);
+                showCustomAlert("ERROR!", "Error: " + errMsg, "error");
             }
+        }
+
+        // Custom Modal Alert Function
+        function showCustomAlert(title, message, type = 'success', callback = null) {
+            const modal = document.getElementById('customAlertModal');
+            if (!modal) {
+                alert(message);
+                return;
+            }
+
+            const titleEl = document.getElementById('customAlertTitle');
+            const msgEl = document.getElementById('customAlertMessage');
+            const iconEl = document.getElementById('customAlertIcon');
+            const btnEl = document.getElementById('customAlertBtn');
+
+            titleEl.innerText = title || (type === 'success' ? 'SUCCESS' : 'ERROR!');
+            msgEl.innerText = message || '';
+
+            if (type === 'success') {
+                titleEl.className = "text-xl font-black uppercase tracking-wider text-emerald-600";
+                iconEl.className = "flex justify-center text-emerald-500 text-5xl mb-2";
+                iconEl.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+                btnEl.className = "w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-xl text-xs tracking-wider uppercase shadow-lg transition transform active:scale-95";
+            } else {
+                titleEl.className = "text-xl font-black uppercase tracking-wider text-rose-600";
+                iconEl.className = "flex justify-center text-rose-500 text-5xl mb-2";
+                iconEl.innerHTML = '<i class="fa-solid fa-circle-xmark"></i>';
+                btnEl.className = "w-full py-3 bg-rose-500 hover:bg-rose-600 text-white font-black rounded-xl text-xs tracking-wider uppercase shadow-lg transition transform active:scale-95";
+            }
+
+            btnEl.onclick = function() {
+                closeCustomAlert();
+                if (typeof callback === 'function') callback();
+            };
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeCustomAlert() {
+            const modal = document.getElementById('customAlertModal');
+            if (modal) modal.classList.add('hidden');
         }
     </script>
 </body>
