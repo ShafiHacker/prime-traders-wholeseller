@@ -145,17 +145,41 @@
                 </div>
 
                 <div>
-                    <label class="block text-slate-300 mb-1 font-semibold">Complete Delivery Address *</label>
-                    <textarea id="custAddress" rows="2" placeholder="House #, Street, Area, Landmark" required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white outline-none focus:border-amber-400"></textarea>
+                    <label class="block text-slate-300 mb-1 font-semibold">Complete Delivery Address & Area *</label>
+                    <textarea id="custAddress" oninput="autoCalculateCheckoutDC(this.value)" rows="2" placeholder="House #, Street, Korangi No. 5 / Gulshan..." required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white outline-none focus:border-amber-400"></textarea>
                 </div>
 
-                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex justify-between items-center">
-                    <div>
-                        <span class="text-[10px] text-slate-400 uppercase font-bold block">COD Amount</span>
-                        <span id="checkoutOrderTotal" class="text-amber-400 font-black text-sm">PKR 0</span>
+                <!-- Estimated Distance & Total Weight (Frozen / Readonly Display) -->
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                        <label class="block text-[10px] uppercase font-bold text-slate-400 mb-0.5"><i class="fa-solid fa-route mr-1 text-amber-400"></i> Auto Distance</label>
+                        <input type="text" id="estimatedDistanceDisplay" readonly value="5 km" class="w-full bg-transparent text-amber-400 font-black text-xs outline-none font-mono">
                     </div>
-                    <span class="text-[10px] text-emerald-400 bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded font-bold">Auto Tracking ID</span>
+                    <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                        <label class="block text-[10px] uppercase font-bold text-slate-400 mb-0.5"><i class="fa-solid fa-weight-scale mr-1 text-blue-400"></i> Weight</label>
+                        <input type="text" id="totalWeightDisplay" readonly value="0.5 KG" class="w-full bg-transparent text-blue-400 font-black text-xs outline-none font-mono">
+                    </div>
                 </div>
+
+                <!-- Clear Breakdown Summary Box -->
+                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-1.5 text-xs">
+                    <div class="flex justify-between text-slate-300">
+                        <span>Product Subtotal:</span>
+                        <span id="breakdownSubtotal" class="font-bold text-white">PKR 0</span>
+                    </div>
+                    <div class="flex justify-between text-slate-300">
+                        <span>Delivery Charges (DC):</span>
+                        <span id="breakdownDC" class="font-bold text-amber-400">PKR 0</span>
+                    </div>
+                    <div class="border-t border-slate-800/80 pt-1.5 flex justify-between items-center text-xs">
+                        <span class="font-black text-white uppercase tracking-wider">Total COD Amount:</span>
+                        <span id="breakdownTotalCod" class="font-black text-emerald-400 text-sm">PKR 0</span>
+                    </div>
+                </div>
+
+                <!-- Hidden Input Compatibility -->
+                <input type="hidden" id="checkoutOrderTotal" value="0">
+                <input type="hidden" id="delCharges" value="250">
 
                 <button type="submit" id="confirmOrderBtn" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black rounded-xl text-xs uppercase shadow-lg transition flex items-center justify-center gap-2">
                     <i class="fa-solid fa-paper-plane"></i> Submit Order to Main Dashboard
@@ -196,5 +220,92 @@
     <!-- External JS Scripts -->
     <script src="js/firebase-config.js"></script>
     <script src="js/store.js"></script>
+    <script>
+        // Karachi Areas Data Fallback
+        const karachiAreasData = [
+            { sNo: 1, area: "Korangi Industrial Area", km: 5 },
+            { sNo: 2, area: "Korangi No. 5", km: 7 },
+            { sNo: 3, area: "Landhi", km: 12 },
+            { sNo: 4, area: "Shah Faisal Colony", km: 12 },
+            { sNo: 5, area: "Malir", km: 16 },
+            { sNo: 6, area: "DHA Phase 2", km: 10 },
+            { sNo: 7, area: "DHA Phase 5", km: 14 },
+            { sNo: 8, area: "Clifton / Boat Basin", km: 17 },
+            { sNo: 9, area: "Saddar", km: 18 },
+            { sNo: 10, area: "I.I. Chundrigar Road", km: 21 },
+            { sNo: 11, area: "PECHS", km: 16 },
+            { sNo: 12, area: "Bahadurabad", km: 19 },
+            { sNo: 13, area: "Gulshan-e-Iqbal", km: 19 },
+            { sNo: 14, area: "Gulistan-e-Johar", km: 20 },
+            { sNo: 15, area: "University Road", km: 21 },
+            { sNo: 16, area: "NED University", km: 24 },
+            { sNo: 17, area: "North Nazimabad", km: 24 },
+            { sNo: 18, area: "Nazimabad", km: 22 },
+            { sNo: 19, area: "Liaquatabad", km: 21 },
+            { sNo: 20, area: "Federal B Area", km: 23 },
+            { sNo: 21, area: "New Karachi", km: 29 },
+            { sNo: 22, area: "Surjani Town", km: 33 },
+            { sNo: 23, area: "Orangi Town", km: 29 },
+            { sNo: 24, area: "SITE Area", km: 27 },
+            { sNo: 25, area: "Baldia Town", km: 32 },
+            { sNo: 26, area: "Keamari", km: 27 },
+            { sNo: 27, area: "Manora (to ferry/boat point)", km: 30 },
+            { sNo: 28, area: "Port Qasim", km: 24 },
+            { sNo: 29, area: "Bahria Town Karachi", km: 43 },
+            { sNo: 30, area: "Gadap / Super Highway side", km: 35 }
+        ];
+
+        // Auto Calculate Checkout DC based on Address and Cart Total Subtotal
+        async function autoCalculateCheckoutDC(addressText) {
+            try {
+                // Get subtotal from cart or global state
+                let subtotal = window.currentCartSubtotal || 0;
+                const subtotalEl = document.getElementById('breakdownSubtotal');
+                
+                const doc = await db.collection('settings').doc('km_dc_rates').get();
+                let rate = 11;
+                let areas = karachiAreasData;
+                if (doc.exists) {
+                    rate = doc.data().perKmRate || 11;
+                    areas = doc.data().areas || karachiAreasData;
+                }
+
+                let matchedKm = 5; // Default fallback
+                let lowerInput = (addressText || "").toLowerCase();
+
+                for (let item of areas) {
+                    if (lowerInput.includes(item.area.toLowerCase())) {
+                        matchedKm = item.km;
+                        break;
+                    }
+                }
+
+                let calculatedDC = matchedKm * rate;
+                let grandTotal = subtotal + calculatedDC;
+
+                // Update UI displays
+                document.getElementById('estimatedDistanceDisplay').value = matchedKm + " km";
+                if (subtotalEl) subtotalEl.innerText = "PKR " + subtotal.toLocaleString();
+                document.getElementById('breakdownDC').innerText = "PKR " + calculatedDC.toLocaleString() + ` (${matchedKm}km × ${rate})`;
+                document.getElementById('breakdownTotalCod').innerText = "PKR " + grandTotal.toLocaleString();
+                
+                // Update hidden inputs for backend submission
+                const delChargesInput = document.getElementById('delCharges');
+                const orderTotalInput = document.getElementById('checkoutOrderTotal');
+                const checkoutTotalDisplay = document.getElementById('checkoutOrderTotal');
+                
+                if (delChargesInput) delChargesInput.value = calculatedDC;
+                if (orderTotalInput) orderTotalInput.value = grandTotal;
+                
+                const displayTotal = document.getElementById('checkoutOrderTotal');
+                if (displayTotal && displayTotal.tagName !== 'INPUT') {
+                    displayTotal.innerText = "PKR " + grandTotal.toLocaleString();
+                }
+
+            } catch (e) {
+                console.error("Auto calculation error:", e);
+            }
+        }
+    </script>
 </body>
 </html>
