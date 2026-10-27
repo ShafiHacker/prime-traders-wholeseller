@@ -477,3 +477,49 @@ async function submitCheckoutOrder(e) {
 }
 
 listenToLiveCatalog();
+// Custom Modal Alert Function (Replaces native alert popups)
+function showCustomAlert(title, message, type = 'success', callback = null) {
+    const modal = document.getElementById('customAlertModal');
+    if (!modal) {
+        alert(message); // Fallback
+        return;
+    }
+
+    const titleEl = document.getElementById('customAlertTitle');
+    const msgEl = document.getElementById('customAlertMessage');
+    const iconEl = document.getElementById('customAlertIcon');
+    const btnEl = document.getElementById('customAlertBtn');
+
+    titleEl.innerText = title || (type === 'success' ? 'SUCCESS' : 'ERROR!');
+    msgEl.innerText = message || '';
+
+    if (type === 'success') {
+        titleEl.className = "text-xl font-black uppercase tracking-wider text-emerald-600";
+        iconEl.className = "flex justify-center text-emerald-500 text-5xl mb-2";
+        iconEl.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+        btnEl.className = "w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-xl text-xs tracking-wider uppercase shadow-lg transition transform active:scale-95";
+    } else {
+        titleEl.className = "text-xl font-black uppercase tracking-wider text-rose-600";
+        iconEl.className = "flex justify-center text-rose-500 text-5xl mb-2";
+        iconEl.innerHTML = '<i class="fa-solid fa-circle-xmark"></i>';
+        btnEl.className = "w-full py-3 bg-rose-500 hover:bg-rose-600 text-white font-black rounded-xl text-xs tracking-wider uppercase shadow-lg transition transform active:scale-95";
+    }
+
+    btnEl.onclick = function() {
+        closeCustomAlert();
+        if (typeof callback === 'function') callback();
+    };
+
+    modal.classList.remove('hidden');
+}
+
+function closeCustomAlert() {
+    const modal = document.getElementById('customAlertModal');
+    if (modal) modal.classList.add('hidden');
+}
+
+// Override default window alert to use our custom modal automatically
+window.alert = function(msg) {
+    let isError = msg.toLowerCase().includes('error') || msg.toLowerCase().includes('failed') || msg.toLowerCase().includes('enter');
+    showCustomAlert(isError ? "ERROR!" : "SUCCESS", msg, isError ? "error" : "success");
+};
