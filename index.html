@@ -7,16 +7,23 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Hide any injected duplicate distance/weight inputs or old summary coming from external JS */
-        #checkoutModal form > div:has(input[id*="Estimated Distance"]),
+        /* Permanently hide any old/duplicate distance/weight inputs or summary injected by external JS */
+        #checkoutModal form input#estimatedDistanceDisplay ~ *,
         #checkoutModal form input[id*="Estimated Distance"],
         #checkoutModal form input[id*="Total Weight"],
-        #checkoutModal form div:has(> input[value="0.5"]) {
+        #checkoutModal form div:has(> input[value="5"]),
+        #checkoutModal form div:has(> input[value="0.5"]),
+        #checkoutModal form div:has(> label:-webkit-any(:contains("Estimated Distance"), :contains("Total Weight"))) {
             display: none !important;
         }
-        /* Target old summary block if injected by JS */
-        #checkoutModal form .space-y-3:last-of-type {
+        /* Hide the old injected summary block specifically */
+        #checkoutModal form div.space-y-3,
+        #checkoutModal form div:has(> span:contains("Subtotal:")) {
             display: none !important;
+        }
+        /* Ensure our new custom boxes remain fully visible */
+        #checkoutModal form div.bg-slate-950 {
+            display: block !important;
         }
     </style>
 </head>
