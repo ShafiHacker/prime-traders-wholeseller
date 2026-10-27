@@ -463,13 +463,13 @@ async function submitCheckoutOrder(e) {
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
 
-        alert(`Order successfully submit ho gaya hai! 🎉\nTracking ID: ${autoTrackingId}\nTotal COD (Incl. DC): PKR ${finalTotal}`);
+        showCustomAlert("SUCCESS", `Order successfully submit ho gaya hai!\nTracking ID: ${autoTrackingId}\nTotal COD (Incl. DC): PKR ${finalTotal}`, "success");
         cart = [];
         updateCartBadge();
         closeCheckoutModal();
         document.getElementById('checkoutModal').querySelector('form').reset();
     } catch (err) {
-        alert("Error submitting order: " + err.message);
+        showCustomAlert("ERROR!", "Error submitting order: " + err.message, "error");
     } finally {
         btn.disabled = false;
         btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Submit Order to Main Dashboard`;
@@ -477,6 +477,7 @@ async function submitCheckoutOrder(e) {
 }
 
 listenToLiveCatalog();
+
 // Custom Modal Alert Function (Replaces native alert popups)
 function showCustomAlert(title, message, type = 'success', callback = null) {
     const modal = document.getElementById('customAlertModal');
