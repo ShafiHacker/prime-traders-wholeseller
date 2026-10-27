@@ -6,6 +6,19 @@
     <title>Catalog & Products | Prime Traders Wholeseller</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Hide any injected duplicate distance/weight inputs or old summary coming from external JS */
+        #checkoutModal form > div:has(input[id*="Estimated Distance"]),
+        #checkoutModal form input[id*="Estimated Distance"],
+        #checkoutModal form input[id*="Total Weight"],
+        #checkoutModal form div:has(> input[value="0.5"]) {
+            display: none !important;
+        }
+        /* Target old summary block if injected by JS */
+        #checkoutModal form .space-y-3:last-of-type {
+            display: none !important;
+        }
+    </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans">
 
@@ -136,7 +149,6 @@
                 <div class="grid grid-cols-2 gap-2">
                     <div>
                         <label class="block text-slate-300 mb-1 font-semibold">Phone / Mobile (11 Digits) *</label>
-                        <!-- Restricted to exactly 11 digits -->
                         <input type="tel" id="custPhone" placeholder="e.g. 03001234567" maxlength="11" pattern="[0-9]{11}" title="Mobile number must be exactly 11 digits" required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white outline-none focus:border-amber-400">
                     </div>
                     <div>
@@ -182,7 +194,6 @@
                 <input type="hidden" id="checkoutOrderTotal" value="0">
                 <input type="hidden" id="delCharges" value="250">
 
-                <!-- Bottom Submit Button -->
                 <button type="submit" id="confirmOrderBtn" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black rounded-xl text-xs uppercase shadow-lg transition flex items-center justify-center gap-2">
                     <i class="fa-solid fa-paper-plane"></i> Submit Order to Main Dashboard
                 </button>
@@ -214,7 +225,6 @@
             </p>
 
             <div class="space-y-2">
-                <!-- Download Evidence Button -->
                 <button id="downloadEvidenceBtn" onclick="window.print()" class="hidden w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-xl text-xs tracking-wider uppercase shadow transition flex items-center justify-center gap-1.5">
                     <i class="fa-solid fa-download"></i> Download / Print Evidence
                 </button>
@@ -277,9 +287,8 @@
                 let subtotal = window.currentCartSubtotal || 0;
                 const subtotalEl = document.getElementById('breakdownSubtotal');
                 
-                // Fetch logistics settings for weight rate & per km rate
                 const logisticsDoc = await db.collection('settings').doc('logistics').get();
-                let perKgRate = 50; // Default weight rate per KG
+                let perKgRate = 50;
                 if (logisticsDoc.exists) {
                     perKgRate = logisticsDoc.data().perKg || 50;
                 }
@@ -303,7 +312,7 @@
                 }
 
                 let distanceDC = matchedKm * rate;
-                let weightKg = 0.5; // Standard weight or from cart
+                let weightKg = 0.5;
                 let weightDC = weightKg * perKgRate;
                 let totalDC = distanceDC + weightDC;
 
