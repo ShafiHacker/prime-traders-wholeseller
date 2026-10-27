@@ -7,23 +7,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Permanently hide any old/duplicate distance/weight inputs or summary injected by external JS */
-        #checkoutModal form input#estimatedDistanceDisplay ~ *,
-        #checkoutModal form input[id*="Estimated Distance"],
-        #checkoutModal form input[id*="Total Weight"],
-        #checkoutModal form div:has(> input[value="5"]),
-        #checkoutModal form div:has(> input[value="0.5"]),
-        #checkoutModal form div:has(> label:-webkit-any(:contains("Estimated Distance"), :contains("Total Weight"))) {
+        /* Fallback CSS to hide any leftover duplicate inputs */
+        #checkoutModal form input[id*="Estimated Distance"] {
             display: none !important;
-        }
-        /* Hide the old injected summary block specifically */
-        #checkoutModal form div.space-y-3,
-        #checkoutModal form div:has(> span:contains("Subtotal:")) {
-            display: none !important;
-        }
-        /* Ensure our new custom boxes remain fully visible */
-        #checkoutModal form div.bg-slate-950 {
-            display: block !important;
         }
     </style>
 </head>
@@ -255,7 +241,27 @@
     <!-- External JS Scripts -->
     <script src="js/firebase-config.js"></script>
     <script src="js/store.js"></script>
+
+    <!-- DOM Observer Script to Purge Injected Duplicate Elements from store.js -->
     <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const observer = new MutationObserver(() => {
+                const modal = document.getElementById('checkoutModal');
+                if (modal) {
+                    const oldLabels = modal.querySelectorAll('label, span, div');
+                    oldLabels.forEach(el => {
+                        if (el.innerText && el.innerText.includes("Estimated Distance (KM)")) {
+                            let box = el.closest('div.bg-slate-950') || el.parentElement;
+                            if (box && !box.id && !box.querySelector('#breakdownSubtotal')) {
+                                box.remove();
+                            }
+                        }
+                    });
+                }
+            });
+            observer.observe(document.body, { childList: true, subtree: true });
+        });
+
         const karachiAreasData = [
             { sNo: 1, area: "Korangi Industrial Area", km: 5 },
             { sNo: 2, area: "Korangi No. 5", km: 7 },
