@@ -7,20 +7,40 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Cyberpunk Neon Gold Custom Glow & Borders */
+        .neon-gold-card {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(5, 5, 5, 0.98));
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.15), inset 0 0 10px rgba(245, 158, 11, 0.05);
+            transition: all 0.3s ease;
+        }
+        .neon-gold-card:hover {
+            border-color: rgba(245, 158, 11, 0.9);
+            box-shadow: 0 0 25px rgba(245, 158, 11, 0.35), inset 0 0 15px rgba(245, 158, 11, 0.1);
+        }
+        .neon-gold-btn {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+            transition: all 0.3s ease;
+        }
+        .neon-gold-btn:hover {
+            box-shadow: 0 0 25px rgba(245, 158, 11, 0.7);
+            filter: brightness(1.1);
+        }
         /* Fallback CSS to hide any leftover duplicate inputs */
         #checkoutModal form input[id*="Estimated Distance"] {
             display: none !important;
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans">
+<body class="bg-black text-slate-100 min-h-screen flex flex-col font-sans">
 
     <!-- Top Navigation Bar -->
-    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-40 backdrop-blur-md bg-opacity-95">
+    <header class="bg-slate-950 border-b border-amber-500/30 sticky top-0 z-40 backdrop-blur-md bg-opacity-95 shadow-lg shadow-amber-500/5">
         <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
             <!-- Brand Logo Header -->
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl overflow-hidden border border-amber-500/30 flex items-center justify-center bg-slate-950 shadow-md">
+                <div class="w-10 h-10 rounded-xl overflow-hidden border border-amber-500/50 flex items-center justify-center bg-black shadow-lg shadow-amber-500/20">
                     <img src="logo.png" alt="Prime Traders Logo" class="w-full h-full object-cover">
                 </div>
                 <div>
@@ -30,16 +50,16 @@
             </div>
 
             <div class="flex items-center gap-3">
-                <a href="index.html" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
+                <a href="index.html" class="bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 border border-slate-800">
                     <i class="fa-solid fa-house"></i> Home
                 </a>
                 
-                <button onclick="openCartModal()" class="relative bg-slate-800 hover:bg-slate-700 text-amber-400 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 border border-amber-500/30">
+                <button onclick="openCartModal()" class="relative bg-slate-900 hover:bg-slate-800 text-amber-400 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 border border-amber-500/40 shadow-sm shadow-amber-500/10">
                     <i class="fa-solid fa-cart-shopping"></i> Cart
-                    <span id="cartCountBadge" class="bg-amber-500 text-slate-950 rounded-full px-1.5 py-0.2 text-[10px] font-black">0</span>
+                    <span id="cartCountBadge" class="bg-amber-500 text-black rounded-full px-1.5 py-0.2 text-[10px] font-black">0</span>
                 </button>
 
-                <a href="login.html" class="bg-amber-500 hover:bg-amber-600 text-slate-950 px-3 py-1.5 rounded-lg text-xs font-black transition flex items-center gap-1.5 shadow-lg">
+                <a href="login.html" class="neon-gold-btn text-black px-3 py-1.5 rounded-lg text-xs font-black transition flex items-center gap-1.5">
                     <i class="fa-solid fa-user-shield"></i> Admin Login
                 </a>
             </div>
@@ -49,29 +69,29 @@
     <!-- Main Content Container -->
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-6 space-y-6">
 
-        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-4">
+        <div class="neon-gold-card p-6 rounded-2xl space-y-4">
             <div class="flex flex-col md:flex-row justify-between items-center gap-4">
                 <div>
-                    <h2 class="text-lg font-black text-white">Product Catalog & Wholesale Inventory</h2>
+                    <h2 class="text-lg font-black text-amber-400">Product Catalog & Wholesale Inventory</h2>
                     <p class="text-xs text-slate-400">Download media assets, check reviews, and place direct bulk orders.</p>
                 </div>
                 <div class="relative w-full md:w-80">
-                    <i class="fa-solid fa-search absolute left-3 top-3 text-slate-500 text-xs"></i>
-                    <input type="text" id="searchInput" oninput="filterProducts()" placeholder="Search products..." class="w-full pl-9 pr-4 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white outline-none focus:border-amber-400 transition">
+                    <i class="fa-solid fa-search absolute left-3 top-3 text-amber-500/70 text-xs"></i>
+                    <input type="text" id="searchInput" oninput="filterProducts()" placeholder="Search products..." class="w-full pl-9 pr-4 py-2 bg-black border border-amber-500/30 rounded-xl text-xs text-white outline-none focus:border-amber-400 transition">
                 </div>
             </div>
 
             <!-- Dynamic Category Filter Buttons Container -->
             <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs" id="categoryFilterContainer">
-                <button onclick="setCategory('All', this)" class="cat-btn px-4 py-1.5 rounded-lg font-bold bg-amber-500 text-slate-950 transition whitespace-nowrap shadow">All Products</button>
+                <button onclick="setCategory('All', this)" class="cat-btn px-4 py-1.5 rounded-lg font-bold neon-gold-btn text-black transition whitespace-nowrap">All Products</button>
             </div>
         </div>
 
         <!-- CATEGORIES OVERVIEW GRID -->
-        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-4">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <div class="neon-gold-card p-6 rounded-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-amber-500/20 pb-3">
                 <div>
-                    <h2 class="text-sm font-black text-white uppercase tracking-wider"><i class="fa-solid fa-layer-group text-amber-400 mr-1.5"></i> Categories Overview</h2>
+                    <h2 class="text-sm font-black text-amber-400 uppercase tracking-wider"><i class="fa-solid fa-layer-group text-amber-400 mr-1.5"></i> Categories Overview</h2>
                     <p class="text-[11px] text-slate-400">Total products count by category</p>
                 </div>
             </div>
@@ -91,9 +111,9 @@
     </main>
 
     <!-- Product Details Modal -->
-    <div id="productModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 space-y-4 shadow-2xl relative">
-            <button onclick="closeProductModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white bg-slate-800 p-2 rounded-full w-8 h-8 flex items-center justify-center text-xs z-10">
+    <div id="productModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="neon-gold-card rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 space-y-4 relative">
+            <button onclick="closeProductModal()" class="absolute top-4 right-4 text-amber-400 hover:text-white bg-slate-900 p-2 rounded-full w-8 h-8 flex items-center justify-center text-xs z-10 border border-amber-500/30">
                 <i class="fa-solid fa-xmark"></i>
             </button>
             <div id="modalContent" class="space-y-4 text-xs"></div>
@@ -101,37 +121,37 @@
     </div>
 
     <!-- Shopping Cart Modal -->
-    <div id="cartModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl relative">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                <h2 class="text-sm font-bold text-white uppercase"><i class="fa-solid fa-cart-shopping text-amber-400 mr-2"></i> Your Wholesale Cart</h2>
-                <button onclick="closeCartModal()" class="text-slate-400 hover:text-white bg-slate-800 p-1.5 rounded-full w-7 h-7 flex items-center justify-center text-xs">
+    <div id="cartModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="neon-gold-card rounded-2xl max-w-md w-full p-6 space-y-4 relative">
+            <div class="flex justify-between items-center border-b border-amber-500/20 pb-3">
+                <h2 class="text-sm font-bold text-amber-400 uppercase"><i class="fa-solid fa-cart-shopping text-amber-400 mr-2"></i> Your Wholesale Cart</h2>
+                <button onclick="closeCartModal()" class="text-amber-400 hover:text-white bg-slate-900 p-1.5 rounded-full w-7 h-7 flex items-center justify-center text-xs border border-amber-500/30">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
             
             <div id="cartItemsList" class="space-y-3 max-h-60 overflow-y-auto text-xs"></div>
 
-            <div class="border-t border-slate-800 pt-3 flex justify-between items-center text-xs font-bold">
+            <div class="border-t border-amber-500/20 pt-3 flex justify-between items-center text-xs font-bold">
                 <span class="text-slate-300">Total Amount:</span>
                 <span id="cartTotalAmount" class="text-amber-400 font-black text-sm">PKR 0</span>
             </div>
 
-            <button onclick="openCheckoutModal()" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black rounded-xl text-xs uppercase shadow-lg transition">
+            <button onclick="openCheckoutModal()" class="w-full py-3 neon-gold-btn text-black font-black rounded-xl text-xs uppercase shadow-lg transition">
                 Proceed to Checkout
             </button>
         </div>
     </div>
 
     <!-- Direct Logistics Dashboard Checkout Modal Form -->
-    <div id="checkoutModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+    <div id="checkoutModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="neon-gold-card rounded-2xl max-w-md w-full p-6 space-y-4 relative max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-amber-500/20 pb-3">
                 <div>
-                    <h2 class="text-sm font-black text-white uppercase"><i class="fa-solid fa-truck-fast text-amber-400 mr-2"></i> Express Logistics Checkout</h2>
+                    <h2 class="text-sm font-black text-amber-400 uppercase"><i class="fa-solid fa-truck-fast text-amber-400 mr-2"></i> Express Logistics Checkout</h2>
                     <p class="text-[10px] text-slate-400">Order goes straight to Main Dashboard (`admin.html`)</p>
                 </div>
-                <button onclick="closeCheckoutModal()" class="text-slate-400 hover:text-white bg-slate-800 p-1.5 rounded-full w-7 h-7 flex items-center justify-center text-xs">
+                <button onclick="closeCheckoutModal()" class="text-amber-400 hover:text-white bg-slate-900 p-1.5 rounded-full w-7 h-7 flex items-center justify-center text-xs border border-amber-500/30">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
@@ -139,39 +159,39 @@
             <form onsubmit="submitCheckoutOrder(event)" class="space-y-3 text-xs">
                 <div>
                     <label class="block text-slate-300 mb-1 font-semibold">Full Name *</label>
-                    <input type="text" id="custName" placeholder="e.g. Ali Khan" required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white outline-none focus:border-amber-400">
+                    <input type="text" id="custName" placeholder="e.g. Ali Khan" required class="w-full p-2.5 bg-black border border-amber-500/30 rounded-xl text-white outline-none focus:border-amber-400">
                 </div>
 
                 <div class="grid grid-cols-2 gap-2">
                     <div>
                         <label class="block text-slate-300 mb-1 font-semibold">Phone / Mobile (11 Digits) *</label>
-                        <input type="tel" id="custPhone" placeholder="e.g. 03001234567" maxlength="11" pattern="[0-9]{11}" title="Mobile number must be exactly 11 digits" required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white outline-none focus:border-amber-400">
+                        <input type="tel" id="custPhone" placeholder="e.g. 03001234567" maxlength="11" pattern="[0-9]{11}" title="Mobile number must be exactly 11 digits" required class="w-full p-2.5 bg-black border border-amber-500/30 rounded-xl text-white outline-none focus:border-amber-400">
                     </div>
                     <div>
                         <label class="block text-slate-300 mb-1 font-semibold">Destination City *</label>
-                        <input type="text" id="custCity" placeholder="e.g. Karachi" required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white outline-none focus:border-amber-400">
+                        <input type="text" id="custCity" placeholder="e.g. Karachi" required class="w-full p-2.5 bg-black border border-amber-500/30 rounded-xl text-white outline-none focus:border-amber-400">
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-slate-300 mb-1 font-semibold">Complete Delivery Address & Area *</label>
-                    <textarea id="custAddress" oninput="autoCalculateCheckoutDC(this.value)" rows="2" placeholder="House #, Street, Korangi No. 5 / Gulshan..." required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white outline-none focus:border-amber-400"></textarea>
+                    <textarea id="custAddress" oninput="autoCalculateCheckoutDC(this.value)" rows="2" placeholder="House #, Street, Korangi No. 5 / Gulshan..." required class="w-full p-2.5 bg-black border border-amber-500/30 rounded-xl text-white outline-none focus:border-amber-400"></textarea>
                 </div>
 
                 <!-- Clean Single Frozen Distance & Weight Row -->
                 <div class="grid grid-cols-2 gap-2">
-                    <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
-                        <label class="block text-[10px] uppercase font-bold text-slate-400 mb-0.5"><i class="fa-solid fa-route mr-1 text-amber-400"></i> Estimated Distance</label>
+                    <div class="bg-black p-2.5 rounded-xl border border-amber-500/20">
+                        <label class="block text-[10px] uppercase font-bold text-amber-400 mb-0.5"><i class="fa-solid fa-route mr-1 text-amber-400"></i> Estimated Distance</label>
                         <input type="text" id="estimatedDistanceDisplay" readonly value="5 km" class="w-full bg-transparent text-amber-400 font-black text-xs outline-none font-mono">
                     </div>
-                    <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
-                        <label class="block text-[10px] uppercase font-bold text-slate-400 mb-0.5"><i class="fa-solid fa-weight-scale mr-1 text-blue-400"></i> Total Weight</label>
+                    <div class="bg-black p-2.5 rounded-xl border border-amber-500/20">
+                        <label class="block text-[10px] uppercase font-bold text-blue-400 mb-0.5"><i class="fa-solid fa-weight-scale mr-1 text-blue-400"></i> Total Weight</label>
                         <input type="text" id="totalWeightDisplay" readonly value="0.5 KG" class="w-full bg-transparent text-blue-400 font-black text-xs outline-none font-mono">
                     </div>
                 </div>
 
                 <!-- Clear Breakdown Summary Box with Weight Charges & Bottom Total Amount -->
-                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-1.5 text-xs">
+                <div class="bg-black p-3 rounded-xl border border-amber-500/30 space-y-1.5 text-xs">
                     <div class="flex justify-between text-slate-300">
                         <span>Product Subtotal:</span>
                         <span id="breakdownSubtotal" class="font-bold text-white">PKR 0</span>
@@ -180,7 +200,7 @@
                         <span>Delivery Charges (DC + Weight):</span>
                         <span id="breakdownDC" class="font-bold text-amber-400">PKR 0</span>
                     </div>
-                    <div class="border-t border-slate-800/80 pt-1.5 flex justify-between items-center text-xs">
+                    <div class="border-t border-amber-500/20 pt-1.5 flex justify-between items-center text-xs">
                         <span class="font-black text-white uppercase tracking-wider">Total COD Amount:</span>
                         <span id="breakdownTotalCod" class="font-black text-emerald-400 text-sm">PKR 0</span>
                     </div>
@@ -190,7 +210,7 @@
                 <input type="hidden" id="checkoutOrderTotal" value="0">
                 <input type="hidden" id="delCharges" value="250">
 
-                <button type="submit" id="confirmOrderBtn" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black rounded-xl text-xs uppercase shadow-lg transition flex items-center justify-center gap-2">
+                <button type="submit" id="confirmOrderBtn" class="w-full py-3 neon-gold-btn text-black font-black rounded-xl text-xs uppercase shadow-lg transition flex items-center justify-center gap-2">
                     <i class="fa-solid fa-paper-plane"></i> Submit Order to Main Dashboard
                 </button>
             </form>
@@ -198,25 +218,25 @@
     </div>
 
     <!-- Enhanced Custom Popup Alert Modal with Detailed Receipt & Download Evidence Button -->
-    <div id="customAlertModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-white text-slate-900 rounded-3xl p-6 max-w-sm w-full shadow-2xl text-center space-y-4 transform transition-all scale-95 border border-slate-100">
-            <div id="customAlertIcon" class="flex justify-center text-emerald-500 text-5xl mb-2">
+    <div id="customAlertModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-slate-900 text-slate-100 border border-amber-500/40 rounded-3xl p-6 max-w-sm w-full shadow-2xl text-center space-y-4">
+            <div id="customAlertIcon" class="flex justify-center text-amber-400 text-5xl mb-2">
                 <i class="fa-solid fa-circle-check"></i>
             </div>
-            <h3 id="customAlertTitle" class="text-xl font-black uppercase tracking-wider text-slate-900">SUCCESS</h3>
+            <h3 id="customAlertTitle" class="text-xl font-black uppercase tracking-wider text-amber-400">SUCCESS</h3>
             
             <!-- Detailed Separated Breakdown Inside Popup for Customer Evidence -->
-            <div id="popupDetailsBox" class="text-left bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-1.5 hidden font-medium">
-                <div class="flex justify-between"><span>Tracking ID:</span> <span id="popTrackId" class="font-mono font-bold text-amber-600">-</span></div>
+            <div id="popupDetailsBox" class="text-left bg-black p-3 rounded-xl border border-amber-500/20 text-xs space-y-1.5 hidden font-medium">
+                <div class="flex justify-between"><span>Tracking ID:</span> <span id="popTrackId" class="font-mono font-bold text-amber-400">-</span></div>
                 <div class="flex justify-between"><span>Customer:</span> <span id="popCustName" class="font-bold">-</span></div>
                 <div class="flex justify-between"><span>Phone:</span> <span id="popPhone" class="font-bold">-</span></div>
                 <div class="flex justify-between"><span>Address:</span> <span id="popAddress" class="font-bold truncate max-w-[180px]">-</span></div>
-                <div class="border-t border-slate-200 pt-1 flex justify-between"><span>Subtotal:</span> <span id="popSubtotal" class="font-bold">PKR 0</span></div>
-                <div class="flex justify-between"><span>Delivery Charges:</span> <span id="popDC" class="font-bold text-amber-600">PKR 0</span></div>
-                <div class="border-t border-slate-200 pt-1 flex justify-between text-sm font-black text-slate-900"><span>Total COD:</span> <span id="popTotal" class="text-emerald-600">PKR 0</span></div>
+                <div class="border-t border-amber-500/20 pt-1 flex justify-between"><span>Subtotal:</span> <span id="popSubtotal" class="font-bold">PKR 0</span></div>
+                <div class="flex justify-between"><span>Delivery Charges:</span> <span id="popDC" class="font-bold text-amber-400">PKR 0</span></div>
+                <div class="border-t border-amber-500/20 pt-1 flex justify-between text-sm font-black"><span>Total COD:</span> <span id="popTotal" class="text-emerald-400">PKR 0</span></div>
             </div>
 
-            <p id="customAlertMessage" class="text-xs text-slate-600 font-medium leading-relaxed px-2">
+            <p id="customAlertMessage" class="text-xs text-slate-300 font-medium leading-relaxed px-2">
                 Your request has been processed successfully.
             </p>
 
@@ -224,7 +244,7 @@
                 <button id="downloadEvidenceBtn" onclick="window.print()" class="hidden w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-xl text-xs tracking-wider uppercase shadow transition flex items-center justify-center gap-1.5">
                     <i class="fa-solid fa-download"></i> Download / Print Evidence
                 </button>
-                <button id="customAlertBtn" onclick="closeCustomAlert()" class="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-xl text-xs tracking-wider uppercase shadow-lg transition transform active:scale-95">
+                <button id="customAlertBtn" onclick="closeCustomAlert()" class="w-full py-3 neon-gold-btn text-black font-black rounded-xl text-xs tracking-wider uppercase shadow-lg transition">
                     Continue
                 </button>
             </div>
@@ -232,7 +252,7 @@
     </div>
 
     <!-- Footer -->
-    <footer class="bg-slate-900 border-t border-slate-800 py-4 text-center text-slate-500 text-[11px]">
+    <footer class="bg-slate-950 border-t border-amber-500/20 py-4 text-center text-slate-500 text-[11px]">
         © 2026 Prime Traders Wholeseller Portal. All rights reserved.
     </footer>
 
