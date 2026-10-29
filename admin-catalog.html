@@ -6,24 +6,47 @@
     <title>Admin Catalog & Orders | Prime Traders Wholeseller</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .neon-gold-card {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(5, 5, 5, 0.98));
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.15), inset 0 0 10px rgba(245, 158, 11, 0.05);
+            transition: all 0.3s ease;
+        }
+        .neon-gold-card:hover {
+            border-color: rgba(245, 158, 11, 0.9);
+            box-shadow: 0 0 25px rgba(245, 158, 11, 0.35);
+        }
+        .neon-gold-btn {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+            transition: all 0.3s ease;
+        }
+        .neon-gold-btn:hover {
+            box-shadow: 0 0 25px rgba(245, 158, 11, 0.7);
+            filter: brightness(1.1);
+        }
+    </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans">
+<body class="bg-black text-slate-100 min-h-screen flex flex-col font-sans">
 
     <!-- Top Admin Header -->
-    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-40">
+    <header class="bg-slate-950 border-b border-amber-500/30 sticky top-0 z-40 backdrop-blur-md bg-opacity-95 shadow-lg shadow-amber-500/5">
         <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="bg-amber-500 text-slate-950 font-black text-xl w-10 h-10 flex items-center justify-center rounded-xl shadow-lg">P</div>
+                <div class="w-10 h-10 rounded-xl overflow-hidden border border-amber-500/50 flex items-center justify-center bg-black shadow-lg shadow-amber-500/20">
+                    <img src="logo.png" alt="Prime Traders Logo" class="w-full h-full object-cover">
+                </div>
                 <div>
-                    <h1 class="text-base font-black tracking-wider uppercase text-white">ADMIN MANAGEMENT PANEL</h1>
-                    <p id="adminUserDisplay" class="text-[10px] text-amber-400 font-bold uppercase tracking-widest">Checking admin session...</p>
+                    <h1 class="text-xs font-black tracking-wider uppercase text-white leading-none">ADMIN MANAGEMENT PANEL</h1>
+                    <p id="adminUserDisplay" class="text-[8px] text-amber-400 font-bold uppercase tracking-widest mt-1">Checking admin session...</p>
                 </div>
             </div>
             <div class="flex items-center gap-3">
-                <a href="index.html" target="_blank" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-globe"></i> View Public Catalog
+                <a href="index.html" target="_blank" class="bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 border border-amber-500/30">
+                    <i class="fa-solid fa-globe text-amber-400"></i> View Public Catalog
                 </a>
-                <button onclick="handleLogout()" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition">
+                <button onclick="handleLogout()" class="bg-rose-600/20 hover:bg-rose-600/40 text-rose-400 border border-rose-500/40 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
                     <i class="fa-solid fa-right-from-bracket"></i> Logout
                 </button>
             </div>
@@ -35,73 +58,73 @@
 
         <!-- LOGISTICS & COURIER PERFORMANCE DASHBOARD CARDS -->
         <div class="space-y-3">
-            <h2 class="text-xs font-black text-slate-400 uppercase tracking-wider flex items-center gap-2">
+            <h2 class="text-xs font-black text-amber-400 uppercase tracking-wider flex items-center gap-2">
                 <i class="fa-solid fa-chart-line text-amber-400"></i> Logistics & Courier Performance Summary
             </h2>
             
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
                 <!-- Total Parcels -->
-                <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-2xl shadow flex items-center justify-between">
+                <div class="neon-gold-card p-3.5 rounded-2xl flex items-center justify-between">
                     <div>
                         <span class="text-[10px] font-bold text-slate-400 block uppercase">Total Parcels</span>
                         <span id="statTotalParcels" class="text-lg font-black text-white">0</span>
                     </div>
-                    <div class="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center">
+                    <div class="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-400 flex items-center justify-center">
                         <i class="fa-solid fa-box"></i>
                     </div>
                 </div>
 
                 <!-- Delivered -->
-                <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-2xl shadow flex items-center justify-between">
+                <div class="neon-gold-card p-3.5 rounded-2xl flex items-center justify-between">
                     <div>
                         <span class="text-[10px] font-bold text-slate-400 block uppercase">Delivered</span>
                         <span id="statDelivered" class="text-lg font-black text-emerald-400">0</span>
                     </div>
-                    <div class="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center">
+                    <div class="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center">
                         <i class="fa-solid fa-circle-check"></i>
                     </div>
                 </div>
 
                 <!-- Processing -->
-                <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-2xl shadow flex items-center justify-between">
+                <div class="neon-gold-card p-3.5 rounded-2xl flex items-center justify-between">
                     <div>
                         <span class="text-[10px] font-bold text-slate-400 block uppercase">Processing</span>
                         <span id="statProcessing" class="text-lg font-black text-amber-300">0</span>
                     </div>
-                    <div class="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 flex items-center justify-center">
+                    <div class="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 flex items-center justify-center">
                         <i class="fa-solid fa-clock"></i>
                     </div>
                 </div>
 
                 <!-- Returned -->
-                <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-2xl shadow flex items-center justify-between">
+                <div class="neon-gold-card p-3.5 rounded-2xl flex items-center justify-between">
                     <div>
                         <span class="text-[10px] font-bold text-slate-400 block uppercase">Returned</span>
                         <span id="statReturned" class="text-lg font-black text-rose-400">0</span>
                     </div>
-                    <div class="w-9 h-9 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 flex items-center justify-center">
+                    <div class="w-9 h-9 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-400 flex items-center justify-center">
                         <i class="fa-solid fa-rotate-left"></i>
                     </div>
                 </div>
 
                 <!-- Total COD Value -->
-                <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-2xl shadow flex items-center justify-between">
+                <div class="neon-gold-card p-3.5 rounded-2xl flex items-center justify-between">
                     <div>
                         <span class="text-[10px] font-bold text-slate-400 block uppercase">COD Value</span>
                         <span id="statTotalCod" class="text-xs font-black text-amber-400">PKR 0</span>
                     </div>
-                    <div class="w-9 h-9 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 flex items-center justify-center">
+                    <div class="w-9 h-9 rounded-xl bg-cyan-500/20 border border-cyan-500/40 text-cyan-400 flex items-center justify-center">
                         <i class="fa-solid fa-wallet"></i>
                     </div>
                 </div>
 
                 <!-- Success Rate -->
-                <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-2xl shadow flex items-center justify-between">
+                <div class="neon-gold-card p-3.5 rounded-2xl flex items-center justify-between">
                     <div>
                         <span class="text-[10px] font-bold text-slate-400 block uppercase">Success Rate</span>
                         <span id="statSuccessRate" class="text-sm font-black text-emerald-400">0%</span>
                     </div>
-                    <div class="w-9 h-9 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 flex items-center justify-center">
+                    <div class="w-9 h-9 rounded-xl bg-indigo-500/20 border border-indigo-500/40 text-indigo-400 flex items-center justify-center">
                         <i class="fa-solid fa-percent"></i>
                     </div>
                 </div>
@@ -109,10 +132,10 @@
         </div>
 
         <!-- CATEGORIES GRID VIEW -->
-        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-4">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <div class="neon-gold-card p-6 rounded-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-amber-500/20 pb-3">
                 <div>
-                    <h2 class="text-sm font-black text-white uppercase tracking-wider"><i class="fa-solid fa-layer-group text-amber-400 mr-1.5"></i> Categories Overview</h2>
+                    <h2 class="text-sm font-black text-amber-400 uppercase tracking-wider"><i class="fa-solid fa-layer-group text-amber-400 mr-1.5"></i> Categories Overview</h2>
                     <p class="text-[11px] text-slate-400">Total products count by category</p>
                 </div>
             </div>
@@ -124,12 +147,12 @@
         </div>
 
         <!-- Add / Edit Product Form Box -->
-        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-4">
-            <div class="border-b border-slate-800 pb-3 flex justify-between items-center">
-                <h2 id="formHeading" class="text-sm font-black text-white uppercase tracking-wider"><i class="fa-solid fa-plus-circle text-amber-400 mr-1.5"></i> Add New Wholesale Product</h2>
+        <div class="neon-gold-card p-6 rounded-2xl space-y-4">
+            <div class="border-b border-amber-500/20 pb-3 flex justify-between items-center">
+                <h2 id="formHeading" class="text-sm font-black text-amber-400 uppercase tracking-wider"><i class="fa-solid fa-plus-circle text-amber-400 mr-1.5"></i> Add New Wholesale Product</h2>
                 <div class="flex items-center gap-2">
-                    <button id="cancelEditBtn" onclick="resetProductForm()" class="hidden bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded text-[10px] font-bold transition">Cancel Edit</button>
-                    <span class="text-[10px] text-amber-400 bg-amber-950/50 border border-amber-500/30 px-2 py-0.5 rounded font-bold">Admin Central Access</span>
+                    <button id="cancelEditBtn" onclick="resetProductForm()" class="hidden bg-slate-900 hover:bg-slate-800 text-slate-300 px-2.5 py-1 rounded text-[10px] font-bold transition border border-amber-500/30">Cancel Edit</button>
+                    <span class="text-[10px] text-amber-400 bg-amber-500/20 border border-amber-500/30 px-2 py-0.5 rounded font-bold">Admin Central Access</span>
                 </div>
             </div>
 
@@ -139,11 +162,11 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-slate-300 mb-1 font-semibold">Product Title *</label>
-                        <input type="text" id="prodTitle" oninput="autoDetectCategory(this.value)" placeholder="e.g. Spice Rack Organizer Metal" required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-white outline-none focus:border-amber-400">
+                        <input type="text" id="prodTitle" oninput="autoDetectCategory(this.value)" placeholder="e.g. Spice Rack Organizer Metal" required class="w-full p-2.5 bg-black border border-amber-500/30 rounded-lg text-white outline-none focus:border-amber-400">
                     </div>
                     <div>
                         <label class="block text-slate-300 mb-1 font-semibold">Category *</label>
-                        <select id="prodCategory" onchange="handleCategoryChange(this.value)" required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-white outline-none focus:border-amber-400">
+                        <select id="prodCategory" onchange="handleCategoryChange(this.value)" required class="w-full p-2.5 bg-black border border-amber-500/30 rounded-lg text-white outline-none focus:border-amber-400">
                             <option value="Fashion & Apparel">Fashion & Apparel</option>
                             <option value="Electronics & Gadgets">Electronics & Gadgets</option>
                             <option value="Home & Kitchen">Home & Kitchen</option>
@@ -157,7 +180,7 @@
 
                         <!-- Custom Category Input Box -->
                         <div id="customCategoryBox" class="hidden mt-2">
-                            <input type="text" id="customCategoryInput" placeholder="Type new category name..." class="w-full p-2 bg-slate-950 border border-amber-500/50 rounded-lg text-amber-300 outline-none">
+                            <input type="text" id="customCategoryInput" placeholder="Type new category name..." class="w-full p-2 bg-black border border-amber-500/50 rounded-lg text-amber-300 outline-none">
                         </div>
                     </div>
                 </div>
@@ -166,19 +189,19 @@
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div>
                         <label class="block text-slate-300 mb-1 font-semibold">Original Retail Price (PKR) *</label>
-                        <input type="number" id="prodOriginalPrice" placeholder="3000" required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-white outline-none focus:border-amber-400">
+                        <input type="number" id="prodOriginalPrice" placeholder="3000" required class="w-full p-2.5 bg-black border border-amber-500/30 rounded-lg text-white outline-none focus:border-amber-400">
                     </div>
                     <div>
                         <label class="block text-slate-300 mb-1 font-semibold">Single Piece Price (PKR) *</label>
-                        <input type="number" id="prodPrice" placeholder="1999" required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-white outline-none focus:border-amber-400">
+                        <input type="number" id="prodPrice" placeholder="1999" required class="w-full p-2.5 bg-black border border-amber-500/30 rounded-lg text-white outline-none focus:border-amber-400">
                     </div>
                     <div>
                         <label class="block text-slate-300 mb-1 font-semibold">Bulk Rate (PKR) (Optional)</label>
-                        <input type="number" id="prodBulkPrice" placeholder="1500" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-white outline-none focus:border-amber-400">
+                        <input type="number" id="prodBulkPrice" placeholder="1500" class="w-full p-2.5 bg-black border border-amber-500/30 rounded-lg text-white outline-none focus:border-amber-400">
                     </div>
                     <div>
                         <label class="block text-slate-300 mb-1 font-semibold">Min Qty for Bulk (Optional)</label>
-                        <input type="number" id="prodBulkQty" placeholder="10" min="2" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-white outline-none focus:border-amber-400">
+                        <input type="number" id="prodBulkQty" placeholder="10" min="2" class="w-full p-2.5 bg-black border border-amber-500/30 rounded-lg text-white outline-none focus:border-amber-400">
                     </div>
                 </div>
 
@@ -186,11 +209,11 @@
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div>
                         <label class="block text-slate-300 mb-1 font-semibold">Stock Quantity *</label>
-                        <input type="number" id="prodStock" placeholder="50" required min="0" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-white outline-none focus:border-amber-400">
+                        <input type="number" id="prodStock" placeholder="50" required min="0" class="w-full p-2.5 bg-black border border-amber-500/30 rounded-lg text-white outline-none focus:border-amber-400">
                     </div>
                     <div>
                         <label class="block text-slate-300 mb-1 font-semibold">Available Sizes</label>
-                        <div class="flex items-center gap-1.5 bg-slate-950 p-2 rounded-lg border border-slate-700 text-slate-300 overflow-x-auto text-[11px]">
+                        <div class="flex items-center gap-1.5 bg-black p-2 rounded-lg border border-amber-500/30 text-slate-300 overflow-x-auto text-[11px]">
                             <label class="flex items-center gap-0.5 cursor-pointer"><input type="checkbox" name="prodSize" value="S" class="accent-amber-500"> S</label>
                             <label class="flex items-center gap-0.5 cursor-pointer"><input type="checkbox" name="prodSize" value="M" class="accent-amber-500"> M</label>
                             <label class="flex items-center gap-0.5 cursor-pointer"><input type="checkbox" name="prodSize" value="L" class="accent-amber-500"> L</label>
@@ -200,11 +223,11 @@
                     </div>
                     <div>
                         <label class="block text-slate-300 mb-1 font-semibold">Colors (Comma Separated)</label>
-                        <input type="text" id="prodColors" placeholder="e.g. Red, Black" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-white outline-none focus:border-amber-400">
+                        <input type="text" id="prodColors" placeholder="e.g. Red, Black" class="w-full p-2.5 bg-black border border-amber-500/30 rounded-lg text-white outline-none focus:border-amber-400">
                     </div>
                     <div>
                         <label class="block text-slate-300 mb-1 font-semibold">Product Weight (Optional)</label>
-                        <input type="text" id="prodWeight" placeholder="e.g. 0.5 kg" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-white outline-none focus:border-amber-400">
+                        <input type="text" id="prodWeight" placeholder="e.g. 0.5 kg" class="w-full p-2.5 bg-black border border-amber-500/30 rounded-lg text-white outline-none focus:border-amber-400">
                     </div>
                 </div>
 
@@ -212,36 +235,36 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-slate-300 mb-1 font-semibold">Upload Pictures * (Laptop & Mobile Compatible)</label>
-                        <input type="file" id="prodImageFiles" accept="image/*" multiple onchange="handleImageSelection(event)" class="w-full p-2 bg-slate-950 border border-slate-700 rounded-lg text-slate-300 text-xs file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-600">
+                        <input type="file" id="prodImageFiles" accept="image/*" multiple onchange="handleImageSelection(event)" class="w-full p-2 bg-black border border-amber-500/30 rounded-lg text-slate-300 text-xs file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-amber-500 file:text-black hover:file:bg-amber-600">
                         <p class="text-[10px] text-amber-400 mt-1">Individual pictures can be removed using the cross (×) button.</p>
                         <div id="imagePreviewContainer" class="flex flex-wrap gap-2 mt-3"></div>
                     </div>
 
                     <div>
                         <label class="block text-slate-300 mb-1 font-semibold">Upload Video Demo (Optional)</label>
-                        <input type="file" id="prodVideoFile" accept="video/*" class="w-full p-2 bg-slate-950 border border-slate-700 rounded-lg text-slate-300 text-xs file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-600">
+                        <input type="file" id="prodVideoFile" accept="video/*" class="w-full p-2 bg-black border border-amber-500/30 rounded-lg text-slate-300 text-xs file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-amber-500 file:text-black hover:file:bg-amber-600">
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-slate-300 mb-1 font-semibold">Product Description & Specs *</label>
-                    <textarea id="prodDesc" rows="3" placeholder="Enter product specifications, material details, etc." required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-white outline-none focus:border-amber-400"></textarea>
+                    <textarea id="prodDesc" rows="3" placeholder="Enter product specifications, material details, etc." required class="w-full p-2.5 bg-black border border-amber-500/30 rounded-lg text-white outline-none focus:border-amber-400"></textarea>
                 </div>
 
-                <button type="submit" id="submitBtn" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black rounded-lg text-xs uppercase shadow-lg transition tracking-wider">
+                <button type="submit" id="submitBtn" class="w-full py-3 neon-gold-btn text-black font-black rounded-lg text-xs uppercase shadow-lg transition tracking-wider">
                     Publish Product to Central Catalog
                 </button>
             </form>
         </div>
 
         <!-- Orders Management Panel -->
-        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-4">
-            <h2 class="text-sm font-black text-white uppercase tracking-wider"><i class="fa-solid fa-cart-flatbed text-amber-400 mr-1.5"></i> Received Orders Management</h2>
+        <div class="neon-gold-card p-6 rounded-2xl space-y-4">
+            <h2 class="text-sm font-black text-amber-400 uppercase tracking-wider"><i class="fa-solid fa-cart-flatbed text-amber-400 mr-1.5"></i> Received Orders Management</h2>
             
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr class="border-b border-slate-800 text-slate-400 text-[11px] uppercase">
+                        <tr class="border-b border-amber-500/20 text-slate-400 text-[11px] uppercase">
                             <th class="p-3">Customer & Details</th>
                             <th class="p-3">Items & Quantities</th>
                             <th class="p-3">Total Amount</th>
@@ -249,7 +272,7 @@
                             <th class="p-3 text-center">Action</th>
                         </tr>
                     </thead>
-                    <tbody id="adminOrdersTableBody" class="divide-y divide-slate-800 text-xs">
+                    <tbody id="adminOrdersTableBody" class="divide-y divide-amber-500/10 text-xs">
                         <tr><td colspan="5" class="p-4 text-center text-slate-500">Loading orders...</td></tr>
                     </tbody>
                 </table>
@@ -257,13 +280,13 @@
         </div>
 
         <!-- Management Table for Products (WITH VENDOR COLUMN) -->
-        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-4">
-            <h2 class="text-sm font-black text-white uppercase tracking-wider"><i class="fa-solid fa-boxes-stacked text-amber-400 mr-1.5"></i> Manage Central Products (Edit, Delete & Active/Inactive)</h2>
+        <div class="neon-gold-card p-6 rounded-2xl space-y-4">
+            <h2 class="text-sm font-black text-amber-400 uppercase tracking-wider"><i class="fa-solid fa-boxes-stacked text-amber-400 mr-1.5"></i> Manage Central Products (Edit, Delete & Active/Inactive)</h2>
             
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr class="border-b border-slate-800 text-slate-400 text-[11px] uppercase">
+                        <tr class="border-b border-amber-500/20 text-slate-400 text-[11px] uppercase">
                             <th class="p-3">Images</th>
                             <th class="p-3">Title & Category</th>
                             <th class="p-3">Vendor</th>
@@ -273,7 +296,7 @@
                             <th class="p-3 text-center">Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="adminProductTableBody" class="divide-y divide-slate-800 text-xs">
+                    <tbody id="adminProductTableBody" class="divide-y divide-amber-500/10 text-xs">
                         <tr><td colspan="7" class="p-4 text-center text-slate-500">Loading products...</td></tr>
                     </tbody>
                 </table>
@@ -281,6 +304,11 @@
         </div>
 
     </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-950 border-t border-amber-500/20 py-4 text-center text-slate-500 text-[11px]">
+        &copy; 2026 Prime Traders Wholeseller Portal. All Rights Reserved.
+    </footer>
 
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
