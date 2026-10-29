@@ -6,30 +6,51 @@
     <title>Admin Login | Prime Traders Wholeseller</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .neon-gold-card {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(5, 5, 5, 0.98));
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            box-shadow: 0 0 25px rgba(245, 158, 11, 0.2), inset 0 0 15px rgba(245, 158, 11, 0.05);
+        }
+        .neon-gold-btn {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+            transition: all 0.3s ease;
+        }
+        .neon-gold-btn:hover {
+            box-shadow: 0 0 25px rgba(245, 158, 11, 0.7);
+            filter: brightness(1.1);
+        }
+    </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center font-sans p-4">
+<body class="bg-black text-slate-100 min-h-screen flex items-center justify-center font-sans p-4">
 
-    <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl max-w-md w-full shadow-2xl space-y-6 text-center">
+    <div class="neon-gold-card p-8 rounded-3xl max-w-md w-full shadow-2xl space-y-6 text-center relative">
         
-        <div class="inline-flex bg-amber-500 text-slate-950 font-black text-2xl w-14 h-14 items-center justify-center rounded-2xl shadow-lg mb-1">
-            P
+        <!-- Logo Image Container -->
+        <div class="w-16 h-16 rounded-2xl overflow-hidden border border-amber-500/50 flex items-center justify-center bg-black mx-auto shadow-lg shadow-amber-500/20 mb-1">
+            <img src="logo.png" alt="Prime Traders Logo" class="w-full h-full object-cover">
         </div>
         <div>
-            <h1 class="text-lg font-black tracking-wider uppercase text-white">ADMIN / VENDOR PORTAL</h1>
+            <h1 class="text-lg font-black tracking-wider uppercase text-amber-400">ADMIN / VENDOR PORTAL</h1>
             <p class="text-xs text-slate-400 mt-1">Sign in to manage wholesale catalog inventory</p>
         </div>
 
         <form onsubmit="handleLogin(event)" class="space-y-4 text-left text-xs">
             <div>
-                <label class="block text-slate-300 font-bold mb-1">Admin Email</label>
-                <input type="email" id="loginEmail" required placeholder="admin@primetraders.com" class="w-full p-3 bg-slate-950 border border-slate-700 rounded-xl text-white outline-none focus:border-amber-400 transition">
+                <label class="block text-slate-300 font-bold mb-1 uppercase tracking-wider text-[10px]">Admin Email</label>
+                <div class="relative">
+                    <i class="fa-solid fa-envelope absolute left-3.5 top-3.5 text-amber-500/70"></i>
+                    <input type="email" id="loginEmail" required placeholder="admin@primetraders.com" class="w-full pl-10 pr-3 py-3 bg-black border border-amber-500/30 rounded-xl text-white outline-none focus:border-amber-400 transition">
+                </div>
             </div>
 
             <div>
-                <label class="block text-slate-300 font-bold mb-1">Password</label>
+                <label class="block text-slate-300 font-bold mb-1 uppercase tracking-wider text-[10px]">Password</label>
                 <div class="relative">
-                    <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full p-3 pr-10 bg-slate-950 border border-slate-700 rounded-xl text-white outline-none focus:border-amber-400 transition">
-                    <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-3.5 text-slate-400 hover:text-white text-sm">
+                    <i class="fa-solid fa-lock absolute left-3.5 top-3.5 text-amber-500/70"></i>
+                    <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full pl-10 pr-10 py-3 bg-black border border-amber-500/30 rounded-xl text-white outline-none focus:border-amber-400 transition">
+                    <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-3.5 text-amber-500/70 hover:text-white text-sm">
                         <i id="togglePasswordIcon" class="fa-solid fa-eye"></i>
                     </button>
                 </div>
@@ -37,7 +58,7 @@
 
             <div id="authMsg" class="hidden text-rose-400 text-center font-bold"></div>
 
-            <button type="submit" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black rounded-xl text-xs uppercase shadow-lg transition tracking-wide">
+            <button type="submit" class="w-full py-3.5 neon-gold-btn text-black font-black rounded-xl text-xs uppercase shadow-lg transition tracking-wide">
                 Secure Login
             </button>
 
@@ -49,27 +70,27 @@
             </div>
         </form>
 
-        <div class="border-t border-slate-800 pt-4">
-            <a href="index.html" class="text-slate-400 hover:text-white text-xs font-bold transition flex items-center justify-center gap-1.5">
+        <div class="border-t border-amber-500/20 pt-4">
+            <a href="index.html" class="text-slate-400 hover:text-amber-400 text-xs font-bold transition flex items-center justify-center gap-1.5">
                 <i class="fa-solid fa-arrow-left text-amber-400"></i> Back to Public Catalog
             </a>
         </div>
     </div>
 
     <!-- Custom Popup Alert Modal (Modern UI) -->
-    <div id="customAlertModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-white text-slate-900 rounded-3xl p-6 max-w-sm w-full shadow-2xl text-center space-y-4 transform transition-all scale-95 animate-in fade-in zoom-in duration-200 border border-slate-100">
+    <div id="customAlertModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-slate-900 text-slate-100 border border-amber-500/40 rounded-3xl p-6 max-w-sm w-full shadow-2xl text-center space-y-4">
             <!-- Dynamic Icon Container -->
-            <div id="customAlertIcon" class="flex justify-center text-emerald-500 text-5xl mb-2">
+            <div id="customAlertIcon" class="flex justify-center text-amber-400 text-5xl mb-2">
                 <i class="fa-solid fa-circle-check"></i>
             </div>
             <!-- Title & Message -->
-            <h3 id="customAlertTitle" class="text-xl font-black uppercase tracking-wider text-slate-900">SUCCESS</h3>
-            <p id="customAlertMessage" class="text-xs text-slate-600 font-medium leading-relaxed px-2">
+            <h3 id="customAlertTitle" class="text-xl font-black uppercase tracking-wider text-amber-400">SUCCESS</h3>
+            <p id="customAlertMessage" class="text-xs text-slate-300 font-medium leading-relaxed px-2">
                 Your request has been processed successfully.
             </p>
             <!-- Action Button -->
-            <button id="customAlertBtn" onclick="closeCustomAlert()" class="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-xl text-xs tracking-wider uppercase shadow-lg transition transform active:scale-95">
+            <button id="customAlertBtn" onclick="closeCustomAlert()" class="w-full py-3 neon-gold-btn text-black font-black rounded-xl text-xs tracking-wider uppercase shadow-lg transition">
                 Continue
             </button>
         </div>
@@ -117,7 +138,7 @@
 
             try {
                 await auth.signInWithEmailAndPassword(email, pass);
-                window.location.href = "admin-catalog.html";
+                window.location.href = "admin.html";
             } catch (err) {
                 authMsg.innerText = "Invalid email or password.";
                 authMsg.classList.remove('hidden');
@@ -167,15 +188,15 @@
             msgEl.innerText = message || '';
 
             if (type === 'success') {
-                titleEl.className = "text-xl font-black uppercase tracking-wider text-emerald-600";
-                iconEl.className = "flex justify-center text-emerald-500 text-5xl mb-2";
+                titleEl.className = "text-xl font-black uppercase tracking-wider text-amber-400";
+                iconEl.className = "flex justify-center text-amber-400 text-5xl mb-2";
                 iconEl.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
-                btnEl.className = "w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-xl text-xs tracking-wider uppercase shadow-lg transition transform active:scale-95";
+                btnEl.className = "w-full py-3 neon-gold-btn text-black font-black rounded-xl text-xs tracking-wider uppercase shadow-lg transition";
             } else {
-                titleEl.className = "text-xl font-black uppercase tracking-wider text-rose-600";
-                iconEl.className = "flex justify-center text-rose-500 text-5xl mb-2";
+                titleEl.className = "text-xl font-black uppercase tracking-wider text-rose-400";
+                iconEl.className = "flex justify-center text-rose-400 text-5xl mb-2";
                 iconEl.innerHTML = '<i class="fa-solid fa-circle-xmark"></i>';
-                btnEl.className = "w-full py-3 bg-rose-500 hover:bg-rose-600 text-white font-black rounded-xl text-xs tracking-wider uppercase shadow-lg transition transform active:scale-95";
+                btnEl.className = "w-full py-3 bg-rose-600 hover:bg-rose-700 text-white font-black rounded-xl text-xs tracking-wider uppercase shadow-lg transition";
             }
 
             btnEl.onclick = function() {
