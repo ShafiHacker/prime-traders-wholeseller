@@ -591,18 +591,50 @@ async function deleteAdminOrder(id) {
 function handleLogout() {
     auth.signOut().then(() => window.location.href = "login.html");
 }
-// Banner Image Selection & Base64 Converter Helper
+// Banner Image Helper & Save Function
 let adminBannerBase64 = "";
 
 document.addEventListener("DOMContentLoaded", () => {
-    const bannerFileInput = document.querySelector('input[type="file"]'); // Jo banner ke liye use ho raha hai
-    if (bannerFileInput) {
-        bannerFileInput.addEventListener('change', async function(e) {
+    const bannerInput = document.querySelector('input[type="file"]');
+    if (bannerInput) {
+        bannerInput.addEventListener('change', async function(e) {
             const file = e.target.files[0];
             if (file) {
                 adminBannerBase64 = await convertFileToBase64(file);
-                console.log("Banner image converted and ready to save!");
             }
         });
     }
 });
+
+async function saveHeroBannerSettings() {
+    const targetLinkInput = document.getElementById('bannerTargetLink');
+    const targetLink = targetLinkInput ? targetLinkInput.value.trim() || '#productGrid' : '#productGrid';
+
+    if (!adminBannerBase64) {
+        alert("Karam farma kar pehle banner image attach karein!");
+        return;
+    }
+
+    const saveBtn = event.target.closest('button') || document.querySelector('button[onclick="saveHeroBannerSettings()"]');
+    if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Saving Banner...`;
+    }
+
+    try {
+        await db.collection('settings').doc('hero_banner').set({
+            imageUrl: adminBannerBase64,
+            targetLink: targetLink,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        alert("Main Hero Banner kamyabi ke sath save aur live publish ho gaya hai! 🎉");
+    } catch (error) {
+        console.error("Banner save error:", error);
+        alert("Error saving banner: " + error.message);
+    } finally {
+        if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-1.5"></i> SAVE & PUBLISH BANNER`;
+        }
+    }
+}
