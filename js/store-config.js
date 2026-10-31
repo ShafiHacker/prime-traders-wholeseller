@@ -185,13 +185,17 @@ function filterProducts() {
 function renderProducts(products) {
     const grid = document.getElementById('productGrid');
     if (!grid) return;
-    if (!products.length) {
+
+    // FEATURED PRODUCTS: Sirf pehle 5 products show honge homepage par
+    const limitedProducts = products.slice(0, 5);
+
+    if (!limitedProducts.length) {
         grid.innerHTML = `<div class="col-span-full text-center text-slate-400 py-12">No products found.</div>`;
         return;
     }
 
     let html = '';
-    products.forEach(p => {
+    limitedProducts.forEach(p => {
         const discPrice = p.price || 0;
         const origPrice = p.originalPrice || Math.round(discPrice * 1.3);
         const mainImg = (p.images && p.images.length > 0) ? p.images[0] : (p.image || 'https://via.placeholder.com/400');
@@ -222,6 +226,13 @@ function renderProducts(products) {
                     </button>
                     <button onclick="openProductModal('${p.id}')" ${isOutOfStock ? 'disabled' : ''} class="w-full py-2 ${isOutOfStock ? 'bg-slate-800 text-slate-500 cursor-not-allowed' : 'bg-amber-500 hover:bg-amber-600 text-slate-950'} font-black rounded-lg text-[11px] text-center transition flex items-center justify-center gap-1 shadow">
                         <i class="fa-solid fa-bolt"></i> Buy Now
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+    grid.innerHTML = html;
+} Buy Now
                     </button>
                 </div>
             </div>
