@@ -128,11 +128,38 @@ function compressImageFile(file) {
     });
 }
 
-async function handleSaveProduct(e) {
-    e.preventDefault();
-    if (selectedImageFiles.length === 0) {
-        alert("Please attach at least 1 image file.");
+async function saveHeroBannerSettings() {
+    const targetLinkInput = document.getElementById('bannerTargetLink');
+    const targetLink = targetLinkInput ? targetLinkInput.value.trim() || '#productGrid' : '#productGrid';
+
+    if (!adminBannerBase64) {
+        alert("Karam farma kar pehle banner image attach karein!");
         return;
+    }
+
+    const saveBtn = event.target.closest('button') || document.querySelector('button[onclick="saveHeroBannerSettings()"]');
+    if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Saving Banner...`;
+    }
+
+    try {
+        await db.collection('settings').doc('hero_banner').set({
+            imageUrl: adminBannerBase64,
+            targetLink: targetLink,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        alert("Main Hero Banner kamyabi ke sath save aur live publish ho gaya hai! 🎉");
+    } catch (error) {
+        console.error("Banner save error:", error);
+        alert("Error saving banner: " + error.message);
+    } finally {
+        if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-1.5"></i> SAVE & PUBLISH BANNER`;
+        }
+    }
+}
     }
 
     const btn = document.getElementById('submitBtn');
