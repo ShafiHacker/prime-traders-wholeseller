@@ -131,6 +131,38 @@
             </div>
         </div>
 
+        <!-- HERO BANNER SETUP MANAGEMENT SECTION -->
+        <div class="neon-gold-card p-6 rounded-2xl space-y-4">
+            <h3 class="text-sm font-black text-amber-400 uppercase tracking-wider flex items-center gap-2">
+                <i class="fa-solid fa-image"></i> Main Hero Banner Setup
+            </h3>
+            <p class="text-xs text-slate-400">Upload high quality banner image & set redirect target link.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                <!-- Direct File Attachment -->
+                <div>
+                    <label class="block text-slate-300 font-bold mb-1">Attach Banner Image *</label>
+                    <input type="file" id="bannerFileInput" accept="image/*" class="w-full bg-black border border-amber-500/30 rounded-xl p-2 text-slate-300 file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-amber-500 file:text-black hover:file:bg-amber-400">
+                </div>
+
+                <!-- Shop Now Target Link -->
+                <div>
+                    <label class="block text-slate-300 font-bold mb-1">Shop Now Click Target Link *</label>
+                    <input type="text" id="bannerTargetLink" placeholder="e.g. #productGrid or https://primewholesale.shop/deals" class="w-full bg-black border border-amber-500/30 rounded-xl p-2.5 text-white outline-none focus:border-amber-400">
+                </div>
+            </div>
+
+            <!-- Preview Box -->
+            <div id="bannerPreviewContainer" class="hidden mt-3 p-3 bg-black rounded-xl border border-amber-500/20">
+                <p class="text-[10px] text-amber-400 font-bold uppercase mb-1">Uploaded Image Preview:</p>
+                <img id="bannerPreviewImg" src="" alt="Banner Preview" class="max-h-40 rounded-lg object-cover">
+            </div>
+
+            <button onclick="saveHeroBannerSettings()" class="neon-gold-btn text-black font-black px-5 py-2.5 rounded-xl text-xs uppercase shadow-lg flex items-center gap-2">
+                <i class="fa-solid fa-cloud-arrow-up"></i> Save & Publish Banner
+            </button>
+        </div>
+
         <!-- CATEGORIES GRID VIEW -->
         <div class="neon-gold-card p-6 rounded-2xl space-y-4">
             <div class="flex justify-between items-center border-b border-amber-500/20 pb-3">
