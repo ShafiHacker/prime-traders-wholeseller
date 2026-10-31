@@ -7,31 +7,29 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Cyberpunk Neon Gold Custom Glow & Borders */
-        .neon-gold-card {
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(5, 5, 5, 0.98));
-            border: 1px solid rgba(245, 158, 11, 0.4);
-            box-shadow: 0 0 15px rgba(245, 158, 11, 0.15), inset 0 0 10px rgba(245, 158, 11, 0.05);
-            transition: all 0.3s ease;
-        }
-        .neon-gold-card:hover {
-            border-color: rgba(245, 158, 11, 0.9);
-            box-shadow: 0 0 25px rgba(245, 158, 11, 0.35), inset 0 0 15px rgba(245, 158, 11, 0.1);
-        }
-        .neon-gold-btn {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
-            transition: all 0.3s ease;
-        }
-        .neon-gold-btn:hover {
-            box-shadow: 0 0 25px rgba(245, 158, 11, 0.7);
-            filter: brightness(1.1);
-        }
-        /* Fallback CSS to hide any leftover duplicate inputs */
-        #checkoutModal form input[id*="Estimated Distance"] {
-            display: none !important;
-        }
-    </style>
+    /* Neon Blue Cyberpunk Theme */
+    .neon-gold-card {
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(5, 5, 5, 0.98));
+        border: 1px solid rgba(0, 229, 255, 0.4);
+        box-shadow: 0 0 15px rgba(0, 229, 255, 0.15), inset 0 0 10px rgba(0, 229, 255, 0.05);
+        transition: all 0.3s ease;
+    }
+    .neon-gold-card:hover {
+        border-color: rgba(0, 229, 255, 0.9);
+        box-shadow: 0 0 25px rgba(0, 229, 255, 0.35);
+    }
+    .neon-gold-btn {
+        background: linear-gradient(135deg, #00e5ff, #00b0ff);
+        box-shadow: 0 0 15px rgba(0, 229, 255, 0.4);
+        transition: all 0.3s ease;
+        color: #000 !important;
+        font-weight: 900;
+    }
+    .neon-gold-btn:hover {
+        box-shadow: 0 0 25px rgba(0, 229, 255, 0.7);
+        filter: brightness(1.1);
+    }
+</style>
 </head>
 <body class="bg-black text-slate-100 min-h-screen flex flex-col font-sans">
 
