@@ -591,3 +591,18 @@ async function deleteAdminOrder(id) {
 function handleLogout() {
     auth.signOut().then(() => window.location.href = "login.html");
 }
+// Banner Image Selection & Base64 Converter Helper
+let adminBannerBase64 = "";
+
+document.addEventListener("DOMContentLoaded", () => {
+    const bannerFileInput = document.querySelector('input[type="file"]'); // Jo banner ke liye use ho raha hai
+    if (bannerFileInput) {
+        bannerFileInput.addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                adminBannerBase64 = await convertFileToBase64(file);
+                console.log("Banner image converted and ready to save!");
+            }
+        });
+    }
+});
