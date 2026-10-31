@@ -48,31 +48,36 @@ function renderPublicCategoriesGrid(productsList) {
         counts[cat] = (counts[cat] || 0) + 1;
     });
 
+    function renderPublicCategoriesGrid(productsList) {
     const grid = document.getElementById('publicCategoriesGrid');
     if (!grid) return;
 
-    const defaultCats = [
-        'Fashion & Apparel', 
-        'Electronics & Gadgets', 
-        'Home & Kitchen', 
-        'Accessories',
-        'Computer Accessories',
-        'Dish Set',
-        'Medicine Box',
-        'Mobile Accessories'
+    const popularCategories = [
+        { name: 'Home & Kitchen', img: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=300&q=80', count: '10 products' },
+        { name: 'Electronics & Gadgets', img: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=300&q=80', count: '7 products' },
+        { name: 'Beauty & Personal Care', img: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=300&q=80', count: '5 products' },
+        { name: 'Toys & Baby Products', img: 'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?auto=format&fit=crop&w=300&q=80', count: '4 products' },
+        { name: 'Health & Fitness', img: 'https://images.unsplash.com/photo-1510519138161-5364d852a364?auto=format&fit=crop&w=300&q=80', count: '6 products' },
+        { name: 'Fashion & Accessories', img: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=300&q=80', count: '9 products' },
+        { name: 'Tools & Hardware', img: 'https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=300&q=80', count: '3 products' },
+        { name: 'Deals & Offers', img: 'https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?auto=format&fit=crop&w=300&q=80', count: '12 products' }
     ];
 
-    const allCats = Array.from(new Set([...defaultCats, ...Object.keys(counts)]));
-
-    let html = `
-        <div onclick="setCategoryFromGrid('All')" class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center flex flex-col items-center justify-center space-y-1 hover:border-amber-500/50 transition shadow cursor-pointer">
-            <div class="w-8 h-8 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-xs">
-                <i class="fa-solid fa-layer-group"></i>
+    let html = '';
+    popularCategories.forEach(cat => {
+        html += `
+            <div onclick="setCategoryFromGrid('${cat.name}')" class="bg-gradient-to-b from-slate-900 to-blue-950 border border-cyan-500/30 hover:border-cyan-400 rounded-xl overflow-hidden cursor-pointer transition transform hover:-translate-y-1 shadow-lg text-center p-2 group">
+                <div class="h-20 bg-slate-950 rounded-lg overflow-hidden mb-2 relative flex items-center justify-center">
+                    <img src="${cat.img}" alt="${cat.name}" class="w-full h-full object-cover group-hover:scale-110 transition duration-300 opacity-90">
+                    <div class="absolute inset-0 bg-gradient-to-t from-blue-950/80 via-transparent to-transparent"></div>
+                </div>
+                <h4 class="text-xs font-bold text-white truncate px-1">${cat.name}</h4>
+                <p class="text-[10px] text-cyan-400 font-semibold mt-0.5">${cat.count}</p>
             </div>
-            <h3 class="font-bold text-slate-200 text-[11px] line-clamp-1">All Products</h3>
-            <span class="bg-amber-950/60 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded text-[9px] font-bold">${productsList.length} products</span>
-        </div>
-    `;
+        `;
+    });
+    grid.innerHTML = html;
+}
 
     allCats.forEach(cat => {
         const num = counts[cat] || 0;
