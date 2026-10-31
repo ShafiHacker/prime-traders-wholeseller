@@ -1,4 +1,4 @@
-// js/store.js
+// js/store-config.js
 let allProducts = [];
 let selectedCategory = 'All';
 let cart = [];
@@ -19,15 +19,20 @@ function listenToLiveCatalog() {
 
         snapshot.forEach(doc => {
             const data = doc.data();
-            allProducts.push({ id: doc.id, ...data });
-            if (data.category && data.category.trim() !== '') {
-                dynamicCategories.add(data.category.trim());
+            // Sirf wahi products load honge jo Active hon
+            if (data.isActive !== false) {
+                allProducts.push({ id: doc.id, ...data });
+                if (data.category && data.category.trim() !== '') {
+                    dynamicCategories.add(data.category.trim());
+                }
             }
         });
 
         allProducts.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
         
         renderPublicCategoriesGrid(allProducts);
+        renderDropdownAndSidebarCategories(allProducts);
+        renderNewArrivals(allProducts);
         filterProducts();
     }, err => {
         console.error("Firestore Error, retrying connection...", err);
@@ -35,6 +40,7 @@ function listenToLiveCatalog() {
     });
 }
 
+// Render Categories Across Popular Grid, Dropdown & Sidebar
 function renderPublicCategoriesGrid(productsList) {
     const counts = {};
     productsList.forEach(p => {
@@ -83,14 +89,108 @@ function renderPublicCategoriesGrid(productsList) {
     grid.innerHTML = html;
 }
 
+function renderDropdownAndSidebarCategories(productsList) {
+    const counts = {};
+    productsList.forEach(p => {
+        const cat = p.category || 'General';
+        counts[cat] = (counts[cat] || 0) + 1;
+    });
+
+    const dropdownList = document.getElementById('dropdownCategoriesList');
+    const sidebarList = document.getElementById('sidebarCategoriesList');
+
+    if (dropdownList) dropdownList.innerHTML = '';
+    if (sidebarList) sidebarList.innerHTML = '';
+
+    Object.keys(counts).forEach(catName => {
+        const count = counts[catName];
+        if (dropdownList) {
+            dropdownList.innerHTML += `
+                <a href="#productGrid" onclick="setCategoryFromGrid('${catName}')" class="block px-4 py-2 hover:bg-slate-900 hover:text-amber-400 text-slate-300 transition">
+                    ${catName} <span class="text-[10px] text-amber-500 font-mono">(${count})</span>
+                </a>
+            `;
+        }
+        if (sidebarList) {
+            sidebarList.innerHTML += `
+                <button onclick="setCategoryFromGrid('${catName}')" class="w-full text-left px-3 py-1.5 rounded-lg hover:bg-slate-900 text-slate-300 hover:text-amber-400 flex justify-between items-center transition">
+                    <span>${catName}</span>
+                    <span class="text-[10px] bg-slate-900 text-amber-400 px-1.5 py-0.5 rounded font-bold">${count}</span>
+                </button>
+            `;
+        }
+    });
+}
+
+function renderNewArrivals(productsList) {
+    const grid = document.getElementById('newArrivalsGrid');
+    if (!grid) return;
+    const latest = productsList.slice(0, 4);
+    if (latest.length === 0) {
+        grid.innerHTML = `<div class="col-span-full text-center text-slate-500 text-xs">No new arrivals.</div>`;
+        return;
+    }
+    let html = '';
+    latest.forEach(p => {
+        const img = (p.images && p.images.length > 0) ? p.images[0] : (p.image || '');
+        html += `
+            <div onclick="openProductModal('${p.id}')" class="bg-black p-2.5 rounded-xl border border-amber-500/20 hover:border-amber-400 cursor-pointer transition space-y-1">
+                <img src="${img}" class="w-full h-24 object-cover rounded-lg">
+                <h4 class="font-bold text-white text-[11px] truncate">${p.title}</h4>
+                <p class="text-amber-400 font-black text-xs">PKR ${p.price}</p>
+            </div>
+        `;
+    });
+    grid.innerHTML = html;
+}
+
+// Dynamic Hero Banner Loader from Firestore
+async function loadDynamicHeroBanner() {
+    try {
+        if (!database) return;
+        const doc = await database.collection('settings').doc('hero_banner').get();
+        if (doc.exists) {
+            const data = doc.data();
+            const bannerContainer = document.querySelector('.lg\\:col-span-2.neon-gold-card');
+            const shopNowBtn = bannerContainer ? bannerContainer.querySelector('a') : null;
+
+            if (bannerContainer && data.imageUrl) {
+                bannerContainer.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('${data.imageUrl}')`;
+                bannerContainer.style.backgroundSize = 'cover';
+                bannerContainer.style.backgroundPosition = 'center';
+            }
+            if (shopNowBtn && data.targetLink) {
+                shopNowBtn.setAttribute('href', data.targetLink);
+            }
+        }
+    } catch (e) {
+        console.error("Error loading dynamic hero banner:", e);
+    }
+}
+
+document.addEventListener("DOMContentLoaded", loadDynamicHeroBanner);
+
 function setCategoryFromGrid(catName) {
     selectedCategory = catName;
     filterProducts();
     window.scrollTo({ top: 400, behavior: 'smooth' });
 }
 
+function setCategory(catName, btnElement) {
+    selectedCategory = catName;
+    document.querySelectorAll('.cat-btn').forEach(b => {
+        b.classList.remove('neon-gold-btn', 'text-black');
+        b.classList.add('bg-slate-900', 'text-slate-300');
+    });
+    if (btnElement) {
+        btnElement.classList.add('neon-gold-btn', 'text-black');
+        btnElement.classList.remove('bg-slate-900', 'text-slate-300');
+    }
+    filterProducts();
+}
+
 function filterProducts() {
-    const searchInput = document.getElementById('searchInput');
+    const searchInput = document.getElementById('searchInput') || document.getElementById('headerSearchInput');
     const query = searchInput ? searchInput.value.toLowerCase() : '';
     const filtered = allProducts.filter(p => {
         const matchesCat = selectedCategory === 'All' || p.category === selectedCategory;
@@ -478,11 +578,10 @@ async function submitCheckoutOrder(e) {
 
 listenToLiveCatalog();
 
-// Custom Modal Alert Function (Replaces native alert popups)
 function showCustomAlert(title, message, type = 'success', callback = null) {
     const modal = document.getElementById('customAlertModal');
     if (!modal) {
-        alert(message); // Fallback
+        alert(message);
         return;
     }
 
@@ -519,7 +618,6 @@ function closeCustomAlert() {
     if (modal) modal.classList.add('hidden');
 }
 
-// Override default window alert to use our custom modal automatically
 window.alert = function(msg) {
     let isError = msg.toLowerCase().includes('error') || msg.toLowerCase().includes('failed') || msg.toLowerCase().includes('enter');
     showCustomAlert(isError ? "ERROR!" : "SUCCESS", msg, isError ? "error" : "success");
