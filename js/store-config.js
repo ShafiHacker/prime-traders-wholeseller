@@ -39,7 +39,7 @@ function listenToLiveCatalog() {
     });
 }
 
-// Render Popular Categories with Professional 3D Image Cards (Reference Design)
+// Render Popular Categories with Professional 3D Image Cards
 function renderPublicCategoriesGrid(productsList) {
     const grid = document.getElementById('publicCategoriesGrid');
     if (!grid) return;
@@ -226,13 +226,6 @@ function renderProducts(products) {
                     </button>
                     <button onclick="openProductModal('${p.id}')" ${isOutOfStock ? 'disabled' : ''} class="w-full py-2 ${isOutOfStock ? 'bg-slate-800 text-slate-500 cursor-not-allowed' : 'bg-amber-500 hover:bg-amber-600 text-slate-950'} font-black rounded-lg text-[11px] text-center transition flex items-center justify-center gap-1 shadow">
                         <i class="fa-solid fa-bolt"></i> Buy Now
-                    </button>
-                </div>
-            </div>
-        `;
-    });
-    grid.innerHTML = html;
-} Buy Now
                     </button>
                 </div>
             </div>
