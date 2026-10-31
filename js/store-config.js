@@ -19,7 +19,6 @@ function listenToLiveCatalog() {
 
         snapshot.forEach(doc => {
             const data = doc.data();
-            // Sirf wahi products load honge jo Active hon
             if (data.isActive !== false) {
                 allProducts.push({ id: doc.id, ...data });
                 if (data.category && data.category.trim() !== '') {
@@ -40,15 +39,8 @@ function listenToLiveCatalog() {
     });
 }
 
-// Render Categories Across Popular Grid, Dropdown & Sidebar
+// Render Popular Categories with Professional 3D Image Cards (Reference Design)
 function renderPublicCategoriesGrid(productsList) {
-    const counts = {};
-    productsList.forEach(p => {
-        const cat = p.category || 'General';
-        counts[cat] = (counts[cat] || 0) + 1;
-    });
-
-    function renderPublicCategoriesGrid(productsList) {
     const grid = document.getElementById('publicCategoriesGrid');
     if (!grid) return;
 
@@ -73,21 +65,6 @@ function renderPublicCategoriesGrid(productsList) {
                 </div>
                 <h4 class="text-xs font-bold text-white truncate px-1">${cat.name}</h4>
                 <p class="text-[10px] text-cyan-400 font-semibold mt-0.5">${cat.count}</p>
-            </div>
-        `;
-    });
-    grid.innerHTML = html;
-}
-
-    allCats.forEach(cat => {
-        const num = counts[cat] || 0;
-        html += `
-            <div onclick="setCategoryFromGrid('${cat}')" class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center flex flex-col items-center justify-center space-y-1 hover:border-amber-500/50 transition shadow cursor-pointer">
-                <div class="w-8 h-8 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-xs">
-                    <i class="fa-solid fa-box-open"></i>
-                </div>
-                <h3 class="font-bold text-slate-200 text-[11px] line-clamp-1">${cat}</h3>
-                <span class="bg-amber-950/60 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded text-[9px] font-bold">${num} products</span>
             </div>
         `;
     });
@@ -627,6 +604,7 @@ window.alert = function(msg) {
     let isError = msg.toLowerCase().includes('error') || msg.toLowerCase().includes('failed') || msg.toLowerCase().includes('enter');
     showCustomAlert(isError ? "ERROR!" : "SUCCESS", msg, isError ? "error" : "success");
 };
+
 // Real-time Countdown Timer for Today's Deals
 function startDealsTimer() {
     let duration = 2 * 3600 + 14 * 60 + 36; // 02h 14m 36s initial
