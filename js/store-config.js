@@ -622,3 +622,24 @@ window.alert = function(msg) {
     let isError = msg.toLowerCase().includes('error') || msg.toLowerCase().includes('failed') || msg.toLowerCase().includes('enter');
     showCustomAlert(isError ? "ERROR!" : "SUCCESS", msg, isError ? "error" : "success");
 };
+// Real-time Countdown Timer for Today's Deals
+function startDealsTimer() {
+    let duration = 2 * 3600 + 14 * 60 + 36; // 02h 14m 36s initial
+    const timerBox = document.querySelector('#todaysDeals .font-mono');
+    if (!timerBox) return;
+
+    setInterval(() => {
+        if (duration <= 0) duration = 24 * 3600; // Reset 24 hours cycle
+        duration--;
+
+        const hours = String(Math.floor(duration / 3600)).padStart(2, '0');
+        const minutes = String(Math.floor((duration % 3600) / 60)).padStart(2, '0');
+        const seconds = String(duration % 60).padStart(2, '0');
+
+        timerBox.innerHTML = `<span>${hours}<small>h</small></span>:<span>${minutes}<small>m</small></span>:<span>${seconds}<small>s</small></span>`;
+    }, 1000);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    startDealsTimer();
+});
