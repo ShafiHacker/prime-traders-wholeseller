@@ -132,7 +132,7 @@ async function saveHeroBannerSettings() {
     const targetLinkInput = document.getElementById('bannerTargetLink');
     const targetLink = targetLinkInput ? targetLinkInput.value.trim() || '#productGrid' : '#productGrid';
 
-    if (!adminBannerBase64) {
+    if (!window.adminBannerBase64) {
         alert("Karam farma kar pehle banner image attach karein!");
         return;
     }
@@ -145,7 +145,7 @@ async function saveHeroBannerSettings() {
 
     try {
         await db.collection('settings').doc('hero_banner').set({
-            imageUrl: adminBannerBase64,
+            imageUrl: window.adminBannerBase64,
             targetLink: targetLink,
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         });
@@ -160,12 +160,25 @@ async function saveHeroBannerSettings() {
         }
     }
 }
-    }
 
+// Product Form Submit Handler (Attached via Event Listener or Form Onsubmit)
+document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById('addProductForm');
+    if (form) {
+        form.onsubmit = async function(e) {
+            e.preventDefault();
+            await submitProductForm();
+        };
+    }
+});
+
+async function submitProductForm() {
     const btn = document.getElementById('submitBtn');
     const editingId = document.getElementById('editingProductId').value;
-    btn.disabled = true;
-    btn.innerText = editingId ? "Updating Product..." : "Publishing to Portal...";
+    if (btn) {
+        btn.disabled = true;
+        btn.innerText = editingId ? "Updating Product..." : "Publishing to Portal...";
+    }
 
     const title = document.getElementById('prodTitle').value.trim();
     let category = document.getElementById('prodCategory').value;
@@ -175,16 +188,16 @@ async function saveHeroBannerSettings() {
             category = customCat;
         } else {
             alert("Please enter custom category name.");
-            btn.disabled = false;
+            if (btn) btn.disabled = false;
             return;
         }
     }
 
-    const originalPrice = parseFloat(document.getElementById('prodOriginalPrice').value);
-    const price = parseFloat(document.getElementById('prodPrice').value);
+    const originalPrice = parseFloat(document.getElementById('prodOriginalPrice').value) || 0;
+    const price = parseFloat(document.getElementById('prodPrice').value) || 0;
     const bulkPrice = parseFloat(document.getElementById('prodBulkPrice').value) || 0;
     const bulkQty = parseInt(document.getElementById('prodBulkQty').value) || 0;
-    const stock = parseInt(document.getElementById('prodStock').value);
+    const stock = parseInt(document.getElementById('prodStock').value) || 10;
     const weight = document.getElementById('prodWeight').value.trim();
     const desc = document.getElementById('prodDesc').value.trim();
 
@@ -208,7 +221,6 @@ async function saveHeroBannerSettings() {
 
         if (editingId && loadedProductsMap[editingId]) {
             const existing = loadedProductsMap[editingId];
-            // Vendor name ko 100% lock rakha gaya hai taaki edit par change na ho
             assignedVendorName = existing.vendorName && !existing.vendorName.includes("@") 
                 ? existing.vendorName 
                 : getVendorName(existing.originalCreatorEmail || existing.addedByAdmin);
@@ -225,9 +237,9 @@ async function saveHeroBannerSettings() {
             image: selectedImageFiles[0] || "",
             desc,
             isActive: true,
-            vendorName: assignedVendorName, // Permanent Locked Vendor Name
-            originalCreatorEmail: originalCreator, // Asal creator email locked
-            addedByAdmin: currentAdminEmail, // Sirf last updater ki email yahan update hogi
+            vendorName: assignedVendorName,
+            originalCreatorEmail: originalCreator,
+            addedByAdmin: currentAdminEmail,
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         };
 
@@ -256,8 +268,10 @@ async function saveHeroBannerSettings() {
     } catch (err) {
         alert("Error: " + err.message);
     } finally {
-        btn.disabled = false;
-        btn.innerText = "Publish Product to Central Catalog";
+        if (btn) {
+            btn.disabled = false;
+            btn.innerText = "Publish Product to Central Catalog";
+        }
     }
 }
 
@@ -419,7 +433,6 @@ function loadAdminProducts() {
 
             const bulkInfo = p.bulkPrice && p.bulkQty ? `<div class="text-[10px] text-emerald-400">Bulk: PKR ${p.bulkPrice} (${p.bulkQty}+ pcs)</div>` : '';
             
-            // Asal vendor name ko secure dikhane ke liye
             const vendorSource = p.vendorName && !p.vendorName.includes("@") ? p.vendorName : (p.originalCreatorEmail || p.addedByAdmin);
             const vendorDisplayName = getVendorName(vendorSource);
             const uploaderEmail = p.addedByAdmin || 'N/V';
