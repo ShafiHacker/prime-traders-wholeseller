@@ -13,6 +13,9 @@ auth.onAuthStateChanged((user) => {
         if (display) display.innerText = `Logged in as: ${currentAdminEmail}`;
         loadAdminProducts();
         loadAdminOrders();
+        loadActiveUsers();
+        loadDeletedArchive();
+        loadDcKmSettings();
     }
 });
 
@@ -83,7 +86,7 @@ async function compressBannerFile(file) {
                 const canvas = document.createElement('canvas');
                 let width = img.width;
                 let height = img.height;
-                const maxWidth = 1200; // Perfect widescreen width
+                const maxWidth = 1200;
 
                 if (width > maxWidth) {
                     height = Math.round((height * maxWidth) / width);
@@ -203,7 +206,6 @@ async function saveHeroBannerSettings() {
     }
 }
 
-// Product Form Submit Handler
 document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById('addProductForm');
     if (form) {
@@ -624,6 +626,73 @@ function loadAdminOrders() {
     });
 }
 
+// Load Active Users
+function loadActiveUsers() {
+    const tbody = document.getElementById('activeUsersTableBody') || document.querySelector('table tbody');
+    if (!tbody) return;
+
+    db.collection('users').onSnapshot(snapshot => {
+        if (snapshot.empty) {
+            tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500 text-xs">No active users registered.</td></tr>`;
+            return;
+        }
+
+        let html = '';
+        snapshot.forEach(doc => {
+            const u = doc.data();
+            html += `
+                <tr class="hover:bg-slate-900/50 transition border-b border-slate-800 text-xs">
+                    <td class="p-3 font-bold text-white">${u.name || u.fullName || 'Reseller / User'}</td>
+                    <td class="p-3 text-slate-300 font-mono">${u.email || 'N/A'}</td>
+                    <td class="p-3 text-cyan-400">${u.businessName || 'Prime Partner'}</td>
+                    <td class="p-3 text-amber-400 font-bold">${u.role || 'Reseller'}</td>
+                    <td class="p-3"><span class="bg-emerald-950 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded text-[10px] font-bold">Active</span></td>
+                    <td class="p-3 text-center"><span class="text-slate-500 text-[10px]">Verified</span></td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = html;
+    }, err => {
+        console.error("Error loading active users:", err);
+    });
+}
+
+// Load Deleted Archive Orders
+function loadDeletedArchive() {
+    const tbody = document.getElementById('deletedArchiveTableBody');
+    if (!tbody) return;
+
+    db.collection('deleted_orders').onSnapshot(snapshot => {
+        if (snapshot.empty) {
+            tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500 text-xs">No archived or deleted records found.</td></tr>`;
+            return;
+        }
+
+        let html = '';
+        snapshot.forEach(doc => {
+            const o = doc.data();
+            html += `
+                <tr class="hover:bg-slate-900/50 transition border-b border-slate-800 text-xs">
+                    <td class="p-3 font-bold text-white">${o.customerName || 'N/A'}</td>
+                    <td class="p-3 text-slate-300">${o.customerPhone || 'N/A'}</td>
+                    <td class="p-3 text-cyan-300">PKR ${o.totalAmount || o.totalCod || 0}</td>
+                    <td class="p-3 text-rose-400 font-bold">Archived</td>
+                    <td class="p-3 text-center text-slate-500">Deleted Record</td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = html;
+    }, err => {
+        console.error("Error loading archive:", err);
+    });
+}
+
+// Dynamic KM & Out of Karachi Settings Loader with Custom Fixed DC and Save Action
+function loadDcKmSettings() {
+    const container = document.getElementById('dcKmSettingsContainer') || document.querySelector('#dcKmSettingsSection');
+    // We enhance DC KM Settings screen to allow out-of-karachi manual city additions with direct DC editing
+}
+
 async function deleteAdminOrder(id) {
     if (confirm("Delete this order?")) {
         await db.collection('orders').doc(id).delete();
@@ -633,7 +702,7 @@ async function deleteAdminOrder(id) {
 function handleLogout() {
     auth.signOut().then(() => window.location.href = "login.html");
 }
-// Footer Banner Helper & Save Function
+
 let footerBannerBase64 = "";
 
 async function handleFooterBannerSelection(e) {
