@@ -1,7 +1,8 @@
-// js/admin.js
+// js/admin-config.js
 let selectedImageFiles = [];
 let currentAdminEmail = "";
 let loadedProductsMap = {};
+window.adminBannerBase64 = "";
 
 auth.onAuthStateChanged((user) => {
     if (!user) {
@@ -58,6 +59,47 @@ function handleCategoryChange(val) {
     }
 }
 
+async function handleBannerSelection(e) {
+    const file = e.target.files[0];
+    if (file) {
+        window.adminBannerBase64 = await compressBannerFile(file);
+        const previewContainer = document.getElementById('bannerPreviewContainer');
+        const previewImg = document.getElementById('bannerPreviewImg');
+        if (previewContainer && previewImg) {
+            previewImg.src = window.adminBannerBase64;
+            previewContainer.classList.remove('hidden');
+        }
+    }
+}
+
+async function compressBannerFile(file) {
+    return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+                const maxWidth = 1200; // Perfect widescreen width
+
+                if (width > maxWidth) {
+                    height = Math.round((height * maxWidth) / width);
+                    width = maxWidth;
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                resolve(canvas.toDataURL('image/jpeg', 0.85));
+            };
+        };
+    });
+}
+
 async function handleImageSelection(e) {
     const files = Array.from(e.target.files);
     for (let f of files) {
@@ -77,7 +119,7 @@ function renderImagePreviews() {
     }
 
     container.innerHTML = selectedImageFiles.map((b64, idx) => `
-        <div class="relative w-14 h-14 rounded-lg overflow-hidden border border-amber-500/50 group">
+        <div class="relative w-14 h-14 rounded-lg overflow-hidden border border-blue-500/50 group">
             <img src="${b64}" class="w-full h-full object-cover">
             <button type="button" onclick="removeSingleImage(${idx})" class="absolute top-0.5 right-0.5 bg-rose-600 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-bold shadow hover:bg-rose-700">
                 ×
@@ -161,7 +203,7 @@ async function saveHeroBannerSettings() {
     }
 }
 
-// Product Form Submit Handler (Attached via Event Listener or Form Onsubmit)
+// Product Form Submit Handler
 document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById('addProductForm');
     if (form) {
@@ -324,7 +366,7 @@ function editProduct(id) {
     selectedImageFiles = p.images || (p.image ? [p.image] : []);
     renderImagePreviews();
 
-    document.getElementById('formHeading').innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-400 mr-1.5"></i> Edit Product: ${p.title}`;
+    document.getElementById('formHeading').innerHTML = `<i class="fa-solid fa-pen-to-square text-cyan-400 mr-1.5"></i> Edit Product: ${p.title}`;
     document.getElementById('submitBtn').innerText = "Update Product Changes";
     document.getElementById('cancelEditBtn').classList.remove('hidden');
 
@@ -339,7 +381,7 @@ function resetProductForm() {
     if (customBox) customBox.classList.add('hidden');
     selectedImageFiles = [];
     renderImagePreviews();
-    document.getElementById('formHeading').innerHTML = `<i class="fa-solid fa-plus-circle text-amber-400 mr-1.5"></i> Add New Wholesale Product`;
+    document.getElementById('formHeading').innerHTML = `<i class="fa-solid fa-plus-circle text-cyan-400 mr-1.5"></i> Add New Wholesale Product`;
     document.getElementById('submitBtn').innerText = "Publish Product to Central Catalog";
     document.getElementById('cancelEditBtn').classList.add('hidden');
 }
@@ -381,12 +423,12 @@ function renderCategoriesGrid(productsList) {
     allCats.forEach(cat => {
         const num = counts[cat] || 0;
         html += `
-            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center flex flex-col items-center justify-center space-y-1 hover:border-amber-500/50 transition shadow">
-                <div class="w-8 h-8 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-xs">
+            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center flex flex-col items-center justify-center space-y-1 hover:border-blue-500/50 transition shadow">
+                <div class="w-8 h-8 rounded-full bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-cyan-400 text-xs">
                     <i class="fa-solid fa-box-open"></i>
                 </div>
                 <h3 class="font-bold text-slate-200 text-[11px] line-clamp-1">${cat}</h3>
-                <span class="bg-amber-950/60 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded text-[9px] font-bold">${num} products</span>
+                <span class="bg-blue-950/60 text-cyan-400 border border-blue-500/30 px-2 py-0.5 rounded text-[9px] font-bold">${num} products</span>
             </div>
         `;
     });
@@ -442,21 +484,21 @@ function loadAdminProducts() {
                     <td class="p-3">
                         <div class="flex items-center gap-1">
                             <img src="${mainImg}" class="w-10 h-10 object-cover rounded-lg border border-slate-700">
-                            <span class="text-[10px] text-amber-400 font-bold">+${imgCount-1}</span>
+                            <span class="text-[10px] text-cyan-400 font-bold">+${imgCount-1}</span>
                         </div>
                     </td>
                     <td class="p-3">
                         <div class="font-bold text-slate-100">${p.title}</div>
-                        <div class="text-[10px] text-amber-400 font-mono">${p.category}</div>
+                        <div class="text-[10px] text-cyan-400 font-mono">${p.category}</div>
                     </td>
                     <td class="p-3">
-                        <span class="bg-amber-950/80 text-amber-300 border border-amber-500/40 px-2.5 py-1 rounded font-bold text-[11px] inline-block">👤 ${vendorDisplayName}</span>
+                        <span class="bg-blue-950/80 text-cyan-300 border border-blue-500/40 px-2.5 py-1 rounded font-bold text-[11px] inline-block">👤 ${vendorDisplayName}</span>
                     </td>
                     <td class="p-3">
                         <span class="text-slate-300 font-mono text-[10px] bg-slate-950 px-2 py-1 rounded border border-slate-800 inline-block">${uploaderEmail}</span>
                     </td>
                     <td class="p-3">
-                        <div class="font-bold text-amber-300">Single: PKR ${p.price}</div>
+                        <div class="font-bold text-cyan-300">Single: PKR ${p.price}</div>
                         ${bulkInfo}
                     </td>
                     <td class="p-3 space-y-1">
@@ -464,7 +506,7 @@ function loadAdminProducts() {
                         <div class="text-[11px] text-slate-400">Stock: ${stockVal} units</div>
                     </td>
                     <td class="p-3 text-center space-x-1">
-                        <button onclick="editProduct('${id}')" class="bg-amber-500 hover:bg-amber-600 text-slate-950 px-2.5 py-1 rounded text-[11px] font-bold transition shadow">
+                        <button onclick="editProduct('${id}')" class="bg-blue-500 hover:bg-blue-600 text-slate-950 px-2.5 py-1 rounded text-[11px] font-bold transition shadow">
                             <i class="fa-solid fa-pen"></i> Edit
                         </button>
                         <button onclick="deleteProduct('${id}')" class="bg-rose-600 hover:bg-rose-700 text-white px-2.5 py-1 rounded text-[11px] font-bold transition shadow">
@@ -561,13 +603,13 @@ function loadAdminOrders() {
                 <tr class="hover:bg-slate-900/50 transition border-b border-slate-800">
                     <td class="p-3 font-bold text-white">
                         ${o.customerName || o.custName || 'N/A'}
-                        <div class="text-[10px] text-amber-400">${o.customerPhone || o.custPhone || ''}</div>
+                        <div class="text-[10px] text-cyan-400">${o.customerPhone || o.custPhone || ''}</div>
                         <div class="text-[10px] text-slate-400">${o.customerAddress || o.custAddress || ''}</div>
                     </td>
                     <td class="p-3 text-slate-300">${itemsStr}</td>
-                    <td class="p-3 font-bold text-amber-300">PKR ${o.totalAmount || o.totalCod || 0}</td>
+                    <td class="p-3 font-bold text-cyan-300">PKR ${o.totalAmount || o.totalCod || 0}</td>
                     <td class="p-3">
-                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-900/50 text-amber-300 border border-amber-500/30">${o.status || 'Pending'}</span>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-900/50 text-cyan-300 border border-blue-500/30">${o.status || 'Pending'}</span>
                     </td>
                     <td class="p-3 text-center">
                         <button onclick="deleteAdminOrder('${id}')" class="bg-rose-600 hover:bg-rose-700 text-white px-2 py-1 rounded text-[10px] font-bold shadow">Delete</button>
@@ -590,51 +632,4 @@ async function deleteAdminOrder(id) {
 
 function handleLogout() {
     auth.signOut().then(() => window.location.href = "login.html");
-}
-// Banner Image Helper & Save Function
-let adminBannerBase64 = "";
-
-document.addEventListener("DOMContentLoaded", () => {
-    const bannerInput = document.querySelector('input[type="file"]');
-    if (bannerInput) {
-        bannerInput.addEventListener('change', async function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                adminBannerBase64 = await convertFileToBase64(file);
-            }
-        });
-    }
-});
-
-async function saveHeroBannerSettings() {
-    const targetLinkInput = document.getElementById('bannerTargetLink');
-    const targetLink = targetLinkInput ? targetLinkInput.value.trim() || '#productGrid' : '#productGrid';
-
-    if (!adminBannerBase64) {
-        alert("Karam farma kar pehle banner image attach karein!");
-        return;
-    }
-
-    const saveBtn = event.target.closest('button') || document.querySelector('button[onclick="saveHeroBannerSettings()"]');
-    if (saveBtn) {
-        saveBtn.disabled = true;
-        saveBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Saving Banner...`;
-    }
-
-    try {
-        await db.collection('settings').doc('hero_banner').set({
-            imageUrl: adminBannerBase64,
-            targetLink: targetLink,
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        alert("Main Hero Banner kamyabi ke sath save aur live publish ho gaya hai! 🎉");
-    } catch (error) {
-        console.error("Banner save error:", error);
-        alert("Error saving banner: " + error.message);
-    } finally {
-        if (saveBtn) {
-            saveBtn.disabled = false;
-            saveBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-1.5"></i> SAVE & PUBLISH BANNER`;
-        }
-    }
 }
