@@ -633,3 +633,51 @@ async function deleteAdminOrder(id) {
 function handleLogout() {
     auth.signOut().then(() => window.location.href = "login.html");
 }
+// Footer Banner Helper & Save Function
+let footerBannerBase64 = "";
+
+async function handleFooterBannerSelection(e) {
+    const file = e.target.files[0];
+    if (file) {
+        footerBannerBase64 = await compressBannerFile(file);
+        const previewContainer = document.getElementById('footerBannerPreviewContainer');
+        const previewImg = document.getElementById('footerBannerPreviewImg');
+        if (previewContainer && previewImg) {
+            previewImg.src = footerBannerBase64;
+            previewContainer.classList.remove('hidden');
+        }
+    }
+}
+
+async function saveFooterBannerSettings() {
+    const targetLinkInput = document.getElementById('footerBannerTargetLink');
+    const targetLink = targetLinkInput ? targetLinkInput.value.trim() || '#productGrid' : '#productGrid';
+
+    if (!footerBannerBase64) {
+        alert("Karam farma kar pehle footer banner image attach karein!");
+        return;
+    }
+
+    const saveBtn = event.target.closest('button') || document.querySelector('button[onclick="saveFooterBannerSettings()"]');
+    if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Saving Footer Banner...`;
+    }
+
+    try {
+        await db.collection('settings').doc('footer_banner').set({
+            imageUrl: footerBannerBase64,
+            targetLink: targetLink,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        alert("Footer Promo Banner kamyabi ke sath save aur live publish ho gaya hai! 🎉");
+    } catch (error) {
+        console.error("Footer banner save error:", error);
+        alert("Error saving footer banner: " + error.message);
+    } finally {
+        if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-1.5"></i> SAVE & PUBLISH FOOTER BANNER`;
+        }
+    }
+}
