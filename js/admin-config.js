@@ -649,7 +649,7 @@ async function handleFooterBannerSelection(e) {
     }
 }
 
-async function saveFooterBannerSettings() {
+async function saveFooterBannerSettings(event) {
     const targetLinkInput = document.getElementById('footerBannerTargetLink');
     const targetLink = targetLinkInput ? targetLinkInput.value.trim() || '#productGrid' : '#productGrid';
 
@@ -658,7 +658,7 @@ async function saveFooterBannerSettings() {
         return;
     }
 
-    const saveBtn = event.target.closest('button') || document.querySelector('button[onclick="saveFooterBannerSettings()"]');
+    const saveBtn = event ? (event.target.closest('button') || document.querySelector('button[onclick*="saveFooterBannerSettings"]')) : document.querySelector('button[onclick*="saveFooterBannerSettings"]');
     if (saveBtn) {
         saveBtn.disabled = true;
         saveBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Saving Footer Banner...`;
