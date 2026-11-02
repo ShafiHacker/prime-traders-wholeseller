@@ -626,35 +626,67 @@ function loadAdminOrders() {
     });
 }
 
-// Load Active Users
+// Load Active Users (Updated to support multiple collection names & fallback fields)
 function loadActiveUsers() {
-    const tbody = document.getElementById('activeUsersTableBody') || document.querySelector('table tbody');
+    const tbody = document.getElementById('activeUsersTableBody') || document.querySelector('#activeUsersView tbody');
     if (!tbody) return;
 
-    db.collection('users').onSnapshot(snapshot => {
-        if (snapshot.empty) {
-            tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500 text-xs">No active users registered.</td></tr>`;
-            return;
-        }
+    tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400 text-xs"><i class="fa-solid fa-spinner fa-spin mr-1"></i> Loading active users from database...</td></tr>`;
 
-        let html = '';
-        snapshot.forEach(doc => {
-            const u = doc.data();
-            html += `
-                <tr class="hover:bg-slate-900/50 transition border-b border-slate-800 text-xs">
-                    <td class="p-3 font-bold text-white">${u.name || u.fullName || 'Reseller / User'}</td>
-                    <td class="p-3 text-slate-300 font-mono">${u.email || 'N/A'}</td>
-                    <td class="p-3 text-cyan-400">${u.businessName || 'Prime Partner'}</td>
-                    <td class="p-3 text-amber-400 font-bold">${u.role || 'Reseller'}</td>
-                    <td class="p-3"><span class="bg-emerald-950 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded text-[10px] font-bold">Active</span></td>
-                    <td class="p-3 text-center"><span class="text-slate-500 text-[10px]">Verified</span></td>
-                </tr>
-            `;
-        });
-        tbody.innerHTML = html;
+    // Try fetching from 'users' collection first
+    db.collection('users').onSnapshot(snapshot => {
+        if (!snapshot.empty) {
+            renderUsersTable(snapshot, tbody);
+        } else {
+            // Fallback to 'accounts' if users is empty
+            db.collection('accounts').onSnapshot(accSnapshot => {
+                if (!accSnapshot.empty) {
+                    renderUsersTable(accSnapshot, tbody);
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500 text-xs">No active users registered in database.</td></tr>`;
+                }
+            }, err => {
+                console.error("Error loading accounts collection:", err);
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-rose-400 text-xs">Error loading users data.</td></tr>`;
+            });
+        }
     }, err => {
-        console.error("Error loading active users:", err);
+        console.error("Error loading users collection:", err);
+        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-rose-400 text-xs">Permission or connection error.</td></tr>`;
     });
+}
+
+function renderUsersTable(snapshot, tbody) {
+    let html = '';
+    snapshot.forEach(doc => {
+        const u = doc.data();
+        const userId = doc.id;
+        const userName = u.name || u.fullName || u.displayName || 'Reseller / Partner';
+        const userEmail = u.email || u.userEmail || 'N/A';
+        const bizName = u.businessName || u.shopName || 'Prime Partner';
+        const userRole = u.role || u.userType || 'Resellers';
+        
+        html += `
+            <tr class="hover:bg-slate-900/50 transition border-b border-slate-800 text-xs">
+                <td class="p-3 font-bold text-white">
+                    ${userName}
+                    <div class="text-[9px] text-slate-500 font-mono">ID: ${userId.substring(0, 8)}...</div>
+                </td>
+                <td class="p-3 text-slate-300 font-mono">${userEmail}</td>
+                <td class="p-3 text-cyan-400 font-semibold">${bizName}</td>
+                <td class="p-3 text-amber-400 font-bold">${userRole}</td>
+                <td class="p-3"><span class="bg-emerald-950 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded text-[10px] font-bold">Active</span></td>
+                <td class="p-3 text-center">
+                    <button onclick="toggleUserStatus('${userId}')" class="bg-slate-800 hover:bg-slate-700 text-cyan-400 border border-cyan-500/30 px-2.5 py-1 rounded text-[10px] font-bold transition">Manage</button>
+                </td>
+            </tr>
+        `;
+    });
+    tbody.innerHTML = html;
+}
+
+function toggleUserStatus(userId) {
+    alert("User management action for ID: " + userId);
 }
 
 // Load Deleted Archive Orders
@@ -750,3 +782,6 @@ async function saveFooterBannerSettings(event) {
         }
     }
 }
+<button onclick="switchAdminTab('activeUsersView'); if(typeof loadUsers === 'function') loadUsers();" class="sidebar-link w-full text-left flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-slate-800 text-slate-300 hover:text-white transition">
+    <i class="fa-solid fa-users w-4 text-amber-400"></i> Active Users
+</button>
