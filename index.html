@@ -428,4 +428,48 @@
         </div>
     </footer>
 </body>
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script>
+    // Load Live Products from Firestore Catalog
+    document.addEventListener("DOMContentLoaded", () => {
+        if (typeof db !== 'undefined') {
+            db.collection('products').onSnapshot(snapshot => {
+                const grid = document.getElementById('productGrid');
+                if (!grid) return;
+                if (snapshot.empty) {
+                    grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs font-semibold">No products found in catalog.</div>`;
+                    return;
+                }
+                let html = '';
+                snapshot.forEach(doc => {
+                    const p = doc.data();
+                    html += `
+                        <div class="neon-gold-card p-4 rounded-2xl space-y-3 flex flex-col justify-between">
+                            <div>
+                                <div class="h-40 bg-slate-900 rounded-xl mb-3 flex items-center justify-center text-slate-600 text-xs overflow-hidden">
+                                    <i class="fa-solid fa-box-open text-3xl text-amber-500/40"></i>
+                                </div>
+                                <span class="text-[10px] font-bold text-amber-400 bg-amber-950/40 px-2 py-0.5 rounded uppercase">${p.category || 'General'}</span>
+                                <h3 class="text-xs font-black text-white mt-1.5 uppercase">${p.title || 'Product Item'}</h3>
+                                <p class="text-[11px] text-slate-400 mt-1 line-clamp-2">${p.description || 'High quality wholesale item.'}</p>
+                            </div>
+                            <div class="border-t border-amber-500/20 pt-3 flex justify-between items-center">
+                                <div>
+                                    <span class="text-[10px] text-slate-500 block">Single Price</span>
+                                    <span class="text-xs font-black text-amber-400">PKR ${p.singlePrice || p.retailPrice || 0}</span>
+                                </div>
+                                <button onclick="alert('Item selected for order!')" class="neon-gold-btn px-3 py-1.5 rounded-lg text-[10px] font-black uppercase">Add to Cart</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                grid.innerHTML = html;
+            });
+        }
+    });
+</script>
 </html>
