@@ -39,23 +39,66 @@
         </div>
     </header>
 
-    <!-- Hero Section -->
+    <!-- Sub Navigation Links -->
+    <nav class="bg-[#090d16]/80 border-b border-amber-500/10 px-6 py-2.5 flex justify-center gap-8 text-xs font-bold text-slate-300">
+        <a href="index.html" class="text-amber-400">Home</a>
+        <a href="#deals" class="hover:text-amber-400 transition">Deals & Offers</a>
+        <a href="#new" class="hover:text-amber-400 transition">New Arrivals</a>
+        <a href="#wholesale" class="hover:text-amber-400 transition">Wholesale</a>
+        <a href="#dropshipping" class="hover:text-amber-400 transition">Dropshipping</a>
+        <a href="#contact" class="hover:text-amber-400 transition">Contact</a>
+    </nav>
+
+    <!-- Main Container -->
     <main class="max-w-7xl mx-auto p-6 space-y-8">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <!-- Left Categories -->
             <div class="bg-slate-900/60 border border-amber-500/20 p-4 rounded-2xl space-y-2">
                 <h3 class="text-xs font-black text-amber-400 uppercase border-b border-amber-500/20 pb-2"><i class="fa-solid fa-list mr-1"></i> Shop By Category</h3>
-                <ul class="space-y-1 text-xs text-slate-300 font-medium" id="categoryList">
+                <ul class="space-y-1 text-xs text-slate-300 font-medium">
                     <li class="p-2 hover:bg-amber-500/10 rounded cursor-pointer flex justify-between"><span>Home & Kitchen</span> <span class="text-amber-400">10</span></li>
                     <li class="p-2 hover:bg-amber-500/10 rounded cursor-pointer flex justify-between"><span>Accessories</span> <span class="text-amber-400">9</span></li>
                     <li class="p-2 hover:bg-amber-500/10 rounded cursor-pointer flex justify-between"><span>Electronics & Gadgets</span> <span class="text-amber-400">7</span></li>
                     <li class="p-2 hover:bg-amber-500/10 rounded cursor-pointer flex justify-between"><span>Fashion & Apparel</span> <span class="text-amber-400">3</span></li>
+                    <li class="p-2 hover:bg-amber-500/10 rounded cursor-pointer flex justify-between"><span>Computer Accessories</span> <span class="text-amber-400">1</span></li>
+                    <li class="p-2 hover:bg-amber-500/10 rounded cursor-pointer flex justify-between"><span>Mobile Accessories</span> <span class="text-amber-400">1</span></li>
+                    <li class="p-2 hover:bg-amber-500/10 rounded cursor-pointer flex justify-between"><span>Exercise & Fitness</span> <span class="text-amber-400">1</span></li>
+                    <li class="p-2 hover:bg-amber-500/10 rounded cursor-pointer flex justify-between"><span>Dish Set</span> <span class="text-amber-400">1</span></li>
+                    <li class="p-2 hover:bg-amber-500/10 rounded cursor-pointer flex justify-between"><span>Medicine Box</span> <span class="text-amber-400">1</span></li>
                 </ul>
             </div>
+
+            <!-- Hero Banner Area -->
             <div class="md:col-span-3 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-amber-500/30 p-8 rounded-3xl flex flex-col justify-center space-y-4">
                 <span class="text-[10px] font-black uppercase tracking-widest text-amber-400 bg-amber-950/60 border border-amber-500/30 px-3 py-1 rounded-full w-max">Wholesale & Dropshipping</span>
                 <h2 class="text-3xl font-black text-white uppercase tracking-wider">Smart Products<br><span class="text-amber-400">Better Business</span></h2>
                 <p class="text-xs text-slate-300 max-w-md">Quality Products • Competitive Prices • Fast Delivery All Over Pakistan.</p>
                 <div><button class="bg-amber-500 hover:bg-amber-400 text-slate-950 px-6 py-3 rounded-xl text-xs font-black uppercase transition shadow-lg shadow-amber-500/30">Start Shopping <i class="fa-solid fa-arrow-right ml-1"></i></button></div>
+            </div>
+        </div>
+
+        <!-- Highlights Row -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-slate-900/60 border border-amber-500/20 p-5 rounded-2xl flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl"><i class="fa-solid fa-tags"></i></div>
+                <div>
+                    <h4 class="text-xs font-bold text-white uppercase">Best Wholesale Prices</h4>
+                    <p class="text-[10px] text-slate-400 mt-0.5">Direct factory & bulk rates</p>
+                </div>
+            </div>
+            <div class="bg-slate-900/60 border border-amber-500/20 p-5 rounded-2xl flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl"><i class="fa-solid fa-boxes-stacked"></i></div>
+                <div>
+                    <h4 class="text-xs font-bold text-white uppercase">Wide Product Range</h4>
+                    <p class="text-[10px] text-slate-400 mt-0.5">Thousands of items in stock</p>
+                </div>
+            </div>
+            <div class="bg-slate-900/60 border border-amber-500/20 p-5 rounded-2xl flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl"><i class="fa-solid fa-users"></i></div>
+                <div>
+                    <h4 class="text-xs font-bold text-white uppercase">Trusted by Resellers</h4>
+                    <p class="text-[10px] text-slate-400 mt-0.5">10K+ Active Resellers</p>
+                </div>
             </div>
         </div>
     </main>
