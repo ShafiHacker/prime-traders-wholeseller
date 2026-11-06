@@ -74,12 +74,19 @@ function renderPublicCategoriesGrid(productsList) {
 function renderDropdownAndSidebarCategories(productsList) {
     const counts = {};
     productsList.forEach(p => {
-        const cat = p.category || 'General';
+        const cat = p.category && p.category.trim() !== '' ? p.category.trim() : 'General';
         counts[cat] = (counts[cat] || 0) + 1;
     });
 
     const dropdownList = document.getElementById('dropdownCategoriesList');
     const sidebarList = document.getElementById('sidebarCategoriesList');
+
+    // Default static categories agar database mein categories na hon
+    const defaultCategories = ['Home & Kitchen', 'Electronics & Gadgets', 'Accessories', 'Fashion & Apparel', 'Tools & Hardware'];
+    
+    defaultCategories.forEach(cat => {
+        if (!counts[cat]) counts[cat] = 0;
+    });
 
     if (dropdownList) dropdownList.innerHTML = '';
     if (sidebarList) sidebarList.innerHTML = '';
@@ -88,8 +95,8 @@ function renderDropdownAndSidebarCategories(productsList) {
         const count = counts[catName];
         if (dropdownList) {
             dropdownList.innerHTML += `
-                <a href="#productGrid" onclick="setCategoryFromGrid('${catName}')" class="block px-4 py-2 hover:bg-slate-900 hover:text-amber-400 text-slate-300 transition">
-                    ${catName} <span class="text-[10px] text-amber-500 font-mono">(${count})</span>
+                <a href="#productGrid" onclick="setCategoryFromGrid('${catName}')" class="block px-4 py-2 hover:bg-slate-900 hover:text-amber-400 text-slate-300 transition flex justify-between items-center">
+                    <span>${catName}</span> <span class="text-[10px] text-amber-500 font-mono">(${count})</span>
                 </a>
             `;
         }
