@@ -427,16 +427,29 @@
             </div>
         </div>
     </footer>
-</body>
-<!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-<script src="js/firebase-config.js"></script>
-<script>
-    // Load Live Products from Firestore Catalog
-    document.addEventListener("DOMContentLoaded", () => {
-        if (typeof db !== 'undefined') {
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AizaSyCRkkoE48FjYIjYfUNFEYzcxNueKuM6YOM",
+            authDomain: "prime-traders-f3eec.firebaseapp.com",
+            projectId: "prime-traders-f3eec",
+            storageBucket: "prime-traders-f3eec.firebasestorage.app",
+            messagingSenderId: "499740236001",
+            appId: "1:499740236001:web:e623dfe1f6f96df22ffa0",
+            measurementId: "G-6CGVKBZFJK"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
+
+        // Load Live Products from Firestore Catalog
+        document.addEventListener("DOMContentLoaded", () => {
             db.collection('products').onSnapshot(snapshot => {
                 const grid = document.getElementById('productGrid');
                 if (!grid) return;
@@ -469,56 +482,7 @@
                 });
                 grid.innerHTML = html;
             });
-        }
-    });
-</script>
+        });
+    </script>
+</body>
 </html>
-<!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-<script>
-    const firebaseConfig = {
-        apiKey: "AizaSyCRkkoE48FjYIjYfUNFEYzcxNueKuM6YOM",
-        authDomain: "prime-traders-f3eec.firebaseapp.com",
-        projectId: "prime-traders-f3eec",
-        storageBucket: "prime-traders-f3eec.firebasestorage.app",
-        messagingSenderId: "499740236001",
-        appId: "1:499740236001:web:e623dfe1f6f96df22ffa0",
-        measurementId: "G-6CGVKBZFJK"
-    };
-
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
-    const db = firebase.firestore();
-
-    // Load Products dynamically from Firestore into Public Store
-    document.addEventListener("DOMContentLoaded", () => {
-        db.collection("products").orderBy("createdAt", "desc").get().then((querySnapshot) => {
-            const productContainer = document.getElementById("publicProductGrid"); 
-            if (!productContainer) return;
-            
-            productContainer.innerHTML = "";
-            querySnapshot.forEach((doc) => {
-                const prod = doc.data();
-                const card = `
-                    <div class="bg-slate-900 border border-amber-500/30 p-4 rounded-2xl space-y-2 shadow-lg">
-                        <h4 class="text-white font-bold text-sm uppercase">${prod.title}</h4>
-                        <p class="text-xs text-amber-400 font-black">Price: PKR ${prod.singlePrice}</p>
-                        <p class="text-[10px] text-cyan-400 uppercase font-semibold">Category: ${prod.category}</p>
-                        <p class="text-[11px] text-slate-300 line-clamp-2">${prod.description || ''}</p>
-                        <button onclick="alert('Order placed for ${prod.title}')" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 py-2 rounded-xl text-xs font-black uppercase transition">Order Now</button>
-                    </div>
-                `;
-                productContainer.innerHTML += card;
-            });
-        }).catch(err => console.error("Error loading products: ", err));
-    });
-</script>
-<!-- Products Display Section -->
-<div class="max-w-7xl mx-auto px-4 py-8">
-    <h3 class="text-xl font-black text-white uppercase mb-6 border-b border-amber-500/20 pb-2">Central Wholesale Catalog</h3>
-    <div id="publicProductGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-        <!-- Firestore se products yahan automatically load honge -->
-    </div>
-</div>
