@@ -630,4 +630,3 @@ function startDealsTimer() {
 document.addEventListener("DOMContentLoaded", () => {
     startDealsTimer();
 });
-<script src="js/store-config.js"></script>
