@@ -119,7 +119,7 @@ function renderNewArrivals(productsList) {
             <div onclick="openProductModal('${p.id}')" class="bg-black p-2.5 rounded-xl border border-amber-500/20 hover:border-amber-400 cursor-pointer transition space-y-1">
                 <img src="${img}" class="w-full h-24 object-cover rounded-lg">
                 <h4 class="font-bold text-white text-[11px] truncate">${p.title}</h4>
-                <p class="text-amber-400 font-black text-xs">PKR ${p.price}</p>
+                <p class="text-amber-400 font-black text-xs">PKR ${p.price || p.singlePrice || 0}</p>
             </div>
         `;
     });
@@ -136,13 +136,13 @@ async function loadDynamicHeroBanner() {
             const bannerContainer = document.querySelector('.lg\\:col-span-2.neon-gold-card');
             const shopNowBtn = bannerContainer ? bannerContainer.querySelector('a') : null;
 
-            if (bannerContainer && data.imageUrl) {
-                bannerContainer.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('${data.imageUrl}')`;
+            if (bannerContainer && data.image) {
+                bannerContainer.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('${data.image}')`;
                 bannerContainer.style.backgroundSize = 'cover';
                 bannerContainer.style.backgroundPosition = 'center';
             }
-            if (shopNowBtn && data.targetLink) {
-                shopNowBtn.setAttribute('href', data.targetLink);
+            if (shopNowBtn && data.link) {
+                shopNowBtn.setAttribute('href', data.link);
             }
         }
     } catch (e) {
@@ -174,6 +174,15 @@ function setCategory(catName, btnElement) {
 function filterProducts() {
     const searchInput = document.getElementById('searchInput') || document.getElementById('headerSearchInput');
     const query = searchInput ? searchInput.value.toLowerCase() : '';
+    
+    // Search Tracking for Excel Export
+    if (database && query.trim() !== '') {
+        database.collection('search_logs').add({
+            query: query.trim().toLowerCase(),
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        }).catch(err => console.error("Search log error:", err));
+    }
+
     const filtered = allProducts.filter(p => {
         const matchesCat = selectedCategory === 'All' || p.category === selectedCategory;
         const matchesQuery = p.title.toLowerCase().includes(query) || (p.desc && p.desc.toLowerCase().includes(query));
@@ -186,7 +195,6 @@ function renderProducts(products) {
     const grid = document.getElementById('productGrid');
     if (!grid) return;
 
-    // FEATURED PRODUCTS: Sirf pehle 5 products show honge homepage par
     const limitedProducts = products.slice(0, 5);
 
     if (!limitedProducts.length) {
@@ -196,7 +204,7 @@ function renderProducts(products) {
 
     let html = '';
     limitedProducts.forEach(p => {
-        const discPrice = p.price || 0;
+        const discPrice = p.price || p.singlePrice || 0;
         const origPrice = p.originalPrice || Math.round(discPrice * 1.3);
         const mainImg = (p.images && p.images.length > 0) ? p.images[0] : (p.image || 'https://via.placeholder.com/400');
         const isOutOfStock = p.stock !== undefined && p.stock <= 0;
@@ -238,7 +246,7 @@ async function openProductModal(id) {
     const p = allProducts.find(item => item.id === id);
     if (!p) return;
 
-    const discPrice = p.price || 0;
+    const discPrice = p.price || p.singlePrice || 0;
     const origPrice = p.originalPrice || Math.round(discPrice * 1.3);
     const imagesList = (p.images && p.images.length > 0) ? p.images : [p.image || 'https://via.placeholder.com/400'];
     const isOutOfStock = p.stock !== undefined && p.stock <= 0;
@@ -262,8 +270,7 @@ async function openProductModal(id) {
         <div class="flex justify-between items-start border-b border-slate-800 pb-3">
             <div>
                 <div class="flex items-center gap-2">
-                    <span class="text-[11px] font-bold text-amber-400 bg-amber-950/50 border border-amber-500/30 px-2.5 py-0.5 rounded">${p.category}</span>
-                    ${p.weight && p.weight !== 'N/A' ? `<span class="text-[11px] font-bold text-slate-300 bg-slate-800 border border-slate-700 px-2.5 py-0.5 rounded"><i class="fa-solid fa-weight-hanging mr-1 text-amber-400"></i>${p.weight}</span>` : ''}
+                    <span class="text-[11px] font-bold text-amber-400 bg-amber-950/50 border border-amber-500/30 px-2.5 py-0.5 rounded">${p.category || 'General'}</span>
                 </div>
                 <h2 class="text-base md:text-lg font-bold text-white mt-1.5">${p.title}</h2>
             </div>
@@ -308,7 +315,7 @@ async function openProductModal(id) {
 
                 <div>
                     <h3 class="font-bold text-slate-300 mb-1.5 text-xs">Description:</h3>
-                    <p class="text-xs text-slate-300 bg-slate-950 p-3.5 rounded-xl border border-slate-800 leading-relaxed whitespace-pre-line max-h-44 overflow-y-auto">${p.desc || 'No description provided.'}</p>
+                    <p class="text-xs text-slate-300 bg-slate-950 p-3.5 rounded-xl border border-slate-800 leading-relaxed whitespace-pre-line max-h-44 overflow-y-auto">${p.description || p.desc || 'No description provided.'}</p>
                 </div>
             </div>
         </div>
@@ -365,7 +372,7 @@ function calculateItemPrice(item) {
     if (item.bulkPrice && item.bulkQty && item.qty >= item.bulkQty) {
         return item.bulkPrice;
     }
-    return item.price;
+    return item.price || item.singlePrice || 0;
 }
 
 function openCartModal() {
@@ -492,7 +499,7 @@ async function calculateLiveDC() {
     if (document.getElementById('summarySubtotal')) document.getElementById('summarySubtotal').innerText = `PKR ${subtotal}`;
     if (document.getElementById('summaryDC')) document.getElementById('summaryDC').innerText = `PKR ${calculatedDC}`;
     if (document.getElementById('summaryFinalTotal')) document.getElementById('summaryFinalTotal').innerText = `PKR ${finalTotal}`;
-    if (document.getElementById('checkoutOrderTotal')) document.getElementById('checkoutOrderTotal').innerText = `PKR ${finalTotal}`;
+    if (document.getElementById('checkoutOrderTotal')) document.getElementById('checkoutOrderTotal').value = finalTotal;
 
     return { subtotal, calculatedDC, finalTotal };
 }
@@ -504,8 +511,10 @@ function closeCheckoutModal() {
 async function submitCheckoutOrder(e) {
     e.preventDefault();
     const btn = document.getElementById('confirmOrderBtn');
-    btn.disabled = true;
-    btn.innerText = "Submitting Order to Logistics...";
+    if(btn) {
+        btn.disabled = true;
+        btn.innerText = "Submitting Order to Logistics...";
+    }
 
     const name = document.getElementById('custName').value.trim();
     const phone = document.getElementById('custPhone').value.trim();
@@ -553,16 +562,16 @@ async function submitCheckoutOrder(e) {
         cart = [];
         updateCartBadge();
         closeCheckoutModal();
-        document.getElementById('checkoutModal').querySelector('form').reset();
+        e.target.reset();
     } catch (err) {
         showCustomAlert("ERROR!", "Error submitting order: " + err.message, "error");
     } finally {
-        btn.disabled = false;
-        btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Submit Order to Main Dashboard`;
+        if(btn) {
+            btn.disabled = false;
+            btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Submit Order to Main Dashboard`;
+        }
     }
 }
-
-listenToLiveCatalog();
 
 function showCustomAlert(title, message, type = 'success', callback = null) {
     const modal = document.getElementById('customAlertModal');
@@ -609,14 +618,47 @@ window.alert = function(msg) {
     showCustomAlert(isError ? "ERROR!" : "SUCCESS", msg, isError ? "error" : "success");
 };
 
-// Real-time Countdown Timer for Today's Deals
-function startDealsTimer() {
-    let duration = 2 * 3600 + 14 * 60 + 36; // 02h 14m 36s initial
+// Load Today's Deal settings from Firestore and sync with timer
+async function loadTodaysDealSettings() {
+    try {
+        if (!database) return;
+        const doc = await database.collection('settings').doc('todays_deal').get();
+        if (doc.exists) {
+            const data = doc.data();
+            const dealBox = document.getElementById('todaysDealBox');
+            if (dealBox) {
+                const discountPercent = data.originalPrice && data.price ? Math.round(((data.originalPrice - data.price) / data.originalPrice) * 100) : 29;
+                dealBox.innerHTML = `
+                    <div class="bg-black p-3 rounded-xl border border-amber-500/20 flex gap-3 items-center">
+                        <div class="w-20 h-20 bg-slate-900 rounded-lg overflow-hidden flex items-center justify-center text-xs text-slate-500">
+                            ${data.image ? `<img src="${data.image}" class="w-full h-full object-cover">` : 'Deal Item'}
+                        </div>
+                        <div class="space-y-1">
+                            <h4 class="text-xs font-bold text-white">${data.title || 'Wireless Neckband Earphones'}</h4>
+                            <p class="text-amber-400 font-black text-xs">PKR ${data.price || 1999} <span class="line-through text-slate-500 text-[10px]">${data.originalPrice || 2799}</span></p>
+                            <span class="inline-block bg-emerald-500/20 text-emerald-400 text-[9px] font-bold px-2 py-0.5 rounded">Save ${discountPercent}%</span>
+                        </div>
+                    </div>
+                `;
+            }
+            startDealsTimer(data.hoursDuration || 2);
+        } else {
+            startDealsTimer(2);
+        }
+    } catch (e) {
+        console.error("Error loading today's deal:", e);
+        startDealsTimer(2);
+    }
+}
+
+// Countdown Timer for Deals
+function startDealsTimer(hoursDuration) {
+    let duration = (hoursDuration || 2) * 3600;
     const timerBox = document.querySelector('#todaysDeals .font-mono');
     if (!timerBox) return;
 
     setInterval(() => {
-        if (duration <= 0) duration = 24 * 3600; // Reset 24 hours cycle
+        if (duration <= 0) duration = 24 * 3600;
         duration--;
 
         const hours = String(Math.floor(duration / 3600)).padStart(2, '0');
@@ -628,5 +670,6 @@ function startDealsTimer() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    startDealsTimer();
+    listenToLiveCatalog();
+    loadTodaysDealSettings();
 });
