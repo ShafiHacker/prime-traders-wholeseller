@@ -202,44 +202,44 @@ function renderProducts(products) {
     const grid = document.getElementById('productGrid');
     if (!grid) return;
 
-    const limitedProducts = products.slice(0, 5);
-
-    if (!limitedProducts.length) {
-        grid.innerHTML = `<div class="col-span-full text-center text-slate-400 py-12">No products found.</div>`;
+    // Agar products array khali hai ya undefined hai
+    if (!products || products.length === 0) {
+        grid.innerHTML = `<div class="col-span-full text-center text-slate-400 py-12">No products found in catalog.</div>`;
         return;
     }
 
+    const limitedProducts = products.slice(0, 8); // 8 products grid
+
     let html = '';
     limitedProducts.forEach(p => {
-        const discPrice = p.price || p.singlePrice || 0;
-        const origPrice = p.originalPrice || Math.round(discPrice * 1.3);
+        // Flexible price check (price, singlePrice, ya retailPrice mein se jo bhi ho)
+        const discPrice = p.price || p.singlePrice || p.retailPrice || 0;
+        const origPrice = p.originalPrice || p.retailPrice || Math.round(discPrice * 1.3);
         const mainImg = (p.images && p.images.length > 0) ? p.images[0] : (p.image || 'https://via.placeholder.com/400');
         const isOutOfStock = p.stock !== undefined && p.stock <= 0;
-        const bulkBadge = p.bulkPrice && p.bulkQty ? `<div class="text-[10px] text-emerald-400 font-bold bg-emerald-950/60 border border-emerald-500/30 px-1.5 py-0.5 rounded mt-1 inline-block">Buy ${p.bulkQty}+ @ PKR ${p.bulkPrice}/pc</div>` : '';
 
         html += `
             <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden hover:border-amber-400/60 transition shadow-lg flex flex-col justify-between">
                 <div>
                     <div class="relative h-48 bg-slate-950 overflow-hidden cursor-pointer" onclick="openProductModal('${p.id}')">
-                        <img src="${mainImg}" alt="${p.title}" class="w-full h-full object-cover hover:scale-105 transition duration-300 ${isOutOfStock ? 'opacity-40' : ''}">
+                        <img src="${mainImg}" alt="${p.title || 'Product'}" class="w-full h-full object-cover hover:scale-105 transition duration-300 ${isOutOfStock ? 'opacity-40' : ''}">
                         ${isOutOfStock ? `<span class="absolute top-2 left-2 bg-rose-600 text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase">OUT OF STOCK</span>` : `<span class="absolute top-2 left-2 bg-emerald-600 text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase">IN STOCK</span>`}
                     </div>
                     <div class="p-3.5 space-y-1.5">
                         <span class="text-[10px] font-bold text-amber-500 uppercase tracking-wider">${p.category || 'General'}</span>
-                        <h3 class="font-bold text-slate-100 text-xs line-clamp-2 cursor-pointer hover:text-amber-400" onclick="openProductModal('${p.id}')">${p.title}</h3>
+                        <h3 class="font-bold text-slate-100 text-xs line-clamp-2 cursor-pointer hover:text-amber-400" onclick="openProductModal('${p.id}')">${p.title || 'Product Item'}</h3>
                         
                         <div class="flex items-center gap-2">
                             <span class="text-sm font-black text-amber-300">PKR ${discPrice}</span>
                             <span class="text-xs text-slate-500 line-through font-semibold">PKR ${origPrice}</span>
                         </div>
-                        ${bulkBadge}
                     </div>
                 </div>
                 <div class="p-3.5 pt-2 grid grid-cols-2 gap-2">
-                    <button onclick="openProductModal('${p.id}')" ${isOutOfStock ? 'disabled' : ''} class="w-full py-2 ${isOutOfStock ? 'bg-slate-800 text-slate-500 cursor-not-allowed' : 'bg-slate-800 hover:bg-slate-700 text-slate-200'} font-bold rounded-lg text-[11px] transition flex items-center justify-center gap-1">
+                    <button onclick="openProductModal('${p.id}')" ${isOutOfStock ? 'disabled' : ''} class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-lg text-[11px] transition flex items-center justify-center gap-1">
                         <i class="fa-solid fa-cart-plus text-amber-400"></i> Add To Cart
                     </button>
-                    <button onclick="openProductModal('${p.id}')" ${isOutOfStock ? 'disabled' : ''} class="w-full py-2 ${isOutOfStock ? 'bg-slate-800 text-slate-500 cursor-not-allowed' : 'bg-amber-500 hover:bg-amber-600 text-slate-950'} font-black rounded-lg text-[11px] text-center transition flex items-center justify-center gap-1 shadow">
+                    <button onclick="openProductModal('${p.id}')" ${isOutOfStock ? 'disabled' : ''} class="w-full py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black rounded-lg text-[11px] text-center transition flex items-center justify-center gap-1 shadow">
                         <i class="fa-solid fa-bolt"></i> Buy Now
                     </button>
                 </div>
