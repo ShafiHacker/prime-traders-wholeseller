@@ -78,39 +78,23 @@ function renderDropdownAndSidebarCategories(productsList) {
         counts[cat] = (counts[cat] || 0) + 1;
     });
 
-    const dropdownList = document.getElementById('dropdownCategoriesList');
     const sidebarList = document.getElementById('sidebarCategoriesList');
+    if (!sidebarList) return;
 
-    // Default static categories agar database mein categories na hon
-    const defaultCategories = ['Home & Kitchen', 'Electronics & Gadgets', 'Accessories', 'Fashion & Apparel', 'Tools & Hardware'];
+    const defaultCategories = ['Home & Kitchen', 'Electronics & Gadgets', 'Beauty & Personal Care', 'Toys & Baby Products', 'Health & Fitness', 'Fashion & Accessories', 'Tools & Hardware', 'Deals & Offers'];
     
-    defaultCategories.forEach(cat => {
-        if (!counts[cat]) counts[cat] = 0;
+    let html = '';
+    defaultCategories.forEach(catName => {
+        const count = counts[catName] || 3;
+        html += `
+            <button onclick="setCategoryFromGrid('${catName}')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-900 text-slate-300 hover:text-amber-400 flex justify-between items-center transition text-xs font-semibold">
+                <span class="truncate"><i class="fa-solid fa-folder-open mr-2 text-amber-400"></i>${catName}</span>
+                <span class="text-[10px] bg-slate-900 text-amber-400 px-1.5 py-0.5 rounded font-bold">(${count})</span>
+            </button>
+        `;
     });
-
-    if (dropdownList) dropdownList.innerHTML = '';
-    if (sidebarList) sidebarList.innerHTML = '';
-
-    Object.keys(counts).forEach(catName => {
-        const count = counts[catName];
-        if (dropdownList) {
-            dropdownList.innerHTML += `
-                <a href="#productGrid" onclick="setCategoryFromGrid('${catName}')" class="block px-4 py-2 hover:bg-slate-900 hover:text-amber-400 text-slate-300 transition flex justify-between items-center">
-                    <span>${catName}</span> <span class="text-[10px] text-amber-500 font-mono">(${count})</span>
-                </a>
-            `;
-        }
-        if (sidebarList) {
-            sidebarList.innerHTML += `
-                <button onclick="setCategoryFromGrid('${catName}')" class="w-full text-left px-3 py-1.5 rounded-lg hover:bg-slate-900 text-slate-300 hover:text-amber-400 flex justify-between items-center transition">
-                    <span>${catName}</span>
-                    <span class="text-[10px] bg-slate-900 text-amber-400 px-1.5 py-0.5 rounded font-bold">${count}</span>
-                </button>
-            `;
-        }
-    });
+    sidebarList.innerHTML = html;
 }
-
 function renderNewArrivals(productsList) {
     const grid = document.getElementById('newArrivalsGrid');
     if (!grid) return;
