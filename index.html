@@ -83,117 +83,84 @@
     </header>
 
     <!-- Main Content Container -->
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-6 space-y-6">
+<main class="flex-1 max-w-7xl w-full mx-auto px-4 py-6 space-y-6">
 
-        <!-- 3. Hero Slider & Promotional Banner Section -->
-        <section class="grid grid-cols-1 lg:grid-cols-4 gap-4 items-center">
-            <div class="lg:col-span-3 bg-[#102544] rounded-3xl p-6 md:p-10 text-white relative overflow-hidden shadow-xl flex flex-col justify-between min-h-[320px]">
+    <!-- 3 & 4. Categories Sidebar (Left) & Hero Banner (Right) Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
+        
+        <!-- Left Side: Categories Overview Menu (1 Column on Desktop) -->
+        <div class="bg-white border border-[#E2E8F0] rounded-2xl p-4 shadow-sm space-y-3">
+            <div class="flex items-center gap-2 border-b border-slate-100 pb-2.5">
+                <i class="fa-solid fa-bars text-[#102544]"></i>
+                <h3 class="text-xs font-black text-[#102544] uppercase tracking-wider">All Categories</h3>
+            </div>
+            
+            <!-- Dynamic Category List for Sidebar -->
+            <div id="publicCategoriesSidebar" class="space-y-1.5 max-h-[340px] overflow-y-auto pr-1">
+                <div class="text-center py-4 text-slate-400 text-xs font-medium">Loading categories...</div>
+            </div>
+        </div>
+
+        <!-- Right Side: Hero Slider & Promotional Banner (3 Columns on Desktop) -->
+        <div class="lg:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+            
+            <!-- Main Hero Banner (Takes 2 columns) -->
+            <div class="md:col-span-2 bg-[#102544] rounded-3xl p-6 md:p-8 text-white relative overflow-hidden shadow-xl flex flex-col justify-between min-h-[300px]">
                 <div class="absolute right-0 bottom-0 opacity-10 pointer-events-none">
-                    <i class="fa-solid fa-boxes-stacked text-9xl"></i>
+                    <i class="fa-solid fa-boxes-stacked text-8xl"></i>
                 </div>
-                <div class="space-y-3 z-10 max-w-xl">
+                <div class="space-y-2.5 z-10 max-w-lg">
                     <span class="bg-amber-500 text-slate-950 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-sm">
                         Wholesale & Dropship Hub
                     </span>
-                    <h2 class="text-2xl md:text-4xl font-black tracking-tight leading-tight">
+                    <h2 class="text-xl md:text-3xl font-black tracking-tight leading-tight">
                         Everything You Need, All in One Place.
                     </h2>
-                    <p class="text-xs md:text-sm text-slate-300 font-medium">
+                    <p class="text-xs text-slate-300 font-medium">
                         Discover Trending Products at Unbeatable Wholesale Prices across Pakistan.
                     </p>
                 </div>
-                <div class="pt-6 z-10 flex flex-wrap items-center gap-4">
-                    <a href="#productGrid" class="bg-[#2563EB] hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition shadow-md flex items-center gap-2">
+                <div class="pt-4 z-10 flex flex-wrap items-center gap-4">
+                    <a href="#productGrid" class="bg-[#2563EB] hover:bg-blue-600 text-white px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition shadow-md flex items-center gap-2">
                         <span>Shop Now</span>
                         <i class="fa-solid fa-arrow-right"></i>
                     </a>
                 </div>
             </div>
 
-            <div class="bg-gradient-to-br from-orange-500 to-amber-600 rounded-3xl p-6 text-white text-center shadow-xl flex flex-col justify-center items-center space-y-3 min-h-[320px]">
-                <div class="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center text-white text-2xl font-black shadow-inner">
+            <!-- Side Promo Banner (Up to 50% Off) -->
+            <div class="bg-gradient-to-br from-orange-500 to-amber-600 rounded-3xl p-6 text-white text-center shadow-xl flex flex-col justify-center items-center space-y-2.5 min-h-[300px]">
+                <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center text-white text-xl font-black shadow-inner">
                     <i class="fa-solid fa-bolt"></i>
                 </div>
-                <span class="bg-white/20 px-3 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest">Limited Time Offer</span>
-                <h3 class="text-2xl md:text-3xl font-black tracking-tight">UP TO 50% OFF</h3>
-                <p class="text-xs text-orange-100 font-medium">Special wholesale discounts on bulk orders and top trending items.</p>
-            </div>
-        </section>
-
-        <!-- Search & Catalog Header Box -->
-        <div class="neon-gold-card p-6 rounded-2xl space-y-4">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                <div>
-                    <h2 class="text-lg font-black text-amber-400">Product Catalog & Wholesale Inventory</h2>
-                    <p class="text-xs text-slate-400">Download media assets, check reviews, and place direct bulk orders.</p>
-                </div>
-                <div class="relative w-full md:w-80">
-                    <i class="fa-solid fa-search absolute left-3 top-3 text-amber-500/70 text-xs"></i>
-                    <input type="text" id="searchInput" oninput="filterProducts()" placeholder="Search products..." class="w-full pl-9 pr-4 py-2 bg-black border border-amber-500/30 rounded-xl text-xs text-white outline-none focus:border-amber-400 transition">
-                </div>
+                <span class="bg-white/20 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest">Limited Time Offer</span>
+                <h3 class="text-xl md:text-2xl font-black tracking-tight">UP TO 50% OFF</h3>
+                <p class="text-[11px] text-orange-100 font-medium">Special wholesale discounts on bulk orders and top trending items.</p>
             </div>
 
-            <!-- Dynamic Category Filter Buttons Container -->
-            <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs" id="categoryFilterContainer">
-                <button onclick="setCategory('All', this)" class="cat-btn px-4 py-1.5 rounded-lg font-bold neon-gold-btn text-black transition whitespace-nowrap">All Products</button>
+        </div>
+
+    </div>
+
+    <!-- 5. Trending Products & Catalog Section -->
+    <section class="space-y-4">
+        <div class="flex justify-between items-center">
+            <div>
+                <h3 class="text-base md:text-lg font-black text-[#102544] uppercase tracking-wider flex items-center gap-2">
+                    <i class="fa-solid fa-fire text-orange-500"></i> Trending Products
+                </h3>
+                <p class="text-xs text-slate-500 font-medium">Best Selling Products at Great Wholesale Prices</p>
             </div>
         </div>
 
-        <!-- CATEGORIES OVERVIEW GRID -->
-        <div class="neon-gold-card p-6 rounded-2xl space-y-4">
-            <div class="flex justify-between items-center border-b border-amber-500/20 pb-3">
-                <div>
-                    <h2 class="text-sm font-black text-amber-400 uppercase tracking-wider"><i class="fa-solid fa-layer-group text-amber-400 mr-1.5"></i> Categories Overview</h2>
-                    <p class="text-[11px] text-slate-400">Total products count by category</p>
-                </div>
-            </div>
-            <div id="publicCategoriesGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-                <div class="col-span-full text-center py-4 text-slate-500 text-xs font-semibold">
-                    <i class="fa-solid fa-spinner fa-spin text-amber-400 mr-1"></i> Calculating categories...
-                </div>
+        <div id="productGrid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div class="col-span-full text-center py-12 text-slate-400 text-xs font-semibold">
+                <i class="fa-solid fa-spinner fa-spin text-[#102544] text-xl mb-2"></i><br>Loading live catalog inventory...
             </div>
         </div>
+    </section>
 
-        <!-- PRODUCT GRID -->
-        <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            <div class="col-span-full text-center py-12 text-slate-500 text-xs font-semibold">
-                <i class="fa-solid fa-spinner fa-spin text-amber-400 text-xl mb-2"></i><br>Loading live catalog inventory...
-            </div>
-        </div>
-
-        <!-- 6. Trust Badges Section -->
-        <section class="neon-gold-card rounded-2xl p-6 shadow-sm grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            <div class="flex flex-col items-center space-y-2">
-                <div class="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center text-lg">
-                    <i class="fa-solid fa-headset"></i>
-                </div>
-                <h4 class="font-bold text-slate-200 text-xs uppercase">24/7 Customer Support</h4>
-                <p class="text-[10px] text-slate-400">Dedicated merchant assistance</p>
-            </div>
-            <div class="flex flex-col items-center space-y-2">
-                <div class="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-lg">
-                    <i class="fa-solid fa-shield-check"></i>
-                </div>
-                <h4 class="font-bold text-slate-200 text-xs uppercase">Safe & Secure Shopping</h4>
-                <p class="text-[10px] text-slate-400">100% protected transactions</p>
-            </div>
-            <div class="flex flex-col items-center space-y-2">
-                <div class="w-12 h-12 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 flex items-center justify-center text-lg">
-                    <i class="fa-solid fa-truck-fast"></i>
-                </div>
-                <h4 class="font-bold text-slate-200 text-xs uppercase">Fast & Free Delivery</h4>
-                <p class="text-[10px] text-slate-400">On maximum wholesale orders</p>
-            </div>
-            <div class="flex flex-col items-center space-y-2">
-                <div class="w-12 h-12 rounded-full bg-orange-500/10 border border-orange-500/30 text-orange-400 flex items-center justify-center text-lg">
-                    <i class="fa-solid fa-rotate-left"></i>
-                </div>
-                <h4 class="font-bold text-slate-200 text-xs uppercase">Easy Returns & Refunds</h4>
-                <p class="text-[10px] text-slate-400">Hassle-free merchant policies</p>
-            </div>
-        </section>
-
-    </main>
+</main>
 
     <!-- Product Details Modal -->
     <div id="productModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
