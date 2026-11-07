@@ -13,6 +13,19 @@ function listenToLiveCatalog() {
         return;
     }
 
+    // 1. INSTANT LOAD: Pehle local storage se foran products dikhao taaki loading khatam ho jaye
+    const cachedProducts = localStorage.getItem('prime_cached_products');
+    if (cachedProducts) {
+        try {
+            allProducts = JSON.parse(cachedProducts);
+            renderPublicCategoriesGrid(allProducts);
+            filterProducts();
+        } catch (e) {
+            console.error("Cache parse error:", e);
+        }
+    }
+
+    // 2. REAL-TIME SYNC: Background mein Firebase se data sync hota rahega aur cache update hogi
     database.collection('products').onSnapshot(snapshot => {
         allProducts = [];
         const dynamicCategories = new Set();
@@ -26,6 +39,9 @@ function listenToLiveCatalog() {
         });
 
         allProducts.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+        
+        // Save to LocalStorage for ultra-fast subsequent loads
+        localStorage.setItem('prime_cached_products', JSON.stringify(allProducts));
         
         renderPublicCategoriesGrid(allProducts);
         filterProducts();
@@ -120,7 +136,7 @@ function renderProducts(products) {
             <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden hover:border-amber-400/60 transition shadow-lg flex flex-col justify-between">
                 <div>
                     <div class="relative h-48 bg-slate-950 overflow-hidden cursor-pointer" onclick="openProductModal('${p.id}')">
-                        <img src="${mainImg}" alt="${p.title}" class="w-full h-full object-cover hover:scale-105 transition duration-300 ${isOutOfStock ? 'opacity-40' : ''}">
+                        <img src="${mainImg}" alt="${p.title}" loading="lazy" class="w-full h-full object-cover hover:scale-105 transition duration-300 ${isOutOfStock ? 'opacity-40' : ''}">
                         ${isOutOfStock ? `<span class="absolute top-2 left-2 bg-rose-600 text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase">OUT OF STOCK</span>` : `<span class="absolute top-2 left-2 bg-emerald-600 text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase">IN STOCK</span>`}
                     </div>
                     <div class="p-3.5 space-y-1.5">
