@@ -1,4 +1,4 @@
-// js/store-config.js
+// js/store.js
 let allProducts = [];
 let selectedCategory = 'All';
 let cart = [];
@@ -19,19 +19,15 @@ function listenToLiveCatalog() {
 
         snapshot.forEach(doc => {
             const data = doc.data();
-            if (data.isActive !== false) {
-                allProducts.push({ id: doc.id, ...data });
-                if (data.category && data.category.trim() !== '') {
-                    dynamicCategories.add(data.category.trim());
-                }
+            allProducts.push({ id: doc.id, ...data });
+            if (data.category && data.category.trim() !== '') {
+                dynamicCategories.add(data.category.trim());
             }
         });
 
         allProducts.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
         
         renderPublicCategoriesGrid(allProducts);
-        renderDropdownAndSidebarCategories(allProducts);
-        renderNewArrivals(allProducts);
         filterProducts();
     }, err => {
         console.error("Firestore Error, retrying connection...", err);
@@ -39,109 +35,53 @@ function listenToLiveCatalog() {
     });
 }
 
-// Render Popular Categories with Professional 3D Image Cards
 function renderPublicCategoriesGrid(productsList) {
-    const grid = document.getElementById('publicCategoriesGrid');
-    if (!grid) return;
-
-    const popularCategories = [
-        { name: 'Home & Kitchen', img: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=300&q=80', count: '10 products' },
-        { name: 'Electronics & Gadgets', img: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=300&q=80', count: '7 products' },
-        { name: 'Beauty & Personal Care', img: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=300&q=80', count: '5 products' },
-        { name: 'Toys & Baby Products', img: 'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?auto=format&fit=crop&w=300&q=80', count: '4 products' },
-        { name: 'Health & Fitness', img: 'https://images.unsplash.com/photo-1510519138161-5364d852a364?auto=format&fit=crop&w=300&q=80', count: '6 products' },
-        { name: 'Fashion & Accessories', img: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=300&q=80', count: '9 products' },
-        { name: 'Tools & Hardware', img: 'https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=300&q=80', count: '3 products' },
-        { name: 'Deals & Offers', img: 'https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?auto=format&fit=crop&w=300&q=80', count: '12 products' }
-    ];
-
-    let html = '';
-    popularCategories.forEach(cat => {
-        html += `
-            <div onclick="setCategoryFromGrid('${cat.name}')" class="bg-gradient-to-b from-slate-900 to-blue-950 border border-cyan-500/30 hover:border-cyan-400 rounded-xl overflow-hidden cursor-pointer transition transform hover:-translate-y-1 shadow-lg text-center p-2 group">
-                <div class="h-20 bg-slate-950 rounded-lg overflow-hidden mb-2 relative flex items-center justify-center">
-                    <img src="${cat.img}" alt="${cat.name}" class="w-full h-full object-cover group-hover:scale-110 transition duration-300 opacity-90">
-                    <div class="absolute inset-0 bg-gradient-to-t from-blue-950/80 via-transparent to-transparent"></div>
-                </div>
-                <h4 class="text-xs font-bold text-white truncate px-1">${cat.name}</h4>
-                <p class="text-[10px] text-cyan-400 font-semibold mt-0.5">${cat.count}</p>
-            </div>
-        `;
-    });
-    grid.innerHTML = html;
-}
-
-function renderDropdownAndSidebarCategories(productsList) {
     const counts = {};
     productsList.forEach(p => {
-        const cat = p.category && p.category.trim() !== '' ? p.category.trim() : 'General';
+        const cat = p.category || 'General';
         counts[cat] = (counts[cat] || 0) + 1;
     });
 
-    const sidebarList = document.getElementById('sidebarCategoriesList');
-    if (!sidebarList) return;
-
-    const defaultCategories = ['Home & Kitchen', 'Electronics & Gadgets', 'Beauty & Personal Care', 'Toys & Baby Products', 'Health & Fitness', 'Fashion & Accessories', 'Tools & Hardware', 'Deals & Offers'];
-    
-    let html = '';
-    defaultCategories.forEach(catName => {
-        const count = counts[catName] || 3;
-        html += `
-            <button onclick="setCategoryFromGrid('${catName}')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-900 text-slate-300 hover:text-amber-400 flex justify-between items-center transition text-xs font-semibold">
-                <span class="truncate"><i class="fa-solid fa-folder-open mr-2 text-amber-400"></i>${catName}</span>
-                <span class="text-[10px] bg-slate-900 text-amber-400 px-1.5 py-0.5 rounded font-bold">(${count})</span>
-            </button>
-        `;
-    });
-    sidebarList.innerHTML = html;
-}
-function renderNewArrivals(productsList) {
-    const grid = document.getElementById('newArrivalsGrid');
+    const grid = document.getElementById('publicCategoriesGrid');
     if (!grid) return;
-    const latest = productsList.slice(0, 4);
-    if (latest.length === 0) {
-        grid.innerHTML = `<div class="col-span-full text-center text-slate-500 text-xs">No new arrivals.</div>`;
-        return;
-    }
-    let html = '';
-    latest.forEach(p => {
-        const img = (p.images && p.images.length > 0) ? p.images[0] : (p.image || '');
+
+    const defaultCats = [
+        'Fashion & Apparel', 
+        'Electronics & Gadgets', 
+        'Home & Kitchen', 
+        'Accessories',
+        'Computer Accessories',
+        'Dish Set',
+        'Medicine Box',
+        'Mobile Accessories'
+    ];
+
+    const allCats = Array.from(new Set([...defaultCats, ...Object.keys(counts)]));
+
+    let html = `
+        <div onclick="setCategoryFromGrid('All')" class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center flex flex-col items-center justify-center space-y-1 hover:border-amber-500/50 transition shadow cursor-pointer">
+            <div class="w-8 h-8 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-xs">
+                <i class="fa-solid fa-layer-group"></i>
+            </div>
+            <h3 class="font-bold text-slate-200 text-[11px] line-clamp-1">All Products</h3>
+            <span class="bg-amber-950/60 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded text-[9px] font-bold">${productsList.length} products</span>
+        </div>
+    `;
+
+    allCats.forEach(cat => {
+        const num = counts[cat] || 0;
         html += `
-            <div onclick="openProductModal('${p.id}')" class="bg-black p-2.5 rounded-xl border border-amber-500/20 hover:border-amber-400 cursor-pointer transition space-y-1">
-                <img src="${img}" class="w-full h-24 object-cover rounded-lg">
-                <h4 class="font-bold text-white text-[11px] truncate">${p.title}</h4>
-                <p class="text-amber-400 font-black text-xs">PKR ${p.price || p.singlePrice || 0}</p>
+            <div onclick="setCategoryFromGrid('${cat}')" class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center flex flex-col items-center justify-center space-y-1 hover:border-amber-500/50 transition shadow cursor-pointer">
+                <div class="w-8 h-8 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-xs">
+                    <i class="fa-solid fa-box-open"></i>
+                </div>
+                <h3 class="font-bold text-slate-200 text-[11px] line-clamp-1">${cat}</h3>
+                <span class="bg-amber-950/60 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded text-[9px] font-bold">${num} products</span>
             </div>
         `;
     });
     grid.innerHTML = html;
 }
-
-// Dynamic Hero Banner Loader from Firestore
-async function loadDynamicHeroBanner() {
-    try {
-        if (!database) return;
-        const doc = await database.collection('settings').doc('hero_banner').get();
-        if (doc.exists) {
-            const data = doc.data();
-            const bannerContainer = document.querySelector('.lg\\:col-span-2.neon-gold-card');
-            const shopNowBtn = bannerContainer ? bannerContainer.querySelector('a') : null;
-
-            if (bannerContainer && data.image) {
-                bannerContainer.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('${data.image}')`;
-                bannerContainer.style.backgroundSize = 'cover';
-                bannerContainer.style.backgroundPosition = 'center';
-            }
-            if (shopNowBtn && data.link) {
-                shopNowBtn.setAttribute('href', data.link);
-            }
-        }
-    } catch (e) {
-        console.error("Error loading dynamic hero banner:", e);
-    }
-}
-
-document.addEventListener("DOMContentLoaded", loadDynamicHeroBanner);
 
 function setCategoryFromGrid(catName) {
     selectedCategory = catName;
@@ -149,31 +89,9 @@ function setCategoryFromGrid(catName) {
     window.scrollTo({ top: 400, behavior: 'smooth' });
 }
 
-function setCategory(catName, btnElement) {
-    selectedCategory = catName;
-    document.querySelectorAll('.cat-btn').forEach(b => {
-        b.classList.remove('neon-gold-btn', 'text-black');
-        b.classList.add('bg-slate-900', 'text-slate-300');
-    });
-    if (btnElement) {
-        btnElement.classList.add('neon-gold-btn', 'text-black');
-        btnElement.classList.remove('bg-slate-900', 'text-slate-300');
-    }
-    filterProducts();
-}
-
 function filterProducts() {
-    const searchInput = document.getElementById('searchInput') || document.getElementById('headerSearchInput');
+    const searchInput = document.getElementById('searchInput');
     const query = searchInput ? searchInput.value.toLowerCase() : '';
-    
-    // Search Tracking for Excel Export
-    if (database && query.trim() !== '') {
-        database.collection('search_logs').add({
-            query: query.trim().toLowerCase(),
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        }).catch(err => console.error("Search log error:", err));
-    }
-
     const filtered = allProducts.filter(p => {
         const matchesCat = selectedCategory === 'All' || p.category === selectedCategory;
         const matchesQuery = p.title.toLowerCase().includes(query) || (p.desc && p.desc.toLowerCase().includes(query));
@@ -185,45 +103,42 @@ function filterProducts() {
 function renderProducts(products) {
     const grid = document.getElementById('productGrid');
     if (!grid) return;
-
-    // Agar products array khali hai ya undefined hai
-    if (!products || products.length === 0) {
-        grid.innerHTML = `<div class="col-span-full text-center text-slate-400 py-12">No products found in catalog.</div>`;
+    if (!products.length) {
+        grid.innerHTML = `<div class="col-span-full text-center text-slate-400 py-12">No products found.</div>`;
         return;
     }
 
-    const limitedProducts = products.slice(0, 8); // 8 products grid
-
     let html = '';
-    limitedProducts.forEach(p => {
-        // Flexible price check (price, singlePrice, ya retailPrice mein se jo bhi ho)
-        const discPrice = p.price || p.singlePrice || p.retailPrice || 0;
-        const origPrice = p.originalPrice || p.retailPrice || Math.round(discPrice * 1.3);
+    products.forEach(p => {
+        const discPrice = p.price || 0;
+        const origPrice = p.originalPrice || Math.round(discPrice * 1.3);
         const mainImg = (p.images && p.images.length > 0) ? p.images[0] : (p.image || 'https://via.placeholder.com/400');
         const isOutOfStock = p.stock !== undefined && p.stock <= 0;
+        const bulkBadge = p.bulkPrice && p.bulkQty ? `<div class="text-[10px] text-emerald-400 font-bold bg-emerald-950/60 border border-emerald-500/30 px-1.5 py-0.5 rounded mt-1 inline-block">Buy ${p.bulkQty}+ @ PKR ${p.bulkPrice}/pc</div>` : '';
 
         html += `
             <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden hover:border-amber-400/60 transition shadow-lg flex flex-col justify-between">
                 <div>
                     <div class="relative h-48 bg-slate-950 overflow-hidden cursor-pointer" onclick="openProductModal('${p.id}')">
-                        <img src="${mainImg}" alt="${p.title || 'Product'}" class="w-full h-full object-cover hover:scale-105 transition duration-300 ${isOutOfStock ? 'opacity-40' : ''}">
+                        <img src="${mainImg}" alt="${p.title}" class="w-full h-full object-cover hover:scale-105 transition duration-300 ${isOutOfStock ? 'opacity-40' : ''}">
                         ${isOutOfStock ? `<span class="absolute top-2 left-2 bg-rose-600 text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase">OUT OF STOCK</span>` : `<span class="absolute top-2 left-2 bg-emerald-600 text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase">IN STOCK</span>`}
                     </div>
                     <div class="p-3.5 space-y-1.5">
                         <span class="text-[10px] font-bold text-amber-500 uppercase tracking-wider">${p.category || 'General'}</span>
-                        <h3 class="font-bold text-slate-100 text-xs line-clamp-2 cursor-pointer hover:text-amber-400" onclick="openProductModal('${p.id}')">${p.title || 'Product Item'}</h3>
+                        <h3 class="font-bold text-slate-100 text-xs line-clamp-2 cursor-pointer hover:text-amber-400" onclick="openProductModal('${p.id}')">${p.title}</h3>
                         
                         <div class="flex items-center gap-2">
                             <span class="text-sm font-black text-amber-300">PKR ${discPrice}</span>
                             <span class="text-xs text-slate-500 line-through font-semibold">PKR ${origPrice}</span>
                         </div>
+                        ${bulkBadge}
                     </div>
                 </div>
                 <div class="p-3.5 pt-2 grid grid-cols-2 gap-2">
-                    <button onclick="openProductModal('${p.id}')" ${isOutOfStock ? 'disabled' : ''} class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-lg text-[11px] transition flex items-center justify-center gap-1">
+                    <button onclick="openProductModal('${p.id}')" ${isOutOfStock ? 'disabled' : ''} class="w-full py-2 ${isOutOfStock ? 'bg-slate-800 text-slate-500 cursor-not-allowed' : 'bg-slate-800 hover:bg-slate-700 text-slate-200'} font-bold rounded-lg text-[11px] transition flex items-center justify-center gap-1">
                         <i class="fa-solid fa-cart-plus text-amber-400"></i> Add To Cart
                     </button>
-                    <button onclick="openProductModal('${p.id}')" ${isOutOfStock ? 'disabled' : ''} class="w-full py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black rounded-lg text-[11px] text-center transition flex items-center justify-center gap-1 shadow">
+                    <button onclick="openProductModal('${p.id}')" ${isOutOfStock ? 'disabled' : ''} class="w-full py-2 ${isOutOfStock ? 'bg-slate-800 text-slate-500 cursor-not-allowed' : 'bg-amber-500 hover:bg-amber-600 text-slate-950'} font-black rounded-lg text-[11px] text-center transition flex items-center justify-center gap-1 shadow">
                         <i class="fa-solid fa-bolt"></i> Buy Now
                     </button>
                 </div>
@@ -237,7 +152,7 @@ async function openProductModal(id) {
     const p = allProducts.find(item => item.id === id);
     if (!p) return;
 
-    const discPrice = p.price || p.singlePrice || 0;
+    const discPrice = p.price || 0;
     const origPrice = p.originalPrice || Math.round(discPrice * 1.3);
     const imagesList = (p.images && p.images.length > 0) ? p.images : [p.image || 'https://via.placeholder.com/400'];
     const isOutOfStock = p.stock !== undefined && p.stock <= 0;
@@ -261,7 +176,8 @@ async function openProductModal(id) {
         <div class="flex justify-between items-start border-b border-slate-800 pb-3">
             <div>
                 <div class="flex items-center gap-2">
-                    <span class="text-[11px] font-bold text-amber-400 bg-amber-950/50 border border-amber-500/30 px-2.5 py-0.5 rounded">${p.category || 'General'}</span>
+                    <span class="text-[11px] font-bold text-amber-400 bg-amber-950/50 border border-amber-500/30 px-2.5 py-0.5 rounded">${p.category}</span>
+                    ${p.weight && p.weight !== 'N/A' ? `<span class="text-[11px] font-bold text-slate-300 bg-slate-800 border border-slate-700 px-2.5 py-0.5 rounded"><i class="fa-solid fa-weight-hanging mr-1 text-amber-400"></i>${p.weight}</span>` : ''}
                 </div>
                 <h2 class="text-base md:text-lg font-bold text-white mt-1.5">${p.title}</h2>
             </div>
@@ -306,7 +222,7 @@ async function openProductModal(id) {
 
                 <div>
                     <h3 class="font-bold text-slate-300 mb-1.5 text-xs">Description:</h3>
-                    <p class="text-xs text-slate-300 bg-slate-950 p-3.5 rounded-xl border border-slate-800 leading-relaxed whitespace-pre-line max-h-44 overflow-y-auto">${p.description || p.desc || 'No description provided.'}</p>
+                    <p class="text-xs text-slate-300 bg-slate-950 p-3.5 rounded-xl border border-slate-800 leading-relaxed whitespace-pre-line max-h-44 overflow-y-auto">${p.desc || 'No description provided.'}</p>
                 </div>
             </div>
         </div>
@@ -363,7 +279,7 @@ function calculateItemPrice(item) {
     if (item.bulkPrice && item.bulkQty && item.qty >= item.bulkQty) {
         return item.bulkPrice;
     }
-    return item.price || item.singlePrice || 0;
+    return item.price;
 }
 
 function openCartModal() {
@@ -490,7 +406,7 @@ async function calculateLiveDC() {
     if (document.getElementById('summarySubtotal')) document.getElementById('summarySubtotal').innerText = `PKR ${subtotal}`;
     if (document.getElementById('summaryDC')) document.getElementById('summaryDC').innerText = `PKR ${calculatedDC}`;
     if (document.getElementById('summaryFinalTotal')) document.getElementById('summaryFinalTotal').innerText = `PKR ${finalTotal}`;
-    if (document.getElementById('checkoutOrderTotal')) document.getElementById('checkoutOrderTotal').value = finalTotal;
+    if (document.getElementById('checkoutOrderTotal')) document.getElementById('checkoutOrderTotal').innerText = `PKR ${finalTotal}`;
 
     return { subtotal, calculatedDC, finalTotal };
 }
@@ -502,10 +418,8 @@ function closeCheckoutModal() {
 async function submitCheckoutOrder(e) {
     e.preventDefault();
     const btn = document.getElementById('confirmOrderBtn');
-    if(btn) {
-        btn.disabled = true;
-        btn.innerText = "Submitting Order to Logistics...";
-    }
+    btn.disabled = true;
+    btn.innerText = "Submitting Order to Logistics...";
 
     const name = document.getElementById('custName').value.trim();
     const phone = document.getElementById('custPhone').value.trim();
@@ -553,21 +467,22 @@ async function submitCheckoutOrder(e) {
         cart = [];
         updateCartBadge();
         closeCheckoutModal();
-        e.target.reset();
+        document.getElementById('checkoutModal').querySelector('form').reset();
     } catch (err) {
         showCustomAlert("ERROR!", "Error submitting order: " + err.message, "error");
     } finally {
-        if(btn) {
-            btn.disabled = false;
-            btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Submit Order to Main Dashboard`;
-        }
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Submit Order to Main Dashboard`;
     }
 }
 
+listenToLiveCatalog();
+
+// Custom Modal Alert Function (Replaces native alert popups)
 function showCustomAlert(title, message, type = 'success', callback = null) {
     const modal = document.getElementById('customAlertModal');
     if (!modal) {
-        alert(message);
+        alert(message); // Fallback
         return;
     }
 
@@ -604,63 +519,8 @@ function closeCustomAlert() {
     if (modal) modal.classList.add('hidden');
 }
 
+// Override default window alert to use our custom modal automatically
 window.alert = function(msg) {
     let isError = msg.toLowerCase().includes('error') || msg.toLowerCase().includes('failed') || msg.toLowerCase().includes('enter');
     showCustomAlert(isError ? "ERROR!" : "SUCCESS", msg, isError ? "error" : "success");
 };
-
-// Load Today's Deal settings from Firestore and sync with timer
-async function loadTodaysDealSettings() {
-    try {
-        if (!database) return;
-        const doc = await database.collection('settings').doc('todays_deal').get();
-        if (doc.exists) {
-            const data = doc.data();
-            const dealBox = document.getElementById('todaysDealBox');
-            if (dealBox) {
-                const discountPercent = data.originalPrice && data.price ? Math.round(((data.originalPrice - data.price) / data.originalPrice) * 100) : 29;
-                dealBox.innerHTML = `
-                    <div class="bg-black p-3 rounded-xl border border-amber-500/20 flex gap-3 items-center">
-                        <div class="w-20 h-20 bg-slate-900 rounded-lg overflow-hidden flex items-center justify-center text-xs text-slate-500">
-                            ${data.image ? `<img src="${data.image}" class="w-full h-full object-cover">` : 'Deal Item'}
-                        </div>
-                        <div class="space-y-1">
-                            <h4 class="text-xs font-bold text-white">${data.title || 'Wireless Neckband Earphones'}</h4>
-                            <p class="text-amber-400 font-black text-xs">PKR ${data.price || 1999} <span class="line-through text-slate-500 text-[10px]">${data.originalPrice || 2799}</span></p>
-                            <span class="inline-block bg-emerald-500/20 text-emerald-400 text-[9px] font-bold px-2 py-0.5 rounded">Save ${discountPercent}%</span>
-                        </div>
-                    </div>
-                `;
-            }
-            startDealsTimer(data.hoursDuration || 2);
-        } else {
-            startDealsTimer(2);
-        }
-    } catch (e) {
-        console.error("Error loading today's deal:", e);
-        startDealsTimer(2);
-    }
-}
-
-// Countdown Timer for Deals
-function startDealsTimer(hoursDuration) {
-    let duration = (hoursDuration || 2) * 3600;
-    const timerBox = document.querySelector('#todaysDeals .font-mono');
-    if (!timerBox) return;
-
-    setInterval(() => {
-        if (duration <= 0) duration = 24 * 3600;
-        duration--;
-
-        const hours = String(Math.floor(duration / 3600)).padStart(2, '0');
-        const minutes = String(Math.floor((duration % 3600) / 60)).padStart(2, '0');
-        const seconds = String(duration % 60).padStart(2, '0');
-
-        timerBox.innerHTML = `<span>${hours}<small>h</small></span>:<span>${minutes}<small>m</small></span>:<span>${seconds}<small>s</small></span>`;
-    }, 1000);
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-    listenToLiveCatalog();
-    loadTodaysDealSettings();
-});
