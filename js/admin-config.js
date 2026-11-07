@@ -1,8 +1,7 @@
-// js/admin-config.js
+// js/admin.js
 let selectedImageFiles = [];
 let currentAdminEmail = "";
 let loadedProductsMap = {};
-window.adminBannerBase64 = "";
 
 auth.onAuthStateChanged((user) => {
     if (!user) {
@@ -13,9 +12,6 @@ auth.onAuthStateChanged((user) => {
         if (display) display.innerText = `Logged in as: ${currentAdminEmail}`;
         loadAdminProducts();
         loadAdminOrders();
-        loadActiveUsers();
-        loadDeletedArchive();
-        loadDcKmSettings();
     }
 });
 
@@ -62,47 +58,6 @@ function handleCategoryChange(val) {
     }
 }
 
-async function handleBannerSelection(e) {
-    const file = e.target.files[0];
-    if (file) {
-        window.adminBannerBase64 = await compressBannerFile(file);
-        const previewContainer = document.getElementById('bannerPreviewContainer');
-        const previewImg = document.getElementById('bannerPreviewImg');
-        if (previewContainer && previewImg) {
-            previewImg.src = window.adminBannerBase64;
-            previewContainer.classList.remove('hidden');
-        }
-    }
-}
-
-async function compressBannerFile(file) {
-    return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = (event) => {
-            const img = new Image();
-            img.src = event.target.result;
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                let width = img.width;
-                let height = img.height;
-                const maxWidth = 1200;
-
-                if (width > maxWidth) {
-                    height = Math.round((height * maxWidth) / width);
-                    width = maxWidth;
-                }
-
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, width, height);
-                resolve(canvas.toDataURL('image/jpeg', 0.85));
-            };
-        };
-    });
-}
-
 async function handleImageSelection(e) {
     const files = Array.from(e.target.files);
     for (let f of files) {
@@ -122,7 +77,7 @@ function renderImagePreviews() {
     }
 
     container.innerHTML = selectedImageFiles.map((b64, idx) => `
-        <div class="relative w-14 h-14 rounded-lg overflow-hidden border border-blue-500/50 group">
+        <div class="relative w-14 h-14 rounded-lg overflow-hidden border border-amber-500/50 group">
             <img src="${b64}" class="w-full h-full object-cover">
             <button type="button" onclick="removeSingleImage(${idx})" class="absolute top-0.5 right-0.5 bg-rose-600 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-bold shadow hover:bg-rose-700">
                 ×
@@ -173,56 +128,17 @@ function compressImageFile(file) {
     });
 }
 
-async function saveHeroBannerSettings() {
-    const targetLinkInput = document.getElementById('bannerTargetLink');
-    const targetLink = targetLinkInput ? targetLinkInput.value.trim() || '#productGrid' : '#productGrid';
-
-    if (!window.adminBannerBase64) {
-        alert("Karam farma kar pehle banner image attach karein!");
+async function handleSaveProduct(e) {
+    e.preventDefault();
+    if (selectedImageFiles.length === 0) {
+        alert("Please attach at least 1 image file.");
         return;
     }
 
-    const saveBtn = event.target.closest('button') || document.querySelector('button[onclick="saveHeroBannerSettings()"]');
-    if (saveBtn) {
-        saveBtn.disabled = true;
-        saveBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Saving Banner...`;
-    }
-
-    try {
-        await db.collection('settings').doc('hero_banner').set({
-            imageUrl: window.adminBannerBase64,
-            targetLink: targetLink,
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        alert("Main Hero Banner kamyabi ke sath save aur live publish ho gaya hai! 🎉");
-    } catch (error) {
-        console.error("Banner save error:", error);
-        alert("Error saving banner: " + error.message);
-    } finally {
-        if (saveBtn) {
-            saveBtn.disabled = false;
-            saveBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-1.5"></i> SAVE & PUBLISH BANNER`;
-        }
-    }
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-    const form = document.getElementById('addProductForm');
-    if (form) {
-        form.onsubmit = async function(e) {
-            e.preventDefault();
-            await submitProductForm();
-        };
-    }
-});
-
-async function submitProductForm() {
     const btn = document.getElementById('submitBtn');
     const editingId = document.getElementById('editingProductId').value;
-    if (btn) {
-        btn.disabled = true;
-        btn.innerText = editingId ? "Updating Product..." : "Publishing to Portal...";
-    }
+    btn.disabled = true;
+    btn.innerText = editingId ? "Updating Product..." : "Publishing to Portal...";
 
     const title = document.getElementById('prodTitle').value.trim();
     let category = document.getElementById('prodCategory').value;
@@ -232,16 +148,16 @@ async function submitProductForm() {
             category = customCat;
         } else {
             alert("Please enter custom category name.");
-            if (btn) btn.disabled = false;
+            btn.disabled = false;
             return;
         }
     }
 
-    const originalPrice = parseFloat(document.getElementById('prodOriginalPrice').value) || 0;
-    const price = parseFloat(document.getElementById('prodPrice').value) || 0;
+    const originalPrice = parseFloat(document.getElementById('prodOriginalPrice').value);
+    const price = parseFloat(document.getElementById('prodPrice').value);
     const bulkPrice = parseFloat(document.getElementById('prodBulkPrice').value) || 0;
     const bulkQty = parseInt(document.getElementById('prodBulkQty').value) || 0;
-    const stock = parseInt(document.getElementById('prodStock').value) || 10;
+    const stock = parseInt(document.getElementById('prodStock').value);
     const weight = document.getElementById('prodWeight').value.trim();
     const desc = document.getElementById('prodDesc').value.trim();
 
@@ -265,6 +181,7 @@ async function submitProductForm() {
 
         if (editingId && loadedProductsMap[editingId]) {
             const existing = loadedProductsMap[editingId];
+            // Vendor name ko 100% lock rakha gaya hai taaki edit par change na ho
             assignedVendorName = existing.vendorName && !existing.vendorName.includes("@") 
                 ? existing.vendorName 
                 : getVendorName(existing.originalCreatorEmail || existing.addedByAdmin);
@@ -281,9 +198,9 @@ async function submitProductForm() {
             image: selectedImageFiles[0] || "",
             desc,
             isActive: true,
-            vendorName: assignedVendorName,
-            originalCreatorEmail: originalCreator,
-            addedByAdmin: currentAdminEmail,
+            vendorName: assignedVendorName, // Permanent Locked Vendor Name
+            originalCreatorEmail: originalCreator, // Asal creator email locked
+            addedByAdmin: currentAdminEmail, // Sirf last updater ki email yahan update hogi
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         };
 
@@ -312,10 +229,8 @@ async function submitProductForm() {
     } catch (err) {
         alert("Error: " + err.message);
     } finally {
-        if (btn) {
-            btn.disabled = false;
-            btn.innerText = "Publish Product to Central Catalog";
-        }
+        btn.disabled = false;
+        btn.innerText = "Publish Product to Central Catalog";
     }
 }
 
@@ -368,7 +283,7 @@ function editProduct(id) {
     selectedImageFiles = p.images || (p.image ? [p.image] : []);
     renderImagePreviews();
 
-    document.getElementById('formHeading').innerHTML = `<i class="fa-solid fa-pen-to-square text-cyan-400 mr-1.5"></i> Edit Product: ${p.title}`;
+    document.getElementById('formHeading').innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-400 mr-1.5"></i> Edit Product: ${p.title}`;
     document.getElementById('submitBtn').innerText = "Update Product Changes";
     document.getElementById('cancelEditBtn').classList.remove('hidden');
 
@@ -383,7 +298,7 @@ function resetProductForm() {
     if (customBox) customBox.classList.add('hidden');
     selectedImageFiles = [];
     renderImagePreviews();
-    document.getElementById('formHeading').innerHTML = `<i class="fa-solid fa-plus-circle text-cyan-400 mr-1.5"></i> Add New Wholesale Product`;
+    document.getElementById('formHeading').innerHTML = `<i class="fa-solid fa-plus-circle text-amber-400 mr-1.5"></i> Add New Wholesale Product`;
     document.getElementById('submitBtn').innerText = "Publish Product to Central Catalog";
     document.getElementById('cancelEditBtn').classList.add('hidden');
 }
@@ -425,12 +340,12 @@ function renderCategoriesGrid(productsList) {
     allCats.forEach(cat => {
         const num = counts[cat] || 0;
         html += `
-            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center flex flex-col items-center justify-center space-y-1 hover:border-blue-500/50 transition shadow">
-                <div class="w-8 h-8 rounded-full bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-cyan-400 text-xs">
+            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center flex flex-col items-center justify-center space-y-1 hover:border-amber-500/50 transition shadow">
+                <div class="w-8 h-8 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-xs">
                     <i class="fa-solid fa-box-open"></i>
                 </div>
                 <h3 class="font-bold text-slate-200 text-[11px] line-clamp-1">${cat}</h3>
-                <span class="bg-blue-950/60 text-cyan-400 border border-blue-500/30 px-2 py-0.5 rounded text-[9px] font-bold">${num} products</span>
+                <span class="bg-amber-950/60 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded text-[9px] font-bold">${num} products</span>
             </div>
         `;
     });
@@ -477,6 +392,7 @@ function loadAdminProducts() {
 
             const bulkInfo = p.bulkPrice && p.bulkQty ? `<div class="text-[10px] text-emerald-400">Bulk: PKR ${p.bulkPrice} (${p.bulkQty}+ pcs)</div>` : '';
             
+            // Asal vendor name ko secure dikhane ke liye
             const vendorSource = p.vendorName && !p.vendorName.includes("@") ? p.vendorName : (p.originalCreatorEmail || p.addedByAdmin);
             const vendorDisplayName = getVendorName(vendorSource);
             const uploaderEmail = p.addedByAdmin || 'N/V';
@@ -486,21 +402,21 @@ function loadAdminProducts() {
                     <td class="p-3">
                         <div class="flex items-center gap-1">
                             <img src="${mainImg}" class="w-10 h-10 object-cover rounded-lg border border-slate-700">
-                            <span class="text-[10px] text-cyan-400 font-bold">+${imgCount-1}</span>
+                            <span class="text-[10px] text-amber-400 font-bold">+${imgCount-1}</span>
                         </div>
                     </td>
                     <td class="p-3">
                         <div class="font-bold text-slate-100">${p.title}</div>
-                        <div class="text-[10px] text-cyan-400 font-mono">${p.category}</div>
+                        <div class="text-[10px] text-amber-400 font-mono">${p.category}</div>
                     </td>
                     <td class="p-3">
-                        <span class="bg-blue-950/80 text-cyan-300 border border-blue-500/40 px-2.5 py-1 rounded font-bold text-[11px] inline-block">👤 ${vendorDisplayName}</span>
+                        <span class="bg-amber-950/80 text-amber-300 border border-amber-500/40 px-2.5 py-1 rounded font-bold text-[11px] inline-block">👤 ${vendorDisplayName}</span>
                     </td>
                     <td class="p-3">
                         <span class="text-slate-300 font-mono text-[10px] bg-slate-950 px-2 py-1 rounded border border-slate-800 inline-block">${uploaderEmail}</span>
                     </td>
                     <td class="p-3">
-                        <div class="font-bold text-cyan-300">Single: PKR ${p.price}</div>
+                        <div class="font-bold text-amber-300">Single: PKR ${p.price}</div>
                         ${bulkInfo}
                     </td>
                     <td class="p-3 space-y-1">
@@ -508,7 +424,7 @@ function loadAdminProducts() {
                         <div class="text-[11px] text-slate-400">Stock: ${stockVal} units</div>
                     </td>
                     <td class="p-3 text-center space-x-1">
-                        <button onclick="editProduct('${id}')" class="bg-blue-500 hover:bg-blue-600 text-slate-950 px-2.5 py-1 rounded text-[11px] font-bold transition shadow">
+                        <button onclick="editProduct('${id}')" class="bg-amber-500 hover:bg-amber-600 text-slate-950 px-2.5 py-1 rounded text-[11px] font-bold transition shadow">
                             <i class="fa-solid fa-pen"></i> Edit
                         </button>
                         <button onclick="deleteProduct('${id}')" class="bg-rose-600 hover:bg-rose-700 text-white px-2.5 py-1 rounded text-[11px] font-bold transition shadow">
@@ -605,13 +521,13 @@ function loadAdminOrders() {
                 <tr class="hover:bg-slate-900/50 transition border-b border-slate-800">
                     <td class="p-3 font-bold text-white">
                         ${o.customerName || o.custName || 'N/A'}
-                        <div class="text-[10px] text-cyan-400">${o.customerPhone || o.custPhone || ''}</div>
+                        <div class="text-[10px] text-amber-400">${o.customerPhone || o.custPhone || ''}</div>
                         <div class="text-[10px] text-slate-400">${o.customerAddress || o.custAddress || ''}</div>
                     </td>
                     <td class="p-3 text-slate-300">${itemsStr}</td>
-                    <td class="p-3 font-bold text-cyan-300">PKR ${o.totalAmount || o.totalCod || 0}</td>
+                    <td class="p-3 font-bold text-amber-300">PKR ${o.totalAmount || o.totalCod || 0}</td>
                     <td class="p-3">
-                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-900/50 text-cyan-300 border border-blue-500/30">${o.status || 'Pending'}</span>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-900/50 text-amber-300 border border-amber-500/30">${o.status || 'Pending'}</span>
                     </td>
                     <td class="p-3 text-center">
                         <button onclick="deleteAdminOrder('${id}')" class="bg-rose-600 hover:bg-rose-700 text-white px-2 py-1 rounded text-[10px] font-bold shadow">Delete</button>
@@ -626,105 +542,6 @@ function loadAdminOrders() {
     });
 }
 
-// Load Active Users (Updated to support multiple collection names & fallback fields)
-function loadActiveUsers() {
-    const tbody = document.getElementById('activeUsersTableBody') || document.querySelector('#activeUsersView tbody');
-    if (!tbody) return;
-
-    tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400 text-xs"><i class="fa-solid fa-spinner fa-spin mr-1"></i> Loading active users from database...</td></tr>`;
-
-    // Try fetching from 'users' collection first
-    db.collection('users').onSnapshot(snapshot => {
-        if (!snapshot.empty) {
-            renderUsersTable(snapshot, tbody);
-        } else {
-            // Fallback to 'accounts' if users is empty
-            db.collection('accounts').onSnapshot(accSnapshot => {
-                if (!accSnapshot.empty) {
-                    renderUsersTable(accSnapshot, tbody);
-                } else {
-                    tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500 text-xs">No active users registered in database.</td></tr>`;
-                }
-            }, err => {
-                console.error("Error loading accounts collection:", err);
-                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-rose-400 text-xs">Error loading users data.</td></tr>`;
-            });
-        }
-    }, err => {
-        console.error("Error loading users collection:", err);
-        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-rose-400 text-xs">Permission or connection error.</td></tr>`;
-    });
-}
-
-function renderUsersTable(snapshot, tbody) {
-    let html = '';
-    snapshot.forEach(doc => {
-        const u = doc.data();
-        const userId = doc.id;
-        const userName = u.name || u.fullName || u.displayName || 'Reseller / Partner';
-        const userEmail = u.email || u.userEmail || 'N/A';
-        const bizName = u.businessName || u.shopName || 'Prime Partner';
-        const userRole = u.role || u.userType || 'Resellers';
-        
-        html += `
-            <tr class="hover:bg-slate-900/50 transition border-b border-slate-800 text-xs">
-                <td class="p-3 font-bold text-white">
-                    ${userName}
-                    <div class="text-[9px] text-slate-500 font-mono">ID: ${userId.substring(0, 8)}...</div>
-                </td>
-                <td class="p-3 text-slate-300 font-mono">${userEmail}</td>
-                <td class="p-3 text-cyan-400 font-semibold">${bizName}</td>
-                <td class="p-3 text-amber-400 font-bold">${userRole}</td>
-                <td class="p-3"><span class="bg-emerald-950 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded text-[10px] font-bold">Active</span></td>
-                <td class="p-3 text-center">
-                    <button onclick="toggleUserStatus('${userId}')" class="bg-slate-800 hover:bg-slate-700 text-cyan-400 border border-cyan-500/30 px-2.5 py-1 rounded text-[10px] font-bold transition">Manage</button>
-                </td>
-            </tr>
-        `;
-    });
-    tbody.innerHTML = html;
-}
-
-function toggleUserStatus(userId) {
-    alert("User management action for ID: " + userId);
-}
-
-// Load Deleted Archive Orders
-function loadDeletedArchive() {
-    const tbody = document.getElementById('deletedArchiveTableBody');
-    if (!tbody) return;
-
-    db.collection('deleted_orders').onSnapshot(snapshot => {
-        if (snapshot.empty) {
-            tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500 text-xs">No archived or deleted records found.</td></tr>`;
-            return;
-        }
-
-        let html = '';
-        snapshot.forEach(doc => {
-            const o = doc.data();
-            html += `
-                <tr class="hover:bg-slate-900/50 transition border-b border-slate-800 text-xs">
-                    <td class="p-3 font-bold text-white">${o.customerName || 'N/A'}</td>
-                    <td class="p-3 text-slate-300">${o.customerPhone || 'N/A'}</td>
-                    <td class="p-3 text-cyan-300">PKR ${o.totalAmount || o.totalCod || 0}</td>
-                    <td class="p-3 text-rose-400 font-bold">Archived</td>
-                    <td class="p-3 text-center text-slate-500">Deleted Record</td>
-                </tr>
-            `;
-        });
-        tbody.innerHTML = html;
-    }, err => {
-        console.error("Error loading archive:", err);
-    });
-}
-
-// Dynamic KM & Out of Karachi Settings Loader with Custom Fixed DC and Save Action
-function loadDcKmSettings() {
-    const container = document.getElementById('dcKmSettingsContainer') || document.querySelector('#dcKmSettingsSection');
-    // We enhance DC KM Settings screen to allow out-of-karachi manual city additions with direct DC editing
-}
-
 async function deleteAdminOrder(id) {
     if (confirm("Delete this order?")) {
         await db.collection('orders').doc(id).delete();
@@ -734,54 +551,3 @@ async function deleteAdminOrder(id) {
 function handleLogout() {
     auth.signOut().then(() => window.location.href = "login.html");
 }
-
-let footerBannerBase64 = "";
-
-async function handleFooterBannerSelection(e) {
-    const file = e.target.files[0];
-    if (file) {
-        footerBannerBase64 = await compressBannerFile(file);
-        const previewContainer = document.getElementById('footerBannerPreviewContainer');
-        const previewImg = document.getElementById('footerBannerPreviewImg');
-        if (previewContainer && previewImg) {
-            previewImg.src = footerBannerBase64;
-            previewContainer.classList.remove('hidden');
-        }
-    }
-}
-
-async function saveFooterBannerSettings(event) {
-    const targetLinkInput = document.getElementById('footerBannerTargetLink');
-    const targetLink = targetLinkInput ? targetLinkInput.value.trim() || '#productGrid' : '#productGrid';
-
-    if (!footerBannerBase64) {
-        alert("Karam farma kar pehle footer banner image attach karein!");
-        return;
-    }
-
-    const saveBtn = event ? (event.target.closest('button') || document.querySelector('button[onclick*="saveFooterBannerSettings"]')) : document.querySelector('button[onclick*="saveFooterBannerSettings"]');
-    if (saveBtn) {
-        saveBtn.disabled = true;
-        saveBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Saving Footer Banner...`;
-    }
-
-    try {
-        await db.collection('settings').doc('footer_banner').set({
-            imageUrl: footerBannerBase64,
-            targetLink: targetLink,
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        alert("Footer Promo Banner kamyabi ke sath save aur live publish ho gaya hai! 🎉");
-    } catch (error) {
-        console.error("Footer banner save error:", error);
-        alert("Error saving footer banner: " + error.message);
-    } finally {
-        if (saveBtn) {
-            saveBtn.disabled = false;
-            saveBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-1.5"></i> SAVE & PUBLISH FOOTER BANNER`;
-        }
-    }
-}
-<button onclick="switchAdminTab('activeUsersView'); if(typeof loadUsers === 'function') loadUsers();" class="sidebar-link w-full text-left flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-slate-800 text-slate-300 hover:text-white transition">
-    <i class="fa-solid fa-users w-4 text-amber-400"></i> Active Users
-</button>
