@@ -40,8 +40,13 @@ function listenToLiveCatalog() {
 
         allProducts.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
         
-        // Save to LocalStorage for ultra-fast subsequent loads
-        localStorage.setItem('prime_cached_products', JSON.stringify(allProducts));
+        // Save to LocalStorage safely (Protected against QuotaExceededError)
+        try {
+            localStorage.setItem('prime_cached_products', JSON.stringify(allProducts));
+        } catch (storageError) {
+            console.warn("Storage quota full, clearing cache:", storageError);
+            localStorage.removeItem('prime_cached_products');
+        }
         
         renderPublicCategoriesGrid(allProducts);
         filterProducts();
