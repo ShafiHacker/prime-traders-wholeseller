@@ -63,9 +63,6 @@ function renderPublicCategoriesGrid(productsList) {
         counts[cat] = (counts[cat] || 0) + 1;
     });
 
-    const grid = document.getElementById('publicCategoriesGrid');
-    if (!grid) return;
-
     const defaultCats = [
         'Fashion & Apparel', 
         'Electronics & Gadgets', 
@@ -79,29 +76,26 @@ function renderPublicCategoriesGrid(productsList) {
 
     const allCats = Array.from(new Set([...defaultCats, ...Object.keys(counts)]));
 
-    let html = `
-        <div onclick="setCategoryFromGrid('All')" class="bg-white p-3.5 rounded-2xl border border-slate-200 text-center flex flex-col items-center justify-center space-y-1.5 hover:border-[#2563EB] hover:shadow-md transition cursor-pointer shadow-sm">
-            <div class="w-9 h-9 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-[#2563EB] text-xs">
-                <i class="fa-solid fa-layer-group"></i>
-            </div>
-            <h3 class="font-bold text-slate-800 text-xs line-clamp-1">All Products</h3>
-            <span class="bg-blue-50 text-[#2563EB] border border-blue-100 px-2.5 py-0.5 rounded-full text-[10px] font-bold">${productsList.length} items</span>
-        </div>
-    `;
-
-    allCats.forEach(cat => {
-        const num = counts[cat] || 0;
-        html += `
-            <div onclick="setCategoryFromGrid('${cat}')" class="bg-white p-3.5 rounded-2xl border border-slate-200 text-center flex flex-col items-center justify-center space-y-1.5 hover:border-[#2563EB] hover:shadow-md transition cursor-pointer shadow-sm">
-                <div class="w-9 h-9 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-[#2563EB] text-xs">
-                    <i class="fa-solid fa-box-open"></i>
-                </div>
-                <h3 class="font-bold text-slate-800 text-xs line-clamp-1">${cat}</h3>
-                <span class="bg-blue-50 text-[#2563EB] border border-blue-100 px-2.5 py-0.5 rounded-full text-[10px] font-bold">${num} items</span>
+    // 1. Render Left Sidebar Menu
+    const sidebar = document.getElementById('publicCategoriesSidebar');
+    if (sidebar) {
+        let sidebarHtml = `
+            <div onclick="setCategoryFromGrid('All')" class="flex items-center justify-between p-2 rounded-xl hover:bg-blue-50 text-slate-700 hover:text-[#2563EB] cursor-pointer transition text-xs font-bold">
+                <span><i class="fa-solid fa-layer-group mr-2 text-[#2563EB]"></i> All Products</span>
+                <span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full text-[10px]">${productsList.length}</span>
             </div>
         `;
-    });
-    grid.innerHTML = html;
+        allCats.forEach(cat => {
+            const num = counts[cat] || 0;
+            sidebarHtml += `
+                <div onclick="setCategoryFromGrid('${cat}')" class="flex items-center justify-between p-2 rounded-xl hover:bg-blue-50 text-slate-700 hover:text-[#2563EB] cursor-pointer transition text-xs font-semibold">
+                    <span class="truncate"><i class="fa-solid fa-angle-right mr-2 text-[10px] text-slate-400"></i> ${cat}</span>
+                    <span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full text-[10px]">${num}</span>
+                </div>
+            `;
+        });
+        sidebar.innerHTML = sidebarHtml;
+    }
 }
 
 function setCategoryFromGrid(catName) {
