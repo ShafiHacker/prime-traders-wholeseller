@@ -80,24 +80,24 @@ function renderPublicCategoriesGrid(productsList) {
     const allCats = Array.from(new Set([...defaultCats, ...Object.keys(counts)]));
 
     let html = `
-        <div onclick="setCategoryFromGrid('All')" class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center flex flex-col items-center justify-center space-y-1 hover:border-amber-500/50 transition shadow cursor-pointer">
-            <div class="w-8 h-8 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-xs">
+        <div onclick="setCategoryFromGrid('All')" class="bg-[#102544] p-3 rounded-xl border border-slate-700 text-center flex flex-col items-center justify-center space-y-1 hover:border-[#2563EB] transition shadow cursor-pointer">
+            <div class="w-8 h-8 rounded-full bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400 text-xs">
                 <i class="fa-solid fa-layer-group"></i>
             </div>
-            <h3 class="font-bold text-slate-200 text-[11px] line-clamp-1">All Products</h3>
-            <span class="bg-amber-950/60 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded text-[9px] font-bold">${productsList.length} products</span>
+            <h3 class="font-bold text-slate-100 text-[11px] line-clamp-1">All Products</h3>
+            <span class="bg-[#2563EB]/20 text-blue-300 border border-[#2563EB]/30 px-2 py-0.5 rounded text-[9px] font-bold">${productsList.length} products</span>
         </div>
     `;
 
     allCats.forEach(cat => {
         const num = counts[cat] || 0;
         html += `
-            <div onclick="setCategoryFromGrid('${cat}')" class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center flex flex-col items-center justify-center space-y-1 hover:border-amber-500/50 transition shadow cursor-pointer">
-                <div class="w-8 h-8 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-xs">
+            <div onclick="setCategoryFromGrid('${cat}')" class="bg-[#102544] p-3 rounded-xl border border-slate-700 text-center flex flex-col items-center justify-center space-y-1 hover:border-[#2563EB] transition shadow cursor-pointer">
+                <div class="w-8 h-8 rounded-full bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400 text-xs">
                     <i class="fa-solid fa-box-open"></i>
                 </div>
-                <h3 class="font-bold text-slate-200 text-[11px] line-clamp-1">${cat}</h3>
-                <span class="bg-amber-950/60 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded text-[9px] font-bold">${num} products</span>
+                <h3 class="font-bold text-slate-100 text-[11px] line-clamp-1">${cat}</h3>
+                <span class="bg-[#2563EB]/20 text-blue-300 border border-[#2563EB]/30 px-2 py-0.5 rounded text-[9px] font-bold">${num} products</span>
             </div>
         `;
     });
@@ -135,32 +135,32 @@ function renderProducts(products) {
         const origPrice = p.originalPrice || Math.round(discPrice * 1.3);
         const mainImg = (p.images && p.images.length > 0) ? p.images[0] : (p.image || 'https://via.placeholder.com/400');
         const isOutOfStock = p.stock !== undefined && p.stock <= 0;
-        const bulkBadge = p.bulkPrice && p.bulkQty ? `<div class="text-[10px] text-emerald-400 font-bold bg-emerald-950/60 border border-emerald-500/30 px-1.5 py-0.5 rounded mt-1 inline-block">Buy ${p.bulkQty}+ @ PKR ${p.bulkPrice}/pc</div>` : '';
+        const bulkBadge = p.bulkPrice && p.bulkQty ? `<div class="text-[10px] text-orange-400 font-bold bg-orange-950/40 border border-orange-500/30 px-1.5 py-0.5 rounded mt-1 inline-block">Buy ${p.bulkQty}+ @ PKR ${p.bulkPrice}/pc</div>` : '';
 
         html += `
-            <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden hover:border-amber-400/60 transition shadow-lg flex flex-col justify-between">
+            <div class="bg-white border border-slate-200 rounded-xl overflow-hidden hover:shadow-xl transition shadow-md flex flex-col justify-between">
                 <div>
-                    <div class="relative h-48 bg-slate-950 overflow-hidden cursor-pointer" onclick="openProductModal('${p.id}')">
+                    <div class="relative h-48 bg-slate-100 overflow-hidden cursor-pointer" onclick="openProductModal('${p.id}')">
                         <img src="${mainImg}" alt="${p.title}" loading="lazy" class="w-full h-full object-cover hover:scale-105 transition duration-300 ${isOutOfStock ? 'opacity-40' : ''}">
                         ${isOutOfStock ? `<span class="absolute top-2 left-2 bg-rose-600 text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase">OUT OF STOCK</span>` : `<span class="absolute top-2 left-2 bg-emerald-600 text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase">IN STOCK</span>`}
                     </div>
                     <div class="p-3.5 space-y-1.5">
-                        <span class="text-[10px] font-bold text-amber-500 uppercase tracking-wider">${p.category || 'General'}</span>
-                        <h3 class="font-bold text-slate-100 text-xs line-clamp-2 cursor-pointer hover:text-amber-400" onclick="openProductModal('${p.id}')">${p.title}</h3>
+                        <span class="text-[10px] font-bold text-[#102544] uppercase tracking-wider">${p.category || 'General'}</span>
+                        <h3 class="font-bold text-slate-900 text-xs line-clamp-2 cursor-pointer hover:text-[#2563EB]" onclick="openProductModal('${p.id}')">${p.title}</h3>
                         
                         <div class="flex items-center gap-2">
-                            <span class="text-sm font-black text-amber-300">PKR ${discPrice}</span>
-                            <span class="text-xs text-slate-500 line-through font-semibold">PKR ${origPrice}</span>
+                            <span class="text-sm font-black text-[#102544]">PKR ${discPrice}</span>
+                            <span class="text-xs text-slate-400 line-through font-semibold">PKR ${origPrice}</span>
                         </div>
                         ${bulkBadge}
                     </div>
                 </div>
                 <div class="p-3.5 pt-2 grid grid-cols-2 gap-2">
-                    <button onclick="openProductModal('${p.id}')" ${isOutOfStock ? 'disabled' : ''} class="w-full py-2 ${isOutOfStock ? 'bg-slate-800 text-slate-500 cursor-not-allowed' : 'bg-slate-800 hover:bg-slate-700 text-slate-200'} font-bold rounded-lg text-[11px] transition flex items-center justify-center gap-1">
-                        <i class="fa-solid fa-cart-plus text-amber-400"></i> Add To Cart
+                    <button onclick="openProductModal('${p.id}')" ${isOutOfStock ? 'disabled' : ''} class="w-full py-2 ${isOutOfStock ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-white border border-[#102544] hover:bg-slate-50 text-[#102544]'} font-bold rounded-lg text-[11px] transition flex items-center justify-center gap-1">
+                        <i class="fa-solid fa-cart-plus text-[#102544]"></i> Add To Cart
                     </button>
-                    <button onclick="openProductModal('${p.id}')" ${isOutOfStock ? 'disabled' : ''} class="w-full py-2 ${isOutOfStock ? 'bg-slate-800 text-slate-500 cursor-not-allowed' : 'bg-amber-500 hover:bg-amber-600 text-slate-950'} font-black rounded-lg text-[11px] text-center transition flex items-center justify-center gap-1 shadow">
-                        <i class="fa-solid fa-bolt"></i> Buy Now
+                    <button onclick="openProductModal('${p.id}')" ${isOutOfStock ? 'disabled' : ''} class="w-full py-2 ${isOutOfStock ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-[#102544] hover:bg-[#2563EB] text-white'} font-black rounded-lg text-[11px] text-center transition flex items-center justify-center gap-1 shadow">
+                        <i class="fa-solid fa-bolt text-amber-400"></i> Buy Now
                     </button>
                 </div>
             </div>
@@ -182,38 +182,38 @@ async function openProductModal(id) {
     let colorOptions = p.colors && p.colors.length > 0 ? p.colors.map(c => `<option value="${c}">${c}</option>`).join('') : '<option value="As Shown">As Shown</option>';
 
     let thumbsHtml = imagesList.map((img) => `
-        <img src="${img}" onclick="switchModalMainImage('${img}')" class="w-14 h-14 object-cover rounded-lg border border-slate-700 cursor-pointer hover:border-amber-400 transition">
+        <img src="${img}" onclick="switchModalMainImage('${img}')" class="w-14 h-14 object-cover rounded-lg border border-slate-300 cursor-pointer hover:border-[#2563EB] transition">
     `).join('');
 
     const modalWrapper = document.getElementById('productModal');
     if (modalWrapper) {
         const innerBox = modalWrapper.querySelector('div > div') || modalWrapper.children[0];
         if (innerBox) {
-            innerBox.className = "bg-slate-900 border border-slate-700 rounded-2xl p-4 md:p-6 max-w-4xl w-full mx-4 relative max-h-[90vh] overflow-y-auto space-y-4 shadow-2xl";
+            innerBox.className = "bg-white border border-slate-200 rounded-2xl p-4 md:p-6 max-w-4xl w-full mx-4 relative max-h-[90vh] overflow-y-auto space-y-4 shadow-2xl";
         }
     }
 
     const modalHtml = `
-        <div class="flex justify-between items-start border-b border-slate-800 pb-3">
+        <div class="flex justify-between items-start border-b border-slate-200 pb-3">
             <div>
                 <div class="flex items-center gap-2">
-                    <span class="text-[11px] font-bold text-amber-400 bg-amber-950/50 border border-amber-500/30 px-2.5 py-0.5 rounded">${p.category}</span>
-                    ${p.weight && p.weight !== 'N/A' ? `<span class="text-[11px] font-bold text-slate-300 bg-slate-800 border border-slate-700 px-2.5 py-0.5 rounded"><i class="fa-solid fa-weight-hanging mr-1 text-amber-400"></i>${p.weight}</span>` : ''}
+                    <span class="text-[11px] font-bold text-[#102544] bg-slate-100 border border-slate-200 px-2.5 py-0.5 rounded">${p.category}</span>
+                    ${p.weight && p.weight !== 'N/A' ? `<span class="text-[11px] font-bold text-slate-700 bg-slate-100 border border-slate-200 px-2.5 py-0.5 rounded"><i class="fa-solid fa-weight-hanging mr-1 text-[#102544]"></i>${p.weight}</span>` : ''}
                 </div>
-                <h2 class="text-base md:text-lg font-bold text-white mt-1.5">${p.title}</h2>
+                <h2 class="text-base md:text-lg font-bold text-slate-900 mt-1.5">${p.title}</h2>
             </div>
             <div class="text-right flex items-center gap-3">
                 <div>
-                    <div class="text-lg md:text-xl font-black text-amber-300">PKR ${discPrice}</div>
-                    <div class="text-xs text-slate-500 line-through font-bold">PKR ${origPrice}</div>
+                    <div class="text-lg md:text-xl font-black text-[#102544]">PKR ${discPrice}</div>
+                    <div class="text-xs text-slate-400 line-through font-bold">PKR ${origPrice}</div>
                 </div>
-                <button onclick="closeProductModal()" class="text-slate-400 hover:text-white p-2 text-lg"><i class="fa-solid fa-xmark"></i></button>
+                <button onclick="closeProductModal()" class="text-slate-400 hover:text-slate-700 p-2 text-lg"><i class="fa-solid fa-xmark"></i></button>
             </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
             <div class="space-y-3">
-                <div class="bg-slate-950 rounded-xl overflow-hidden h-72 md:h-80 border border-slate-800 shadow-inner">
+                <div class="bg-slate-100 rounded-xl overflow-hidden h-72 md:h-80 border border-slate-200 shadow-inner">
                     <img id="modalMainImg" src="${imagesList[0]}" class="w-full h-full object-cover">
                 </div>
                 <div class="flex gap-2 overflow-x-auto pb-1">
@@ -224,36 +224,36 @@ async function openProductModal(id) {
             <div class="space-y-4">
                 <div class="grid grid-cols-3 gap-3">
                     <div>
-                        <label class="block text-slate-400 text-xs font-bold mb-1">SIZE:</label>
-                        <select id="modalSelectSize" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-white text-xs font-bold outline-none">
+                        <label class="block text-slate-600 text-xs font-bold mb-1">SIZE:</label>
+                        <select id="modalSelectSize" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 text-xs font-bold outline-none">
                             ${sizeOptions}
                         </select>
                     </div>
                     <div>
-                        <label class="block text-slate-400 text-xs font-bold mb-1">COLOR:</label>
-                        <select id="modalSelectColor" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-white text-xs font-bold outline-none">
+                        <label class="block text-slate-600 text-xs font-bold mb-1">COLOR:</label>
+                        <select id="modalSelectColor" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 text-xs font-bold outline-none">
                             ${colorOptions}
                         </select>
                     </div>
                     <div>
-                        <label class="block text-slate-400 text-xs font-bold mb-1">QTY:</label>
-                        <input type="number" id="modalSelectQty" value="1" min="1" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-white text-xs font-bold outline-none">
+                        <label class="block text-slate-600 text-xs font-bold mb-1">QTY:</label>
+                        <input type="number" id="modalSelectQty" value="1" min="1" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 text-xs font-bold outline-none">
                     </div>
                 </div>
 
                 <div>
-                    <h3 class="font-bold text-slate-300 mb-1.5 text-xs">Description:</h3>
-                    <p class="text-xs text-slate-300 bg-slate-950 p-3.5 rounded-xl border border-slate-800 leading-relaxed whitespace-pre-line max-h-44 overflow-y-auto">${p.desc || 'No description provided.'}</p>
+                    <h3 class="font-bold text-slate-700 mb-1.5 text-xs">Description:</h3>
+                    <p class="text-xs text-slate-600 bg-slate-50 p-3.5 rounded-xl border border-slate-200 leading-relaxed whitespace-pre-line max-h-44 overflow-y-auto">${p.desc || 'No description provided.'}</p>
                 </div>
             </div>
         </div>
 
-        <div class="border-t border-slate-800 pt-4 flex gap-3">
-            <button onclick="addSelectedToCart('${p.id}')" ${isOutOfStock ? 'disabled' : ''} class="flex-1 py-3 ${isOutOfStock ? 'bg-slate-800 text-slate-500 cursor-not-allowed' : 'bg-slate-800 hover:bg-slate-700 text-slate-200'} font-bold rounded-xl text-xs md:text-sm flex items-center justify-center gap-2 transition">
-                <i class="fa-solid fa-cart-plus text-amber-400"></i> ${isOutOfStock ? 'Out of Stock' : 'Add To Cart'}
+        <div class="border-t border-slate-200 pt-4 flex gap-3">
+            <button onclick="addSelectedToCart('${p.id}')" ${isOutOfStock ? 'disabled' : ''} class="flex-1 py-3 ${isOutOfStock ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-white border border-[#102544] hover:bg-slate-50 text-[#102544]'} font-bold rounded-xl text-xs md:text-sm flex items-center justify-center gap-2 transition">
+                <i class="fa-solid fa-cart-plus text-[#102544]"></i> ${isOutOfStock ? 'Out of Stock' : 'Add To Cart'}
             </button>
-            <button onclick="buySelectedNow('${p.id}')" ${isOutOfStock ? 'disabled' : ''} class="flex-1 py-3 ${isOutOfStock ? 'bg-slate-800 text-slate-500 cursor-not-allowed' : 'bg-amber-500 hover:bg-amber-600 text-slate-950'} font-black rounded-xl text-center text-xs md:text-sm shadow transition flex items-center justify-center gap-2">
-                <i class="fa-solid fa-bolt"></i> Buy Now
+            <button onclick="buySelectedNow('${p.id}')" ${isOutOfStock ? 'disabled' : ''} class="flex-1 py-3 ${isOutOfStock ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-[#102544] hover:bg-[#2563EB] text-white'} font-black rounded-xl text-center text-xs md:text-sm shadow transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-bolt text-amber-400"></i> Buy Now
             </button>
         </div>
     `;
@@ -319,15 +319,15 @@ function openCartModal() {
             const img = (item.images && item.images.length > 0) ? item.images[0] : (item.image || '');
 
             html += `
-                <div class="flex items-center justify-between bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                <div class="flex items-center justify-between bg-slate-50 p-2.5 rounded-lg border border-slate-200">
                     <div class="flex items-center gap-2">
                         <img src="${img}" class="w-10 h-10 object-cover rounded-md">
                         <div>
-                            <h4 class="font-bold text-white text-[11px] line-clamp-1">${item.title}</h4>
-                            <p class="text-amber-400 font-bold text-[10px]">PKR ${unitPrice} x ${item.qty} = PKR ${subtotal}</p>
+                            <h4 class="font-bold text-slate-900 text-[11px] line-clamp-1">${item.title}</h4>
+                            <p class="text-[#102544] font-bold text-[10px]">PKR ${unitPrice} x ${item.qty} = PKR ${subtotal}</p>
                         </div>
                     </div>
-                    <button onclick="removeFromCart(${index})" class="text-rose-400 hover:text-rose-600 p-1">
+                    <button onclick="removeFromCart(${index})" class="text-rose-500 hover:text-rose-700 p-1">
                         <i class="fa-solid fa-trash"></i>
                     </button>
                 </div>
@@ -367,22 +367,22 @@ function setupCheckoutDCInputs() {
 
     const container = document.createElement('div');
     container.id = 'checkoutDCBreakdown';
-    container.className = "space-y-2 bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs";
+    container.className = "space-y-2 bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs";
     container.innerHTML = `
         <div class="grid grid-cols-2 gap-2">
             <div>
-                <label class="block text-slate-400 font-bold mb-1">Estimated Distance (KM):</label>
-                <input type="number" id="custDistanceKm" value="5" min="1" oninput="calculateLiveDC()" class="w-full p-2 bg-slate-900 border border-slate-700 rounded-lg text-white font-bold outline-none">
+                <label class="block text-slate-600 font-bold mb-1">Estimated Distance (KM):</label>
+                <input type="number" id="custDistanceKm" value="5" min="1" oninput="calculateLiveDC()" class="w-full p-2 bg-white border border-slate-300 rounded-lg text-slate-900 font-bold outline-none">
             </div>
             <div>
-                <label class="block text-slate-400 font-bold mb-1">Total Weight (KG):</label>
-                <input type="number" id="custTotalWeightKg" value="0.5" step="0.1" min="0.1" oninput="calculateLiveDC()" class="w-full p-2 bg-slate-900 border border-slate-700 rounded-lg text-white font-bold outline-none">
+                <label class="block text-slate-600 font-bold mb-1">Total Weight (KG):</label>
+                <input type="number" id="custTotalWeightKg" value="0.5" step="0.1" min="0.1" oninput="calculateLiveDC()" class="w-full p-2 bg-white border border-slate-300 rounded-lg text-slate-900 font-bold outline-none">
             </div>
         </div>
-        <div class="border-t border-slate-800 pt-2 space-y-1 text-slate-300">
-            <div class="flex justify-between"><span>Subtotal:</span> <span id="summarySubtotal" class="font-bold text-white">PKR 0</span></div>
-            <div class="flex justify-between"><span>Delivery Charges (DC):</span> <span id="summaryDC" class="font-bold text-amber-400">PKR 0</span></div>
-            <div class="flex justify-between text-sm border-t border-slate-800 pt-1 font-black text-amber-300">
+        <div class="border-t border-slate-200 pt-2 space-y-1 text-slate-600">
+            <div class="flex justify-between"><span>Subtotal:</span> <span id="summarySubtotal" class="font-bold text-slate-900">PKR 0</span></div>
+            <div class="flex justify-between"><span>Delivery Charges (DC):</span> <span id="summaryDC" class="font-bold text-[#102544]">PKR 0</span></div>
+            <div class="flex justify-between text-sm border-t border-slate-200 pt-1 font-black text-[#102544]">
                 <span>Total COD Amount:</span> <span id="summaryFinalTotal">PKR 0</span>
             </div>
         </div>
