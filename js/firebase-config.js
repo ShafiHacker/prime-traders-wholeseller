@@ -15,16 +15,18 @@ if (!firebase.apps.length) {
 
 const db = firebase.firestore();
 
-// Firestore Offline Persistence Cache (Speed Fast Karne ke liye)
+// Settings pehle set hongi taaki Firestore crash na ho
+db.settings({ experimentalForceLongPolling: true });
+
+// Offline Cache Enable
 db.enablePersistence().catch((err) => {
     if (err.code == 'failed-precondition') {
-        // Multiple tabs open hon toh error aa sakti hai, ignore karein
+        // Multiple tabs open hone par ignore karein
     } else if (err.code == 'unimplemented') {
-        // Browser support na kare toh ignore karein
+        // Unsupported browser par ignore karein
     }
 });
 
-db.settings({ experimentalForceLongPolling: true });
 window.db = db; 
 
 const auth = firebase.auth();
