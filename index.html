@@ -35,7 +35,23 @@
 </head>
 <body class="bg-black text-slate-100 min-h-screen flex flex-col font-sans">
 
-    <!-- Top Navigation Bar -->
+    <!-- 1. Announcement Bar -->
+    <div class="bg-[#102544] text-white text-[11px] py-2 px-4 flex flex-wrap justify-between items-center border-b border-blue-900">
+        <div class="flex items-center gap-4">
+            <span><i class="fa-solid fa-truck-fast text-amber-400 mr-1"></i> Azadi Offer - DC Free on Maximum Products</span>
+            <span class="hidden md:inline">|</span>
+            <span class="hidden md:inline"><i class="fa-solid fa-box-open text-amber-400 mr-1"></i> Free Delivery</span>
+            <span class="hidden md:inline">|</span>
+            <span class="hidden md:inline"><i class="fa-solid fa-money-bill-wave text-amber-400 mr-1"></i> Cash on Delivery</span>
+        </div>
+        <div class="flex items-center gap-3">
+            <span><i class="fa-solid fa-shield-halved text-emerald-400 mr-1"></i> Secure Shopping</span>
+            <span>|</span>
+            <a href="tel:03313534676" class="font-bold hover:text-amber-300 transition"><i class="fa-solid fa-phone text-amber-400 mr-1"></i> 0331-3534676</a>
+        </div>
+    </div>
+
+    <!-- 2. Top Navigation Bar -->
     <header class="bg-slate-950 border-b border-amber-500/30 sticky top-0 z-40 backdrop-blur-md bg-opacity-95 shadow-lg shadow-amber-500/5">
         <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
             <!-- Brand Logo Header -->
@@ -69,6 +85,42 @@
     <!-- Main Content Container -->
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-6 space-y-6">
 
+        <!-- 3. Hero Slider & Promotional Banner Section -->
+        <section class="grid grid-cols-1 lg:grid-cols-4 gap-4 items-center">
+            <div class="lg:col-span-3 bg-[#102544] rounded-3xl p-6 md:p-10 text-white relative overflow-hidden shadow-xl flex flex-col justify-between min-h-[320px]">
+                <div class="absolute right-0 bottom-0 opacity-10 pointer-events-none">
+                    <i class="fa-solid fa-boxes-stacked text-9xl"></i>
+                </div>
+                <div class="space-y-3 z-10 max-w-xl">
+                    <span class="bg-amber-500 text-slate-950 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-sm">
+                        Wholesale & Dropship Hub
+                    </span>
+                    <h2 class="text-2xl md:text-4xl font-black tracking-tight leading-tight">
+                        Everything You Need, All in One Place.
+                    </h2>
+                    <p class="text-xs md:text-sm text-slate-300 font-medium">
+                        Discover Trending Products at Unbeatable Wholesale Prices across Pakistan.
+                    </p>
+                </div>
+                <div class="pt-6 z-10 flex flex-wrap items-center gap-4">
+                    <a href="#productGrid" class="bg-[#2563EB] hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition shadow-md flex items-center gap-2">
+                        <span>Shop Now</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-br from-orange-500 to-amber-600 rounded-3xl p-6 text-white text-center shadow-xl flex flex-col justify-center items-center space-y-3 min-h-[320px]">
+                <div class="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center text-white text-2xl font-black shadow-inner">
+                    <i class="fa-solid fa-bolt"></i>
+                </div>
+                <span class="bg-white/20 px-3 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest">Limited Time Offer</span>
+                <h3 class="text-2xl md:text-3xl font-black tracking-tight">UP TO 50% OFF</h3>
+                <p class="text-xs text-orange-100 font-medium">Special wholesale discounts on bulk orders and top trending items.</p>
+            </div>
+        </section>
+
+        <!-- Search & Catalog Header Box -->
         <div class="neon-gold-card p-6 rounded-2xl space-y-4">
             <div class="flex flex-col md:flex-row justify-between items-center gap-4">
                 <div>
@@ -102,11 +154,44 @@
             </div>
         </div>
 
+        <!-- PRODUCT GRID -->
         <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             <div class="col-span-full text-center py-12 text-slate-500 text-xs font-semibold">
                 <i class="fa-solid fa-spinner fa-spin text-amber-400 text-xl mb-2"></i><br>Loading live catalog inventory...
             </div>
         </div>
+
+        <!-- 6. Trust Badges Section -->
+        <section class="neon-gold-card rounded-2xl p-6 shadow-sm grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            <div class="flex flex-col items-center space-y-2">
+                <div class="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-headset"></i>
+                </div>
+                <h4 class="font-bold text-slate-200 text-xs uppercase">24/7 Customer Support</h4>
+                <p class="text-[10px] text-slate-400">Dedicated merchant assistance</p>
+            </div>
+            <div class="flex flex-col items-center space-y-2">
+                <div class="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-shield-check"></i>
+                </div>
+                <h4 class="font-bold text-slate-200 text-xs uppercase">Safe & Secure Shopping</h4>
+                <p class="text-[10px] text-slate-400">100% protected transactions</p>
+            </div>
+            <div class="flex flex-col items-center space-y-2">
+                <div class="w-12 h-12 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-truck-fast"></i>
+                </div>
+                <h4 class="font-bold text-slate-200 text-xs uppercase">Fast & Free Delivery</h4>
+                <p class="text-[10px] text-slate-400">On maximum wholesale orders</p>
+            </div>
+            <div class="flex flex-col items-center space-y-2">
+                <div class="w-12 h-12 rounded-full bg-orange-500/10 border border-orange-500/30 text-orange-400 flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-rotate-left"></i>
+                </div>
+                <h4 class="font-bold text-slate-200 text-xs uppercase">Easy Returns & Refunds</h4>
+                <p class="text-[10px] text-slate-400">Hassle-free merchant policies</p>
+            </div>
+        </section>
 
     </main>
 
@@ -217,7 +302,7 @@
         </div>
     </div>
 
-    <!-- Enhanced Custom Popup Alert Modal with Detailed Receipt & Download Evidence Button -->
+    <!-- Enhanced Custom Popup Alert Modal -->
     <div id="customAlertModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
         <div class="bg-slate-900 text-slate-100 border border-amber-500/40 rounded-3xl p-6 max-w-sm w-full shadow-2xl text-center space-y-4">
             <div id="customAlertIcon" class="flex justify-center text-amber-400 text-5xl mb-2">
@@ -225,7 +310,6 @@
             </div>
             <h3 id="customAlertTitle" class="text-xl font-black uppercase tracking-wider text-amber-400">SUCCESS</h3>
             
-            <!-- Detailed Separated Breakdown Inside Popup for Customer Evidence -->
             <div id="popupDetailsBox" class="text-left bg-black p-3 rounded-xl border border-amber-500/20 text-xs space-y-1.5 hidden font-medium">
                 <div class="flex justify-between"><span>Tracking ID:</span> <span id="popTrackId" class="font-mono font-bold text-amber-400">-</span></div>
                 <div class="flex justify-between"><span>Customer:</span> <span id="popCustName" class="font-bold">-</span></div>
@@ -261,11 +345,11 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     
-    <!-- External JS Scripts (Updated to match hyphenated filename conventions) -->
+    <!-- External JS Scripts -->
     <script src="js/firebase-config.js"></script>
-<script src="js/store.js"></script>
+    <script src="js/store.js"></script>
 
-    <!-- DOM Observer Script to Purge Injected Duplicate Elements from store-config.js -->
+    <!-- DOM Observer Script & Karachi Areas Logic -->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const observer = new MutationObserver(() => {
@@ -373,246 +457,3 @@
     </script>
 </body>
 </html>
-<!-- 1. Announcement Bar -->
-<div class="bg-[#102544] text-white text-[11px] py-2 px-4 flex flex-wrap justify-between items-center border-b border-blue-900">
-    <div class="flex items-center gap-4">
-        <span><i class="fa-solid fa-truck-fast text-amber-400 mr-1"></i> Azadi Offer - DC Free on Maximum Products</span>
-        <span class="hidden md:inline">|</span>
-        <span class="hidden md:inline"><i class="fa-solid fa-box-open text-amber-400 mr-1"></i> Free Delivery</span>
-        <span class="hidden md:inline">|</span>
-        <span class="hidden md:inline"><i class="fa-solid fa-money-bill-wave text-amber-400 mr-1"></i> Cash on Delivery</span>
-    </div>
-    <div class="flex items-center gap-3">
-        <span><i class="fa-solid fa-shield-halved text-emerald-400 mr-1"></i> Secure Shopping</span>
-        <span>|</span>
-        <a href="tel:03313534676" class="font-bold hover:text-amber-300 transition"><i class="fa-solid fa-phone text-amber-400 mr-1"></i> 0331-3534676</a>
-    </div>
-</div>
-
-<!-- 2. Header & Main Search Area -->
-<header class="bg-white border-b border-[#E2E8F0] sticky top-0 z-50 shadow-xs">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
-        <!-- Logo -->
-        <a href="index.html" class="flex items-center gap-2.5">
-            <div class="w-10 h-10 rounded-xl bg-[#102544] flex items-center justify-center text-amber-400 text-lg font-black shadow-md">
-                <i class="fa-solid fa-store"></i>
-            </div>
-            <div>
-                <h1 class="font-black text-sm md:text-base tracking-wider text-[#102544]">PRIME TRADERS</h1>
-                <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Wholesale & Dropship Hub</p>
-            </div>
-        </a>
-
-        <!-- Search Bar -->
-        <div class="flex-1 max-w-xl relative hidden md:block">
-            <input type="text" id="searchInput" oninput="filterProducts()" placeholder="Search for products..." class="w-full pl-4 pr-12 py-2.5 bg-[#F3F4F6] border border-[#E2E8F0] rounded-xl text-xs font-semibold text-slate-800 outline-none focus:border-[#2563EB] transition">
-            <button class="absolute right-1 top-1/2 -translate-y-1/2 w-9 h-9 bg-[#102544] hover:bg-[#2563EB] text-white rounded-lg flex items-center justify-center transition">
-                <i class="fa-solid fa-magnifying-glass text-xs"></i>
-            </button>
-        </div>
-
-        <!-- Account, Wishlist & Cart Links -->
-        <div class="flex items-center gap-4 text-xs font-bold text-[#102544]">
-            <a href="login.html" class="hidden lg:flex items-center gap-1.5 hover:text-[#2563EB] transition">
-                <i class="fa-regular fa-user text-base"></i>
-                <div class="text-left leading-tight">
-                    <div class="text-[10px] text-slate-400 font-normal">Account</div>
-                    <div>Login/Register</div>
-                </div>
-            </a>
-            
-            <button onclick="alert('Wishlist feature active! ❤️')" class="hidden sm:flex items-center gap-1.5 hover:text-[#2563EB] transition">
-                <i class="fa-regular fa-heart text-base"></i>
-                <span class="text-xs bg-slate-100 px-2 py-0.5 rounded-full text-slate-600">0</span>
-            </button>
-
-            <button onclick="openCartModal()" class="flex items-center gap-2 bg-[#102544] hover:bg-[#2563EB] text-white px-3.5 py-2 rounded-xl transition shadow-xs">
-                <i class="fa-solid fa-cart-shopping text-amber-400 text-sm"></i>
-                <span>Cart</span>
-                <span id="cartCountBadge" class="bg-amber-500 text-slate-950 font-black px-1.5 py-0.2 rounded-full text-[10px]">0</span>
-            </button>
-        </div>
-    </div>
-</header>
-<!-- 3. Hero Slider & Promotional Banner Section -->
-<section class="max-w-7xl mx-auto px-4 py-4">
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 items-center">
-        
-        <!-- Main Hero Banner (Takes 3 columns on desktop) -->
-        <div class="lg:col-span-3 bg-[#102544] rounded-3xl p-6 md:p-10 text-white relative overflow-hidden shadow-xl flex flex-col justify-between min-h-[320px]">
-            <div class="absolute right-0 bottom-0 opacity-10 pointer-events-none">
-                <i class="fa-solid fa-boxes-stacked text-9xl"></i>
-            </div>
-            
-            <div class="space-y-3 z-10 max-w-xl">
-                <span class="bg-amber-500 text-slate-950 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-sm">
-                    Wholesale & Dropship Hub
-                </span>
-                <h2 class="text-2xl md:text-4xl font-black tracking-tight leading-tight">
-                    Everything You Need, All in One Place.
-                </h2>
-                <p class="text-xs md:text-sm text-slate-300 font-medium">
-                    Discover Trending Products at Unbeatable Wholesale Prices across Pakistan.
-                </p>
-            </div>
-
-            <div class="pt-6 z-10 flex flex-wrap items-center gap-4">
-                <a href="#productGrid" class="bg-[#2563EB] hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition shadow-md flex items-center gap-2">
-                    <span>Shop Now</span>
-                    <i class="fa-solid fa-arrow-right"></i>
-                </a>
-                <div class="flex items-center gap-3 text-xs text-slate-300 font-semibold">
-                    <span><i class="fa-solid fa-truck-fast text-amber-400 mr-1"></i> Fast Delivery</span>
-                    <span>•</span>
-                    <span><i class="fa-solid fa-shield-halved text-emerald-400 mr-1"></i> Secure COD</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Side Promo Banner (Up to 50% Off) -->
-        <div class="bg-gradient-to-br from-orange-500 to-amber-600 rounded-3xl p-6 text-white text-center shadow-xl flex flex-col justify-center items-center space-y-3 min-h-[320px]">
-            <div class="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center text-white text-2xl font-black shadow-inner">
-                <i class="fa-solid fa-bolt"></i>
-            </div>
-            <span class="bg-white/20 px-3 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest">Limited Time Offer</span>
-            <h3 class="text-2xl md:text-3xl font-black tracking-tight">UP TO 50% OFF</h3>
-            <p class="text-xs text-orange-100 font-medium">Special wholesale discounts on bulk orders and top trending items.</p>
-        </div>
-
-    </div>
-</section>
-
-<!-- 4. Categories Overview Section (Dynamic Grid) -->
-<section class="max-w-7xl mx-auto px-4 py-4">
-    <div class="flex justify-between items-center mb-3">
-        <h3 class="text-sm md:text-base font-black text-[#102544] uppercase tracking-wider flex items-center gap-2">
-            <i class="fa-solid fa-layer-group text-[#2563EB]"></i> Categories Overview
-        </h3>
-        <span class="text-xs text-slate-500 font-semibold">Browse all store sections</span>
-    </div>
-
-    <!-- Dynamic Category Grid handled by store.js -->
-    <div id="publicCategoriesGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-3">
-        <!-- JavaScript will automatically populate categories here -->
-        <div class="col-span-full text-center text-slate-400 py-4 text-xs font-semibold">Loading categories...</div>
-    </div>
-</section>
-<!-- 5. Trending Products & Catalog Section -->
-<section class="max-w-7xl mx-auto px-4 py-6">
-    <!-- Section Header -->
-    <div class="flex justify-between items-center mb-4">
-        <div>
-            <h3 class="text-base md:text-lg font-black text-[#102544] uppercase tracking-wider flex items-center gap-2">
-                <i class="fa-solid fa-fire text-orange-500"></i> Trending Products
-            </h3>
-            <p class="text-xs text-slate-500 font-medium">Best Selling Products at Great Wholesale Prices</p>
-        </div>
-        <button onclick="setCategoryFromGrid('All')" class="text-xs font-bold text-[#2563EB] hover:underline flex items-center gap-1">
-            <span>View All Products</span>
-            <i class="fa-solid fa-arrow-right text-[10px]"></i>
-        </button>
-    </div>
-
-    <!-- Main Product Grid (Handled dynamically by js/store.js with your exact card design) -->
-    <div id="productGrid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        <!-- Products will be rendered here dynamically with pure white cards, -30% badges, and Deep Navy buttons -->
-        <div class="col-span-full text-center text-slate-400 py-12 text-xs font-semibold">Loading live catalog inventory...</div>
-    </div>
-</section>
-<!-- 6. Trust Badges Section -->
-<section class="max-w-7xl mx-auto px-4 py-6">
-    <div class="bg-white border border-[#E2E8F0] rounded-2xl p-6 shadow-sm grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-        <div class="flex flex-col items-center space-y-2">
-            <div class="w-12 h-12 rounded-full bg-blue-50 text-[#2563EB] flex items-center justify-center text-lg">
-                <i class="fa-solid fa-headset"></i>
-            </div>
-            <h4 class="font-bold text-slate-800 text-xs uppercase">24/7 Customer Support</h4>
-            <p class="text-[10px] text-slate-500">Dedicated merchant assistance</p>
-        </div>
-        <div class="flex flex-col items-center space-y-2">
-            <div class="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg">
-                <i class="fa-solid fa-shield-check"></i>
-            </div>
-            <h4 class="font-bold text-slate-800 text-xs uppercase">Safe & Secure Shopping</h4>
-            <p class="text-[10px] text-slate-500">100% protected transactions</p>
-        </div>
-        <div class="flex flex-col items-center space-y-2">
-            <div class="w-12 h-12 rounded-full bg-blue-50 text-[#2563EB] flex items-center justify-center text-lg">
-                <i class="fa-solid fa-truck-fast"></i>
-            </div>
-            <h4 class="font-bold text-slate-800 text-xs uppercase">Fast & Free Delivery</h4>
-            <p class="text-[10px] text-slate-500">On maximum wholesale orders</p>
-        </div>
-        <div class="flex flex-col items-center space-y-2">
-            <div class="w-12 h-12 rounded-full bg-orange-50 text-orange-600 flex items-center justify-center text-lg">
-                <i class="fa-solid fa-rotate-left"></i>
-            </div>
-            <h4 class="font-bold text-slate-800 text-xs uppercase">Easy Returns & Refunds</h4>
-            <p class="text-[10px] text-slate-500">Hassle-free merchant policies</p>
-        </div>
-    </div>
-</section>
-
-<!-- 7. Newsletter & Exclusive Deals Section -->
-<section class="max-w-7xl mx-auto px-4 py-4">
-    <div class="bg-[#102544] rounded-2xl p-6 md:p-8 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 text-white">
-        <div class="space-y-1 text-center md:text-left">
-            <h3 class="text-base md:text-lg font-black tracking-wide">Join Our Store & Get Exclusive Deals!</h3>
-            <p class="text-xs text-slate-300 font-medium">Stay Updated with Latest Offers & Discounts across Pakistan.</p>
-        </div>
-        <form onsubmit="event.preventDefault(); alert('Subscribed successfully! 🎉');" class="flex w-full md:w-auto gap-2">
-            <input type="email" placeholder="Enter Your Email" required class="px-4 py-2.5 rounded-xl bg-white text-slate-900 text-xs font-semibold outline-none w-full md:w-72">
-            <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-xl font-bold text-xs uppercase transition shadow-md whitespace-nowrap">
-                Subscribe
-            </button>
-        </form>
-    </div>
-</section>
-
-<!-- 8. Professional Footer -->
-<footer class="bg-slate-900 text-slate-400 text-xs border-t border-slate-800 mt-8">
-    <div class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-4 gap-8">
-        <div class="space-y-3">
-            <div class="flex items-center gap-2.5">
-                <div class="w-8 h-8 rounded-lg bg-[#102544] flex items-center justify-center text-amber-400 font-black">
-                    <i class="fa-solid fa-store"></i>
-                </div>
-                <span class="font-black text-white text-sm tracking-wider">PRIME TRADERS</span>
-            </div>
-            <p class="text-[11px] leading-relaxed text-slate-400">
-                Your trusted partner for wholesale and dropshipping fulfillment across Pakistan. Quality products, fast delivery, and best merchant support.
-            </p>
-        </div>
-        <div>
-            <h4 class="font-bold text-white text-xs mb-3 uppercase tracking-wider">Quick Links</h4>
-            <ul class="space-y-2 text-[11px]">
-                <li><a href="index.html" class="hover:text-amber-400 transition">Home Catalog</a></li>
-                <li><a href="login.html" class="hover:text-amber-400 transition">Admin Login Portal</a></li>
-                <li><a href="#" onclick="openCartModal()" class="hover:text-amber-400 transition">View Shopping Cart</a></li>
-                <li><a href="#" class="hover:text-amber-400 transition">Wholesale Support</a></li>
-            </ul>
-        </div>
-        <div>
-            <h4 class="font-bold text-white text-xs mb-3 uppercase tracking-wider">Categories</h4>
-            <ul class="space-y-2 text-[11px]">
-                <li><a href="#" onclick="setCategoryFromGrid('Fashion & Apparel')" class="hover:text-amber-400 transition">Fashion & Apparel</a></li>
-                <li><a href="#" onclick="setCategoryFromGrid('Electronics & Gadgets')" class="hover:text-amber-400 transition">Electronics & Gadgets</a></li>
-                <li><a href="#" onclick="setCategoryFromGrid('Home & Kitchen')" class="hover:text-amber-400 transition">Home & Kitchen</a></li>
-                <li><a href="#" onclick="setCategoryFromGrid('Accessories')" class="hover:text-amber-400 transition">Accessories</a></li>
-            </ul>
-        </div>
-        <div class="space-y-3">
-            <h4 class="font-bold text-white text-xs mb-3 uppercase tracking-wider">Connect With Us</h4>
-            <p class="text-[11px]">Karachi, Pakistan</p>
-            <p class="text-[11px] font-bold text-amber-400">Phone: 0331-3534676</p>
-            <div class="flex gap-3 pt-2">
-                <a href="#" class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-white hover:bg-[#2563EB] transition"><i class="fa-brands fa-facebook-f"></i></a>
-                <a href="#" class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-white hover:bg-[#2563EB] transition"><i class="fa-brands fa-whatsapp"></i></a>
-                <a href="#" class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-white hover:bg-[#2563EB] transition"><i class="fa-brands fa-instagram"></i></a>
-            </div>
-        </div>
-    </div>
-    <div class="bg-slate-950 py-4 text-center text-[10px] text-slate-500 border-t border-slate-800">
-        © 2026 Prime Traders Wholeseller Portal. All rights reserved.
-    </div>
-</footer>
