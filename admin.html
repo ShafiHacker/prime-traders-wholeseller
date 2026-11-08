@@ -3,39 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Catalog & Orders | Prime Traders Wholeseller</title>
+    <title>Admin Dashboard | Prime Traders Wholeseller</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .neon-gold-card {
+        .card-box {
             background: #ffffff;
             border: 1px solid #E2E8F0;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-            transition: all 0.3s ease;
-        }
-        .neon-gold-card:hover {
-            border-color: #CBD5E1;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
-        }
-        .neon-gold-btn {
-            background: #102544;
-            color: #ffffff;
-            transition: all 0.3s ease;
-        }
-        .neon-gold-btn:hover {
-            background: #2563EB;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
     </style>
 </head>
-<body class="bg-[#F3F4F6] text-slate-800 min-h-screen flex font-sans">
+<body class="bg-[#F3F4F6] text-slate-800 min-h-screen flex font-sans antialiased">
 
-    <!-- Left Sidebar Menu (Daraz / Post Office Style) -->
-    <aside class="w-64 bg-white border-r border-[#E2E8F0] flex flex-col justify-between hidden md:flex sticky top-0 h-screen shadow-sm z-40">
+    <!-- Desktop Sidebar Menu -->
+    <aside class="w-64 bg-white border-r border-[#E2E8F0] flex flex-col justify-between hidden md:flex sticky top-0 h-screen shadow-sm z-30">
         <div>
-            <!-- Sidebar Header / Logo -->
-            <div class="p-5 border-b border-slate-100 flex items-center gap-3">
+            <!-- Logo Header -->
+            <div class="p-6 border-b border-slate-100 flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-[#102544] flex items-center justify-center text-amber-400 font-black shadow-md">
-                    <i class="fa-solid fa-store"></i>
+                    <i class="fa-solid fa-store text-base"></i>
                 </div>
                 <div>
                     <h1 class="font-black text-xs text-[#102544] tracking-wider">PRIME TRADERS</h1>
@@ -43,7 +30,7 @@
                 </div>
             </div>
 
-            <!-- Navigation Menu Tabs -->
+            <!-- Navigation Links -->
             <nav class="p-4 space-y-1.5 text-xs font-bold">
                 <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition bg-[#102544] text-white shadow-sm">
                     <i class="fa-solid fa-chart-line w-5 text-amber-400"></i> Dashboard Overview
@@ -66,7 +53,7 @@
             </nav>
         </div>
 
-        <!-- Sidebar Footer Logout -->
+        <!-- Logout Button -->
         <div class="p-4 border-t border-slate-100">
             <button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-xs transition">
                 <i class="fa-solid fa-right-from-bracket"></i> Logout Portal
@@ -74,16 +61,16 @@
         </div>
     </aside>
 
-    <!-- Main Content Area -->
-    <div class="flex-1 flex flex-col min-h-screen">
+    <!-- Main Content Area Wrapper -->
+    <div class="flex-1 flex flex-col min-w-0 bg-[#F3F4F6] min-h-screen">
         
-        <!-- Top Admin Header -->
-        <header class="bg-white border-b border-[#E2E8F0] p-4 flex justify-between items-center sticky top-0 z-30 shadow-xs">
+        <!-- Top Header Bar -->
+        <header class="bg-white border-b border-[#E2E8F0] px-6 py-4 flex justify-between items-center sticky top-0 z-20 shadow-xs">
             <div class="flex items-center gap-3">
-                <span class="font-black text-sm text-[#102544]" id="currentActivePageTitle">Dashboard Overview</span>
+                <h2 class="font-black text-sm md:text-base text-[#102544]" id="currentActivePageTitle">Dashboard Overview</h2>
             </div>
             <div class="flex items-center gap-3">
-                <a href="index.html" target="_blank" class="bg-slate-100 hover:bg-slate-200 text-[#102544] px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5">
+                <a href="index.html" target="_blank" class="bg-slate-100 hover:bg-slate-200 text-[#102544] px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5">
                     <i class="fa-solid fa-globe text-[#2563EB]"></i> View Public Catalog
                 </a>
                 <button onclick="handleLogout()" class="md:hidden bg-rose-50 text-rose-600 p-2 rounded-xl text-xs font-bold">
@@ -92,40 +79,40 @@
             </div>
         </header>
 
-        <!-- Main Container Tabs -->
-        <main class="flex-1 max-w-7xl w-full mx-auto px-6 py-6 space-y-6">
+        <!-- Dynamic Body Content -->
+        <main class="flex-1 p-6 md:p-8 space-y-6 max-w-7xl w-full mx-auto">
 
-            <!-- TAB 1: DASHBOARD & LOGISTICS SUMMARY -->
+            <!-- TAB 1: DASHBOARD OVERVIEW & LOGISTICS -->
             <section id="tab-dashboard" class="space-y-6">
-                <div class="neon-gold-card p-6 rounded-2xl space-y-4">
-                    <h2 class="text-xs font-black text-[#102544] uppercase tracking-wider flex items-center gap-2">
+                <div class="card-box p-6 rounded-2xl space-y-4">
+                    <h3 class="text-xs font-black text-[#102544] uppercase tracking-wider flex items-center gap-2">
                         <i class="fa-solid fa-chart-line text-[#2563EB]"></i> Logistics & Courier Performance Summary
-                    </h2>
+                    </h3>
                     
-                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
                         <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
                             <span class="text-[10px] font-bold text-slate-500 block uppercase">Total Parcels</span>
-                            <span id="statTotalParcels" class="text-lg font-black text-[#102544]">0</span>
+                            <span id="statTotalParcels" class="text-xl font-black text-[#102544]">0</span>
                         </div>
                         <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
                             <span class="text-[10px] font-bold text-slate-500 block uppercase">Delivered</span>
-                            <span id="statDelivered" class="text-lg font-black text-emerald-600">0</span>
+                            <span id="statDelivered" class="text-xl font-black text-emerald-600">0</span>
                         </div>
                         <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
                             <span class="text-[10px] font-bold text-slate-500 block uppercase">Processing</span>
-                            <span id="statProcessing" class="text-lg font-black text-blue-600">0</span>
+                            <span id="statProcessing" class="text-xl font-black text-blue-600">0</span>
                         </div>
                         <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
                             <span class="text-[10px] font-bold text-slate-500 block uppercase">Returned</span>
-                            <span id="statReturned" class="text-lg font-black text-rose-600">0</span>
+                            <span id="statReturned" class="text-xl font-black text-rose-600">0</span>
                         </div>
                         <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
                             <span class="text-[10px] font-bold text-slate-500 block uppercase">COD Value</span>
-                            <span id="statTotalCod" class="text-xs font-black text-amber-600">PKR 0</span>
+                            <span id="statTotalCod" class="text-sm font-black text-amber-600">PKR 0</span>
                         </div>
                         <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
                             <span class="text-[10px] font-bold text-slate-500 block uppercase">Success Rate</span>
-                            <span id="statSuccessRate" class="text-sm font-black text-emerald-600">0%</span>
+                            <span id="statSuccessRate" class="text-xl font-black text-emerald-600">0%</span>
                         </div>
                     </div>
                 </div>
@@ -133,10 +120,10 @@
 
             <!-- TAB 2: RECEIVED ORDERS MANAGEMENT -->
             <section id="tab-orders" class="space-y-4 hidden">
-                <div class="neon-gold-card p-6 rounded-2xl space-y-4">
-                    <h2 class="text-sm font-black text-[#102544] uppercase tracking-wider flex items-center gap-2">
+                <div class="card-box p-6 rounded-2xl space-y-4">
+                    <h3 class="text-sm font-black text-[#102544] uppercase tracking-wider flex items-center gap-2">
                         <i class="fa-solid fa-cart-flatbed text-[#2563EB] mr-1.5"></i> Received Orders Management
-                    </h2>
+                    </h3>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
                             <thead>
@@ -158,10 +145,10 @@
 
             <!-- TAB 3: MANAGE CENTRAL PRODUCTS -->
             <section id="tab-products" class="space-y-4 hidden">
-                <div class="neon-gold-card p-6 rounded-2xl space-y-4">
-                    <h2 class="text-sm font-black text-[#102544] uppercase tracking-wider flex items-center gap-2">
+                <div class="card-box p-6 rounded-2xl space-y-4">
+                    <h3 class="text-sm font-black text-[#102544] uppercase tracking-wider flex items-center gap-2">
                         <i class="fa-solid fa-boxes-stacked text-[#2563EB] mr-1.5"></i> Manage Central Products (Edit, Delete & Active/Inactive)
-                    </h2>
+                    </h3>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
                             <thead>
@@ -183,11 +170,11 @@
                 </div>
             </section>
 
-            <!-- TAB 4: ADD NEW PRODUCT FORM -->
+            <!-- TAB 4: ADD NEW WHOLESALE PRODUCT -->
             <section id="tab-add-product" class="space-y-4 hidden">
-                <div class="neon-gold-card p-6 rounded-2xl space-y-4 max-w-4xl">
+                <div class="card-box p-6 rounded-2xl space-y-4 max-w-4xl">
                     <div class="border-b border-slate-100 pb-3 flex justify-between items-center">
-                        <h2 id="formHeading" class="text-sm font-black text-[#102544] uppercase tracking-wider"><i class="fa-solid fa-plus-circle text-emerald-600 mr-1.5"></i> Add New Wholesale Product</h2>
+                        <h3 id="formHeading" class="text-sm font-black text-[#102544] uppercase tracking-wider"><i class="fa-solid fa-plus-circle text-emerald-600 mr-1.5"></i> Add New Wholesale Product</h3>
                         <div class="flex items-center gap-2">
                             <button id="cancelEditBtn" onclick="resetProductForm()" class="hidden bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1 rounded text-[10px] font-bold transition border border-slate-200">Cancel Edit</button>
                             <span class="text-[10px] text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded font-bold">Admin Central Access</span>
@@ -291,14 +278,14 @@
 
             <!-- TAB 5: CATEGORIES OVERVIEW -->
             <section id="tab-categories" class="space-y-4 hidden">
-                <div class="neon-gold-card p-6 rounded-2xl space-y-4">
+                <div class="card-box p-6 rounded-2xl space-y-4">
                     <div class="flex justify-between items-center border-b border-slate-100 pb-3">
                         <div>
-                            <h2 class="text-sm font-black text-[#102544] uppercase tracking-wider"><i class="fa-solid fa-layer-group text-purple-600 mr-1.5"></i> Categories Overview</h2>
+                            <h3 class="text-sm font-black text-[#102544] uppercase tracking-wider"><i class="fa-solid fa-layer-group text-purple-600 mr-1.5"></i> Categories Overview</h3>
                             <p class="text-[11px] text-slate-500">Total products count by category</p>
                         </div>
                     </div>
-                    <div id="categoriesGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                    <div id="categoriesGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                         <div class="col-span-full text-center py-4 text-slate-400 text-xs font-semibold">
                             <i class="fa-solid fa-spinner fa-spin text-[#102544] mr-1"></i> Calculating categories...
                         </div>
@@ -306,12 +293,12 @@
                 </div>
             </section>
 
-            <!-- TAB 6: STOCK ASSET DETAILS (NEW FEATURE) -->
+            <!-- TAB 6: STOCK ASSET DETAILS -->
             <section id="tab-stock-assets" class="space-y-4 hidden">
-                <div class="neon-gold-card p-6 rounded-2xl space-y-4">
+                <div class="card-box p-6 rounded-2xl space-y-4">
                     <div class="flex justify-between items-center border-b border-slate-100 pb-3">
                         <div>
-                            <h2 class="text-sm font-black text-[#102544] uppercase tracking-wider"><i class="fa-solid fa-warehouse text-orange-500 mr-1.5"></i> Stock Asset Details & Valuation</h2>
+                            <h3 class="text-sm font-black text-[#102544] uppercase tracking-wider"><i class="fa-solid fa-warehouse text-orange-500 mr-1.5"></i> Stock Asset Details & Valuation</h3>
                             <p class="text-[11px] text-slate-500">Real-time inventory worth and availability tracking</p>
                         </div>
                         <div class="text-right">
@@ -326,12 +313,12 @@
             </section>
 
         </main>
-    </div>
 
-    <!-- Footer -->
-    <footer class="bg-slate-900 border-t border-slate-800 py-4 text-center text-slate-400 text-[11px] w-full">
-        &copy; 2026 Prime Traders Wholeseller Portal. All Rights Reserved.
-    </footer>
+        <!-- Footer -->
+        <footer class="bg-white border-t border-[#E2E8F0] py-4 text-center text-slate-500 text-[11px] mt-auto">
+            &copy; 2026 Prime Traders Wholeseller Portal. All Rights Reserved.
+        </footer>
+    </div>
 
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -372,10 +359,59 @@
             };
             document.getElementById('currentActivePageTitle').innerText = titles[tabId] || 'Admin Panel';
 
-            // Trigger stock asset table load when tab is clicked
             if (tabId === 'stock-assets' && typeof renderStockAssetsTable === 'function') {
                 renderStockAssetsTable();
             }
+        }
+
+        function renderStockAssetsTable() {
+            const container = document.getElementById('stockAssetDetailsContainer');
+            const totalValuationEl = document.getElementById('totalStockAssetAmount');
+            if (!container || !window.allAdminProducts) return;
+
+            let totalValuation = 0;
+            let html = `
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-200 text-slate-500 text-[11px] uppercase">
+                            <th class="p-3">Product Title</th>
+                            <th class="p-3">Category</th>
+                            <th class="p-3">Unit Price (PKR)</th>
+                            <th class="p-3">Available Stock Qty</th>
+                            <th class="p-3 text-right">Asset Worth (PKR)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 text-xs">
+            `;
+
+            if (window.allAdminProducts.length === 0) {
+                html += `<tr><td colspan="5" class="p-4 text-center text-slate-400">No products found in inventory.</td></tr>`;
+            } else {
+                window.allAdminProducts.forEach(p => {
+                    const price = p.price || 0;
+                    const stock = p.stock !== undefined ? p.stock : 0;
+                    const assetWorth = price * stock;
+                    totalValuation += assetWorth;
+
+                    html += `
+                        <tr>
+                            <td class="p-3 font-bold text-slate-800">${p.title}</td>
+                            <td class="p-3 text-slate-500">${p.category || 'General'}</td>
+                            <td class="p-3 font-semibold text-slate-700">PKR ${price.toLocaleString()}</td>
+                            <td class="p-3">
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${stock > 0 ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-rose-50 text-rose-600 border border-rose-200'}">
+                                    ${stock > 0 ? stock + ' in stock' : 'Out of Stock'}
+                                </span>
+                            </td>
+                            <td class="p-3 text-right font-black text-[#102544]">PKR ${assetWorth.toLocaleString()}</td>
+                        </tr>
+                    `;
+                });
+            }
+
+            html += `</tbody></table>`;
+            container.innerHTML = html;
+            if (totalValuationEl) totalValuationEl.innerText = `PKR ${totalValuation.toLocaleString()}`;
         }
     </script>
 </body>
