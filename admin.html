@@ -8,305 +8,328 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .neon-gold-card {
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(5, 5, 5, 0.98));
-            border: 1px solid rgba(245, 158, 11, 0.4);
-            box-shadow: 0 0 15px rgba(245, 158, 11, 0.15), inset 0 0 10px rgba(245, 158, 11, 0.05);
+            background: #ffffff;
+            border: 1px solid #E2E8F0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
             transition: all 0.3s ease;
         }
         .neon-gold-card:hover {
-            border-color: rgba(245, 158, 11, 0.9);
-            box-shadow: 0 0 25px rgba(245, 158, 11, 0.35);
+            border-color: #CBD5E1;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
         }
         .neon-gold-btn {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+            background: #102544;
+            color: #ffffff;
             transition: all 0.3s ease;
         }
         .neon-gold-btn:hover {
-            box-shadow: 0 0 25px rgba(245, 158, 11, 0.7);
-            filter: brightness(1.1);
+            background: #2563EB;
         }
     </style>
 </head>
-<body class="bg-black text-slate-100 min-h-screen flex flex-col font-sans">
+<body class="bg-[#F3F4F6] text-slate-800 min-h-screen flex font-sans">
 
-    <!-- Top Admin Header -->
-    <header class="bg-slate-950 border-b border-amber-500/30 sticky top-0 z-40 backdrop-blur-md bg-opacity-95 shadow-lg shadow-amber-500/5">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl overflow-hidden border border-amber-500/50 flex items-center justify-center bg-black shadow-lg shadow-amber-500/20">
-                    <img src="logo.png" alt="Prime Traders Logo" class="w-full h-full object-cover">
+    <!-- Left Sidebar Menu (Daraz / Post Office Style) -->
+    <aside class="w-64 bg-white border-r border-[#E2E8F0] flex flex-col justify-between hidden md:flex sticky top-0 h-screen shadow-sm z-40">
+        <div>
+            <!-- Sidebar Header / Logo -->
+            <div class="p-5 border-b border-slate-100 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-[#102544] flex items-center justify-center text-amber-400 font-black shadow-md">
+                    <i class="fa-solid fa-store"></i>
                 </div>
                 <div>
-                    <h1 class="text-xs font-black tracking-wider uppercase text-white leading-none">ADMIN MANAGEMENT PANEL</h1>
-                    <p id="adminUserDisplay" class="text-[8px] text-amber-400 font-bold uppercase tracking-widest mt-1">Checking admin session...</p>
+                    <h1 class="font-black text-xs text-[#102544] tracking-wider">PRIME TRADERS</h1>
+                    <p id="adminUserDisplay" class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Admin Portal</p>
                 </div>
             </div>
+
+            <!-- Navigation Menu Tabs -->
+            <nav class="p-4 space-y-1.5 text-xs font-bold">
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition bg-[#102544] text-white shadow-sm">
+                    <i class="fa-solid fa-chart-line w-5 text-amber-400"></i> Dashboard Overview
+                </button>
+                <button onclick="switchTab('orders')" id="nav-orders" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition text-slate-600 hover:bg-slate-50 hover:text-[#102544]">
+                    <i class="fa-solid fa-cart-flatbed w-5 text-[#2563EB]"></i> Received Orders
+                </button>
+                <button onclick="switchTab('products')" id="nav-products" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition text-slate-600 hover:bg-slate-50 hover:text-[#102544]">
+                    <i class="fa-solid fa-boxes-stacked w-5 text-[#2563EB]"></i> Manage Products
+                </button>
+                <button onclick="switchTab('add-product')" id="nav-add-product" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition text-slate-600 hover:bg-slate-50 hover:text-[#102544]">
+                    <i class="fa-solid fa-plus-circle w-5 text-emerald-600"></i> Add New Product
+                </button>
+                <button onclick="switchTab('categories')" id="nav-categories" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition text-slate-600 hover:bg-slate-50 hover:text-[#102544]">
+                    <i class="fa-solid fa-layer-group w-5 text-purple-600"></i> Categories Overview
+                </button>
+                <button onclick="switchTab('stock-assets')" id="nav-stock-assets" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition text-slate-600 hover:bg-slate-50 hover:text-[#102544]">
+                    <i class="fa-solid fa-warehouse w-5 text-orange-500"></i> Stock Asset Details
+                </button>
+            </nav>
+        </div>
+
+        <!-- Sidebar Footer Logout -->
+        <div class="p-4 border-t border-slate-100">
+            <button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-xs transition">
+                <i class="fa-solid fa-right-from-bracket"></i> Logout Portal
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 flex flex-col min-h-screen">
+        
+        <!-- Top Admin Header -->
+        <header class="bg-white border-b border-[#E2E8F0] p-4 flex justify-between items-center sticky top-0 z-30 shadow-xs">
             <div class="flex items-center gap-3">
-                <a href="index.html" target="_blank" class="bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 border border-amber-500/30">
-                    <i class="fa-solid fa-globe text-amber-400"></i> View Public Catalog
+                <span class="font-black text-sm text-[#102544]" id="currentActivePageTitle">Dashboard Overview</span>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="index.html" target="_blank" class="bg-slate-100 hover:bg-slate-200 text-[#102544] px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-globe text-[#2563EB]"></i> View Public Catalog
                 </a>
-                <button onclick="handleLogout()" class="bg-rose-600/20 hover:bg-rose-600/40 text-rose-400 border border-rose-500/40 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-right-from-bracket"></i> Logout
+                <button onclick="handleLogout()" class="md:hidden bg-rose-50 text-rose-600 p-2 rounded-xl text-xs font-bold">
+                    <i class="fa-solid fa-right-from-bracket"></i>
                 </button>
             </div>
-        </div>
-    </header>
+        </header>
 
-    <!-- Main Container -->
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-6 space-y-6">
+        <!-- Main Container Tabs -->
+        <main class="flex-1 max-w-7xl w-full mx-auto px-6 py-6 space-y-6">
 
-        <!-- LOGISTICS & COURIER PERFORMANCE DASHBOARD CARDS -->
-        <div class="space-y-3">
-            <h2 class="text-xs font-black text-amber-400 uppercase tracking-wider flex items-center gap-2">
-                <i class="fa-solid fa-chart-line text-amber-400"></i> Logistics & Courier Performance Summary
-            </h2>
-            
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
-                <!-- Total Parcels -->
-                <div class="neon-gold-card p-3.5 rounded-2xl flex items-center justify-between">
-                    <div>
-                        <span class="text-[10px] font-bold text-slate-400 block uppercase">Total Parcels</span>
-                        <span id="statTotalParcels" class="text-lg font-black text-white">0</span>
-                    </div>
-                    <div class="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-400 flex items-center justify-center">
-                        <i class="fa-solid fa-box"></i>
-                    </div>
-                </div>
-
-                <!-- Delivered -->
-                <div class="neon-gold-card p-3.5 rounded-2xl flex items-center justify-between">
-                    <div>
-                        <span class="text-[10px] font-bold text-slate-400 block uppercase">Delivered</span>
-                        <span id="statDelivered" class="text-lg font-black text-emerald-400">0</span>
-                    </div>
-                    <div class="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center">
-                        <i class="fa-solid fa-circle-check"></i>
-                    </div>
-                </div>
-
-                <!-- Processing -->
-                <div class="neon-gold-card p-3.5 rounded-2xl flex items-center justify-between">
-                    <div>
-                        <span class="text-[10px] font-bold text-slate-400 block uppercase">Processing</span>
-                        <span id="statProcessing" class="text-lg font-black text-amber-300">0</span>
-                    </div>
-                    <div class="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 flex items-center justify-center">
-                        <i class="fa-solid fa-clock"></i>
-                    </div>
-                </div>
-
-                <!-- Returned -->
-                <div class="neon-gold-card p-3.5 rounded-2xl flex items-center justify-between">
-                    <div>
-                        <span class="text-[10px] font-bold text-slate-400 block uppercase">Returned</span>
-                        <span id="statReturned" class="text-lg font-black text-rose-400">0</span>
-                    </div>
-                    <div class="w-9 h-9 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-400 flex items-center justify-center">
-                        <i class="fa-solid fa-rotate-left"></i>
-                    </div>
-                </div>
-
-                <!-- Total COD Value -->
-                <div class="neon-gold-card p-3.5 rounded-2xl flex items-center justify-between">
-                    <div>
-                        <span class="text-[10px] font-bold text-slate-400 block uppercase">COD Value</span>
-                        <span id="statTotalCod" class="text-xs font-black text-amber-400">PKR 0</span>
-                    </div>
-                    <div class="w-9 h-9 rounded-xl bg-cyan-500/20 border border-cyan-500/40 text-cyan-400 flex items-center justify-center">
-                        <i class="fa-solid fa-wallet"></i>
-                    </div>
-                </div>
-
-                <!-- Success Rate -->
-                <div class="neon-gold-card p-3.5 rounded-2xl flex items-center justify-between">
-                    <div>
-                        <span class="text-[10px] font-bold text-slate-400 block uppercase">Success Rate</span>
-                        <span id="statSuccessRate" class="text-sm font-black text-emerald-400">0%</span>
-                    </div>
-                    <div class="w-9 h-9 rounded-xl bg-indigo-500/20 border border-indigo-500/40 text-indigo-400 flex items-center justify-center">
-                        <i class="fa-solid fa-percent"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- CATEGORIES GRID VIEW -->
-        <div class="neon-gold-card p-6 rounded-2xl space-y-4">
-            <div class="flex justify-between items-center border-b border-amber-500/20 pb-3">
-                <div>
-                    <h2 class="text-sm font-black text-amber-400 uppercase tracking-wider"><i class="fa-solid fa-layer-group text-amber-400 mr-1.5"></i> Categories Overview</h2>
-                    <p class="text-[11px] text-slate-400">Total products count by category</p>
-                </div>
-            </div>
-            <div id="categoriesGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-                <div class="col-span-full text-center py-4 text-slate-500 text-xs font-semibold">
-                    <i class="fa-solid fa-spinner fa-spin text-amber-400 mr-1"></i> Calculating categories...
-                </div>
-            </div>
-        </div>
-
-        <!-- Add / Edit Product Form Box -->
-        <div class="neon-gold-card p-6 rounded-2xl space-y-4">
-            <div class="border-b border-amber-500/20 pb-3 flex justify-between items-center">
-                <h2 id="formHeading" class="text-sm font-black text-amber-400 uppercase tracking-wider"><i class="fa-solid fa-plus-circle text-amber-400 mr-1.5"></i> Add New Wholesale Product</h2>
-                <div class="flex items-center gap-2">
-                    <button id="cancelEditBtn" onclick="resetProductForm()" class="hidden bg-slate-900 hover:bg-slate-800 text-slate-300 px-2.5 py-1 rounded text-[10px] font-bold transition border border-amber-500/30">Cancel Edit</button>
-                    <span class="text-[10px] text-amber-400 bg-amber-500/20 border border-amber-500/30 px-2 py-0.5 rounded font-bold">Admin Central Access</span>
-                </div>
-            </div>
-
-            <form id="addProductForm" onsubmit="handleSaveProduct(event)" class="space-y-4 text-xs">
-                <input type="hidden" id="editingProductId" value="">
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-slate-300 mb-1 font-semibold">Product Title *</label>
-                        <input type="text" id="prodTitle" oninput="autoDetectCategory(this.value)" placeholder="e.g. Spice Rack Organizer Metal" required class="w-full p-2.5 bg-black border border-amber-500/30 rounded-lg text-white outline-none focus:border-amber-400">
-                    </div>
-                    <div>
-                        <label class="block text-slate-300 mb-1 font-semibold">Category *</label>
-                        <select id="prodCategory" onchange="handleCategoryChange(this.value)" required class="w-full p-2.5 bg-black border border-amber-500/30 rounded-lg text-white outline-none focus:border-amber-400">
-                            <option value="Fashion & Apparel">Fashion & Apparel</option>
-                            <option value="Electronics & Gadgets">Electronics & Gadgets</option>
-                            <option value="Home & Kitchen">Home & Kitchen</option>
-                            <option value="Accessories">Accessories</option>
-                            <option value="Computer Accessories">Computer Accessories</option>
-                            <option value="Dish Set">Dish Set</option>
-                            <option value="Medicine Box">Medicine Box</option>
-                            <option value="Mobile Accessories">Mobile Accessories</option>
-                            <option value="__NEW__">+ Add Custom Category...</option>
-                        </select>
-
-                        <!-- Custom Category Input Box -->
-                        <div id="customCategoryBox" class="hidden mt-2">
-                            <input type="text" id="customCategoryInput" placeholder="Type new category name..." class="w-full p-2 bg-black border border-amber-500/50 rounded-lg text-amber-300 outline-none">
+            <!-- TAB 1: DASHBOARD & LOGISTICS SUMMARY -->
+            <section id="tab-dashboard" class="space-y-6">
+                <div class="neon-gold-card p-6 rounded-2xl space-y-4">
+                    <h2 class="text-xs font-black text-[#102544] uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-chart-line text-[#2563EB]"></i> Logistics & Courier Performance Summary
+                    </h2>
+                    
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
+                            <span class="text-[10px] font-bold text-slate-500 block uppercase">Total Parcels</span>
+                            <span id="statTotalParcels" class="text-lg font-black text-[#102544]">0</span>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
+                            <span class="text-[10px] font-bold text-slate-500 block uppercase">Delivered</span>
+                            <span id="statDelivered" class="text-lg font-black text-emerald-600">0</span>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
+                            <span class="text-[10px] font-bold text-slate-500 block uppercase">Processing</span>
+                            <span id="statProcessing" class="text-lg font-black text-blue-600">0</span>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
+                            <span class="text-[10px] font-bold text-slate-500 block uppercase">Returned</span>
+                            <span id="statReturned" class="text-lg font-black text-rose-600">0</span>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
+                            <span class="text-[10px] font-bold text-slate-500 block uppercase">COD Value</span>
+                            <span id="statTotalCod" class="text-xs font-black text-amber-600">PKR 0</span>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
+                            <span class="text-[10px] font-bold text-slate-500 block uppercase">Success Rate</span>
+                            <span id="statSuccessRate" class="text-sm font-black text-emerald-600">0%</span>
                         </div>
                     </div>
                 </div>
+            </section>
 
-                <!-- Pricing & Stock Row -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div>
-                        <label class="block text-slate-300 mb-1 font-semibold">Original Retail Price (PKR) *</label>
-                        <input type="number" id="prodOriginalPrice" placeholder="3000" required class="w-full p-2.5 bg-black border border-amber-500/30 rounded-lg text-white outline-none focus:border-amber-400">
-                    </div>
-                    <div>
-                        <label class="block text-slate-300 mb-1 font-semibold">Single Piece Price (PKR) *</label>
-                        <input type="number" id="prodPrice" placeholder="1999" required class="w-full p-2.5 bg-black border border-amber-500/30 rounded-lg text-white outline-none focus:border-amber-400">
-                    </div>
-                    <div>
-                        <label class="block text-slate-300 mb-1 font-semibold">Bulk Rate (PKR) (Optional)</label>
-                        <input type="number" id="prodBulkPrice" placeholder="1500" class="w-full p-2.5 bg-black border border-amber-500/30 rounded-lg text-white outline-none focus:border-amber-400">
-                    </div>
-                    <div>
-                        <label class="block text-slate-300 mb-1 font-semibold">Min Qty for Bulk (Optional)</label>
-                        <input type="number" id="prodBulkQty" placeholder="10" min="2" class="w-full p-2.5 bg-black border border-amber-500/30 rounded-lg text-white outline-none focus:border-amber-400">
+            <!-- TAB 2: RECEIVED ORDERS MANAGEMENT -->
+            <section id="tab-orders" class="space-y-4 hidden">
+                <div class="neon-gold-card p-6 rounded-2xl space-y-4">
+                    <h2 class="text-sm font-black text-[#102544] uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-cart-flatbed text-[#2563EB] mr-1.5"></i> Received Orders Management
+                    </h2>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-slate-200 text-slate-500 text-[11px] uppercase">
+                                    <th class="p-3">Customer & Details</th>
+                                    <th class="p-3">Items & Quantities</th>
+                                    <th class="p-3">Total Amount</th>
+                                    <th class="p-3">Status</th>
+                                    <th class="p-3 text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminOrdersTableBody" class="divide-y divide-slate-100 text-xs">
+                                <tr><td colspan="5" class="p-4 text-center text-slate-400">Loading orders...</td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
+            </section>
 
-                <!-- Sizes, Colors, Weight & Stock -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div>
-                        <label class="block text-slate-300 mb-1 font-semibold">Stock Quantity *</label>
-                        <input type="number" id="prodStock" placeholder="50" required min="0" class="w-full p-2.5 bg-black border border-amber-500/30 rounded-lg text-white outline-none focus:border-amber-400">
+            <!-- TAB 3: MANAGE CENTRAL PRODUCTS -->
+            <section id="tab-products" class="space-y-4 hidden">
+                <div class="neon-gold-card p-6 rounded-2xl space-y-4">
+                    <h2 class="text-sm font-black text-[#102544] uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-boxes-stacked text-[#2563EB] mr-1.5"></i> Manage Central Products (Edit, Delete & Active/Inactive)
+                    </h2>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-slate-200 text-slate-500 text-[11px] uppercase">
+                                    <th class="p-3">Images</th>
+                                    <th class="p-3">Title & Category</th>
+                                    <th class="p-3">Vendor</th>
+                                    <th class="p-3">Added By</th>
+                                    <th class="p-3">Wholesale Rates</th>
+                                    <th class="p-3">Status / Stock</th>
+                                    <th class="p-3 text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminProductTableBody" class="divide-y divide-slate-100 text-xs">
+                                <tr><td colspan="7" class="p-4 text-center text-slate-400">Loading products...</td></tr>
+                            </tbody>
+                        </table>
                     </div>
-                    <div>
-                        <label class="block text-slate-300 mb-1 font-semibold">Available Sizes</label>
-                        <div class="flex items-center gap-1.5 bg-black p-2 rounded-lg border border-amber-500/30 text-slate-300 overflow-x-auto text-[11px]">
-                            <label class="flex items-center gap-0.5 cursor-pointer"><input type="checkbox" name="prodSize" value="S" class="accent-amber-500"> S</label>
-                            <label class="flex items-center gap-0.5 cursor-pointer"><input type="checkbox" name="prodSize" value="M" class="accent-amber-500"> M</label>
-                            <label class="flex items-center gap-0.5 cursor-pointer"><input type="checkbox" name="prodSize" value="L" class="accent-amber-500"> L</label>
-                            <label class="flex items-center gap-0.5 cursor-pointer"><input type="checkbox" name="prodSize" value="XL" class="accent-amber-500"> XL</label>
-                            <label class="flex items-center gap-0.5 cursor-pointer"><input type="checkbox" name="prodSize" value="Free Size" class="accent-amber-500"> Free</label>
+                </div>
+            </section>
+
+            <!-- TAB 4: ADD NEW PRODUCT FORM -->
+            <section id="tab-add-product" class="space-y-4 hidden">
+                <div class="neon-gold-card p-6 rounded-2xl space-y-4 max-w-4xl">
+                    <div class="border-b border-slate-100 pb-3 flex justify-between items-center">
+                        <h2 id="formHeading" class="text-sm font-black text-[#102544] uppercase tracking-wider"><i class="fa-solid fa-plus-circle text-emerald-600 mr-1.5"></i> Add New Wholesale Product</h2>
+                        <div class="flex items-center gap-2">
+                            <button id="cancelEditBtn" onclick="resetProductForm()" class="hidden bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1 rounded text-[10px] font-bold transition border border-slate-200">Cancel Edit</button>
+                            <span class="text-[10px] text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded font-bold">Admin Central Access</span>
                         </div>
                     </div>
-                    <div>
-                        <label class="block text-slate-300 mb-1 font-semibold">Colors (Comma Separated)</label>
-                        <input type="text" id="prodColors" placeholder="e.g. Red, Black" class="w-full p-2.5 bg-black border border-amber-500/30 rounded-lg text-white outline-none focus:border-amber-400">
+
+                    <form id="addProductForm" onsubmit="handleSaveProduct(event)" class="space-y-4 text-xs">
+                        <input type="hidden" id="editingProductId" value="">
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-slate-700 mb-1 font-semibold">Product Title *</label>
+                                <input type="text" id="prodTitle" oninput="autoDetectCategory(this.value)" placeholder="e.g. Spice Rack Organizer Metal" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 outline-none focus:border-[#2563EB]">
+                            </div>
+                            <div>
+                                <label class="block text-slate-700 mb-1 font-semibold">Category *</label>
+                                <select id="prodCategory" onchange="handleCategoryChange(this.value)" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 outline-none focus:border-[#2563EB]">
+                                    <option value="Fashion & Apparel">Fashion & Apparel</option>
+                                    <option value="Electronics & Gadgets">Electronics & Gadgets</option>
+                                    <option value="Home & Kitchen">Home & Kitchen</option>
+                                    <option value="Accessories">Accessories</option>
+                                    <option value="Computer Accessories">Computer Accessories</option>
+                                    <option value="Dish Set">Dish Set</option>
+                                    <option value="Medicine Box">Medicine Box</option>
+                                    <option value="Mobile Accessories">Mobile Accessories</option>
+                                    <option value="__NEW__">+ Add Custom Category...</option>
+                                </select>
+                                <div id="customCategoryBox" class="hidden mt-2">
+                                    <input type="text" id="customCategoryInput" placeholder="Type new category name..." class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 outline-none">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div>
+                                <label class="block text-slate-700 mb-1 font-semibold">Original Retail Price (PKR) *</label>
+                                <input type="number" id="prodOriginalPrice" placeholder="3000" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 outline-none focus:border-[#2563EB]">
+                            </div>
+                            <div>
+                                <label class="block text-slate-700 mb-1 font-semibold">Single Piece Price (PKR) *</label>
+                                <input type="number" id="prodPrice" placeholder="1999" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 outline-none focus:border-[#2563EB]">
+                            </div>
+                            <div>
+                                <label class="block text-slate-700 mb-1 font-semibold">Bulk Rate (PKR) (Optional)</label>
+                                <input type="number" id="prodBulkPrice" placeholder="1500" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 outline-none focus:border-[#2563EB]">
+                            </div>
+                            <div>
+                                <label class="block text-slate-700 mb-1 font-semibold">Min Qty for Bulk (Optional)</label>
+                                <input type="number" id="prodBulkQty" placeholder="10" min="2" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 outline-none focus:border-[#2563EB]">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div>
+                                <label class="block text-slate-700 mb-1 font-semibold">Stock Quantity *</label>
+                                <input type="number" id="prodStock" placeholder="50" required min="0" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 outline-none focus:border-[#2563EB]">
+                            </div>
+                            <div>
+                                <label class="block text-slate-700 mb-1 font-semibold">Available Sizes</label>
+                                <div class="flex items-center gap-1.5 bg-slate-50 p-2 rounded-lg border border-slate-200 text-slate-700 overflow-x-auto text-[11px]">
+                                    <label class="flex items-center gap-0.5 cursor-pointer"><input type="checkbox" name="prodSize" value="S" class="accent-[#2563EB]"> S</label>
+                                    <label class="flex items-center gap-0.5 cursor-pointer"><input type="checkbox" name="prodSize" value="M" class="accent-[#2563EB]"> M</label>
+                                    <label class="flex items-center gap-0.5 cursor-pointer"><input type="checkbox" name="prodSize" value="L" class="accent-[#2563EB]"> L</label>
+                                    <label class="flex items-center gap-0.5 cursor-pointer"><input type="checkbox" name="prodSize" value="XL" class="accent-[#2563EB]"> XL</label>
+                                    <label class="flex items-center gap-0.5 cursor-pointer"><input type="checkbox" name="prodSize" value="Free Size" class="accent-[#2563EB]"> Free</label>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-slate-700 mb-1 font-semibold">Colors (Comma Separated)</label>
+                                <input type="text" id="prodColors" placeholder="e.g. Red, Black" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 outline-none focus:border-[#2563EB]">
+                            </div>
+                            <div>
+                                <label class="block text-slate-700 mb-1 font-semibold">Product Weight (Optional)</label>
+                                <input type="text" id="prodWeight" placeholder="e.g. 0.5 kg" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 outline-none focus:border-[#2563EB]">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-slate-700 mb-1 font-semibold">Upload Pictures *</label>
+                                <input type="file" id="prodImageFiles" accept="image/*" multiple onchange="handleImageSelection(event)" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-700 text-xs file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-[#102544] file:text-white hover:file:bg-[#2563EB]">
+                                <div id="imagePreviewContainer" class="flex flex-wrap gap-2 mt-3"></div>
+                            </div>
+                            <div>
+                                <label class="block text-slate-700 mb-1 font-semibold">Upload Video Demo (Optional)</label>
+                                <input type="file" id="prodVideoFile" accept="video/*" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-700 text-xs file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-[#102544] file:text-white hover:file:bg-[#2563EB]">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-slate-700 mb-1 font-semibold">Product Description & Specs *</label>
+                            <textarea id="prodDesc" rows="3" placeholder="Enter product specifications..." required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 outline-none focus:border-[#2563EB]"></textarea>
+                        </div>
+
+                        <button type="submit" id="submitBtn" class="w-full py-3 bg-[#102544] hover:bg-[#2563EB] text-white font-black rounded-xl text-xs uppercase shadow-lg transition tracking-wider">
+                            Publish Product to Central Catalog
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- TAB 5: CATEGORIES OVERVIEW -->
+            <section id="tab-categories" class="space-y-4 hidden">
+                <div class="neon-gold-card p-6 rounded-2xl space-y-4">
+                    <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                        <div>
+                            <h2 class="text-sm font-black text-[#102544] uppercase tracking-wider"><i class="fa-solid fa-layer-group text-purple-600 mr-1.5"></i> Categories Overview</h2>
+                            <p class="text-[11px] text-slate-500">Total products count by category</p>
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-slate-300 mb-1 font-semibold">Product Weight (Optional)</label>
-                        <input type="text" id="prodWeight" placeholder="e.g. 0.5 kg" class="w-full p-2.5 bg-black border border-amber-500/30 rounded-lg text-white outline-none focus:border-amber-400">
+                    <div id="categoriesGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                        <div class="col-span-full text-center py-4 text-slate-400 text-xs font-semibold">
+                            <i class="fa-solid fa-spinner fa-spin text-[#102544] mr-1"></i> Calculating categories...
+                        </div>
                     </div>
                 </div>
+            </section>
 
-                <!-- Image Picker & Video -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-slate-300 mb-1 font-semibold">Upload Pictures * (Laptop & Mobile Compatible)</label>
-                        <input type="file" id="prodImageFiles" accept="image/*" multiple onchange="handleImageSelection(event)" class="w-full p-2 bg-black border border-amber-500/30 rounded-lg text-slate-300 text-xs file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-amber-500 file:text-black hover:file:bg-amber-600">
-                        <p class="text-[10px] text-amber-400 mt-1">Individual pictures can be removed using the cross (×) button.</p>
-                        <div id="imagePreviewContainer" class="flex flex-wrap gap-2 mt-3"></div>
+            <!-- TAB 6: STOCK ASSET DETAILS (NEW FEATURE) -->
+            <section id="tab-stock-assets" class="space-y-4 hidden">
+                <div class="neon-gold-card p-6 rounded-2xl space-y-4">
+                    <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                        <div>
+                            <h2 class="text-sm font-black text-[#102544] uppercase tracking-wider"><i class="fa-solid fa-warehouse text-orange-500 mr-1.5"></i> Stock Asset Details & Valuation</h2>
+                            <p class="text-[11px] text-slate-500">Real-time inventory worth and availability tracking</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-[10px] text-slate-400 block font-bold uppercase">Total Inventory Valuation:</span>
+                            <span id="totalStockAssetAmount" class="text-base font-black text-[#102544]">PKR 0</span>
+                        </div>
                     </div>
-
-                    <div>
-                        <label class="block text-slate-300 mb-1 font-semibold">Upload Video Demo (Optional)</label>
-                        <input type="file" id="prodVideoFile" accept="video/*" class="w-full p-2 bg-black border border-amber-500/30 rounded-lg text-slate-300 text-xs file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-amber-500 file:text-black hover:file:bg-amber-600">
+                    <div id="stockAssetDetailsContainer" class="overflow-x-auto">
+                        <p class="text-xs text-slate-400 py-4 text-center">Loading stock assets...</p>
                     </div>
                 </div>
+            </section>
 
-                <div>
-                    <label class="block text-slate-300 mb-1 font-semibold">Product Description & Specs *</label>
-                    <textarea id="prodDesc" rows="3" placeholder="Enter product specifications, material details, etc." required class="w-full p-2.5 bg-black border border-amber-500/30 rounded-lg text-white outline-none focus:border-amber-400"></textarea>
-                </div>
-
-                <button type="submit" id="submitBtn" class="w-full py-3 neon-gold-btn text-black font-black rounded-lg text-xs uppercase shadow-lg transition tracking-wider">
-                    Publish Product to Central Catalog
-                </button>
-            </form>
-        </div>
-
-        <!-- Orders Management Panel -->
-        <div class="neon-gold-card p-6 rounded-2xl space-y-4">
-            <h2 class="text-sm font-black text-amber-400 uppercase tracking-wider"><i class="fa-solid fa-cart-flatbed text-amber-400 mr-1.5"></i> Received Orders Management</h2>
-            
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="border-b border-amber-500/20 text-slate-400 text-[11px] uppercase">
-                            <th class="p-3">Customer & Details</th>
-                            <th class="p-3">Items & Quantities</th>
-                            <th class="p-3">Total Amount</th>
-                            <th class="p-3">Status</th>
-                            <th class="p-3 text-center">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="adminOrdersTableBody" class="divide-y divide-amber-500/10 text-xs">
-                        <tr><td colspan="5" class="p-4 text-center text-slate-500">Loading orders...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Management Table for Products (WITH VENDOR COLUMN) -->
-        <div class="neon-gold-card p-6 rounded-2xl space-y-4">
-            <h2 class="text-sm font-black text-amber-400 uppercase tracking-wider"><i class="fa-solid fa-boxes-stacked text-amber-400 mr-1.5"></i> Manage Central Products (Edit, Delete & Active/Inactive)</h2>
-            
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="border-b border-amber-500/20 text-slate-400 text-[11px] uppercase">
-                            <th class="p-3">Images</th>
-                            <th class="p-3">Title & Category</th>
-                            <th class="p-3">Vendor</th>
-                            <th class="p-3">Added By</th>
-                            <th class="p-3">Wholesale Rates</th>
-                            <th class="p-3">Status / Stock</th>
-                            <th class="p-3 text-center">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="adminProductTableBody" class="divide-y divide-amber-500/10 text-xs">
-                        <tr><td colspan="7" class="p-4 text-center text-slate-500">Loading products...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-    </main>
+        </main>
+    </div>
 
     <!-- Footer -->
-    <footer class="bg-slate-950 border-t border-amber-500/20 py-4 text-center text-slate-500 text-[11px]">
+    <footer class="bg-slate-900 border-t border-slate-800 py-4 text-center text-slate-400 text-[11px] w-full">
         &copy; 2026 Prime Traders Wholeseller Portal. All Rights Reserved.
     </footer>
 
@@ -317,6 +340,43 @@
     
     <!-- External JS Scripts -->
     <script src="js/firebase-config.js"></script>
-<script src="js/admin.js"></script>
+    <script src="js/admin.js"></script>
+
+    <!-- Sidebar Tab Switching & Stock Asset Rendering Logic -->
+    <script>
+        function switchTab(tabId) {
+            const tabs = ['dashboard', 'orders', 'products', 'add-product', 'categories', 'stock-assets'];
+            tabs.forEach(t => {
+                const section = document.getElementById(`tab-${t}`);
+                const btn = document.getElementById(`nav-${t}`);
+                if (section) section.classList.add('hidden');
+                if (btn) {
+                    btn.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition text-slate-600 hover:bg-slate-50 hover:text-[#102544]";
+                }
+            });
+
+            const activeSection = document.getElementById(`tab-${tabId}`);
+            const activeBtn = document.getElementById(`nav-${tabId}`);
+            if (activeSection) activeSection.classList.remove('hidden');
+            if (activeBtn) {
+                activeBtn.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition bg-[#102544] text-white shadow-sm";
+            }
+
+            const titles = {
+                'dashboard': 'Dashboard Overview',
+                'orders': 'Received Orders Management',
+                'products': 'Manage Central Products',
+                'add-product': 'Add New Wholesale Product',
+                'categories': 'Categories Overview',
+                'stock-assets': 'Stock Asset Details'
+            };
+            document.getElementById('currentActivePageTitle').innerText = titles[tabId] || 'Admin Panel';
+
+            // Trigger stock asset table load when tab is clicked
+            if (tabId === 'stock-assets' && typeof renderStockAssetsTable === 'function') {
+                renderStockAssetsTable();
+            }
+        }
+    </script>
 </body>
 </html>
