@@ -2,6 +2,7 @@
 let selectedImageFiles = [];
 let currentAdminEmail = "";
 let loadedProductsMap = {};
+window.allAdminProducts = []; // Global array for Stock Assets calculation
 
 auth.onAuthStateChanged((user) => {
     if (!user) {
@@ -77,7 +78,7 @@ function renderImagePreviews() {
     }
 
     container.innerHTML = selectedImageFiles.map((b64, idx) => `
-        <div class="relative w-14 h-14 rounded-lg overflow-hidden border border-amber-500/50 group">
+        <div class="relative w-14 h-14 rounded-lg overflow-hidden border border-slate-300 group shadow-xs">
             <img src="${b64}" class="w-full h-full object-cover">
             <button type="button" onclick="removeSingleImage(${idx})" class="absolute top-0.5 right-0.5 bg-rose-600 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-bold shadow hover:bg-rose-700">
                 ×
@@ -181,7 +182,6 @@ async function handleSaveProduct(e) {
 
         if (editingId && loadedProductsMap[editingId]) {
             const existing = loadedProductsMap[editingId];
-            // Vendor name ko 100% lock rakha gaya hai taaki edit par change na ho
             assignedVendorName = existing.vendorName && !existing.vendorName.includes("@") 
                 ? existing.vendorName 
                 : getVendorName(existing.originalCreatorEmail || existing.addedByAdmin);
@@ -198,9 +198,9 @@ async function handleSaveProduct(e) {
             image: selectedImageFiles[0] || "",
             desc,
             isActive: true,
-            vendorName: assignedVendorName, // Permanent Locked Vendor Name
-            originalCreatorEmail: originalCreator, // Asal creator email locked
-            addedByAdmin: currentAdminEmail, // Sirf last updater ki email yahan update hogi
+            vendorName: assignedVendorName,
+            originalCreatorEmail: originalCreator,
+            addedByAdmin: currentAdminEmail,
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         };
 
@@ -240,6 +240,14 @@ async function toggleProductStatus(id, currentStatus) {
         await db.collection('products').doc(id).update({ isActive: newStatus });
     } catch (e) {
         alert("Error updating status: " + e.message);
+    }
+}
+
+async function updateProductStock(id, newStock) {
+    try {
+        await db.collection('products').doc(id).update({ stock: newStock });
+    } catch (e) {
+        alert("Error updating stock: " + e.message);
     }
 }
 
@@ -283,7 +291,7 @@ function editProduct(id) {
     selectedImageFiles = p.images || (p.image ? [p.image] : []);
     renderImagePreviews();
 
-    document.getElementById('formHeading').innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-400 mr-1.5"></i> Edit Product: ${p.title}`;
+    document.getElementById('formHeading').innerHTML = `<i class="fa-solid fa-pen-to-square text-[#2563EB] mr-1.5"></i> Edit Product: ${p.title}`;
     document.getElementById('submitBtn').innerText = "Update Product Changes";
     document.getElementById('cancelEditBtn').classList.remove('hidden');
 
@@ -298,7 +306,7 @@ function resetProductForm() {
     if (customBox) customBox.classList.add('hidden');
     selectedImageFiles = [];
     renderImagePreviews();
-    document.getElementById('formHeading').innerHTML = `<i class="fa-solid fa-plus-circle text-amber-400 mr-1.5"></i> Add New Wholesale Product`;
+    document.getElementById('formHeading').innerHTML = `<i class="fa-solid fa-plus-circle text-emerald-600 mr-1.5"></i> Add New Wholesale Product`;
     document.getElementById('submitBtn').innerText = "Publish Product to Central Catalog";
     document.getElementById('cancelEditBtn').classList.add('hidden');
 }
@@ -340,12 +348,12 @@ function renderCategoriesGrid(productsList) {
     allCats.forEach(cat => {
         const num = counts[cat] || 0;
         html += `
-            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center flex flex-col items-center justify-center space-y-1 hover:border-amber-500/50 transition shadow">
-                <div class="w-8 h-8 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-xs">
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center flex flex-col items-center justify-center space-y-1.5 hover:border-[#2563EB] transition shadow-xs">
+                <div class="w-9 h-9 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center text-[#2563EB] text-sm font-bold">
                     <i class="fa-solid fa-box-open"></i>
                 </div>
-                <h3 class="font-bold text-slate-200 text-[11px] line-clamp-1">${cat}</h3>
-                <span class="bg-amber-950/60 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded text-[9px] font-bold">${num} products</span>
+                <h3 class="font-bold text-slate-800 text-xs line-clamp-1">${cat}</h3>
+                <span class="bg-blue-100 text-[#102544] px-2.5 py-0.5 rounded-full text-[10px] font-black">${num} products</span>
             </div>
         `;
     });
@@ -359,8 +367,10 @@ function loadAdminProducts() {
     db.collection('products').onSnapshot(snapshot => {
         loadedProductsMap = {};
         if (snapshot.empty) {
-            tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-500">No products uploaded yet.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-500 font-semibold">No products uploaded yet.</td></tr>`;
             renderCategoriesGrid([]);
+            window.allAdminProducts = [];
+            if (typeof renderStockAssetsTable === 'function') renderStockAssetsTable();
             return;
         }
 
@@ -370,8 +380,10 @@ function loadAdminProducts() {
         });
 
         productsList.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+        window.allAdminProducts = productsList; // Store globally for stock asset details
 
         renderCategoriesGrid(productsList);
+        if (typeof renderStockAssetsTable === 'function') renderStockAssetsTable();
 
         let html = '';
         const categoriesSet = new Set();
@@ -383,51 +395,48 @@ function loadAdminProducts() {
 
             const mainImg = (p.images && p.images.length > 0) ? p.images[0] : (p.image || 'https://via.placeholder.com/100');
             const imgCount = p.images ? p.images.length : 1;
-            const stockVal = p.stock !== undefined ? p.stock : 10;
+            const stockVal = p.stock !== undefined ? p.stock : 0;
             
             const isActive = p.isActive !== false;
             const statusBadge = isActive 
-                ? `<button onclick="toggleProductStatus('${id}', true)" class="bg-emerald-950/80 text-emerald-400 border border-emerald-500/30 px-2.5 py-1 rounded-full text-[10px] font-bold hover:bg-rose-950 hover:text-rose-400 transition" title="Click to Unactive">Active (Visible)</button>`
-                : `<button onclick="toggleProductStatus('${id}', false)" class="bg-rose-950/80 text-rose-400 border border-emerald-500/30 px-2.5 py-1 rounded-full text-[10px] font-bold hover:bg-emerald-950 hover:text-emerald-400 transition" title="Click to Active">Inactive (Hidden)</button>`;
+                ? `<button onclick="toggleProductStatus('${id}', true)" class="bg-emerald-100 text-emerald-800 border border-emerald-300 px-2.5 py-1 rounded-full text-[10px] font-bold hover:bg-rose-100 hover:text-rose-800 transition">Active (Visible)</button>`
+                : `<button onclick="toggleProductStatus('${id}', false)" class="bg-rose-100 text-rose-800 border border-rose-300 px-2.5 py-1 rounded-full text-[10px] font-bold hover:bg-emerald-100 hover:text-emerald-800 transition">Inactive (Hidden)</button>`;
 
-            const bulkInfo = p.bulkPrice && p.bulkQty ? `<div class="text-[10px] text-emerald-400">Bulk: PKR ${p.bulkPrice} (${p.bulkQty}+ pcs)</div>` : '';
-            
-            // Asal vendor name ko secure dikhane ke liye
-            const vendorSource = p.vendorName && !p.vendorName.includes("@") ? p.vendorName : (p.originalCreatorEmail || p.addedByAdmin);
-            const vendorDisplayName = getVendorName(vendorSource);
-            const uploaderEmail = p.addedByAdmin || 'N/V';
+            const bulkInfo = p.bulkPrice && p.bulkQty ? `<div class="text-[10px] font-bold text-orange-600 mt-0.5">Bulk: PKR ${p.bulkPrice} (${p.bulkQty}+ pcs)</div>` : '';
 
             html += `
-                <tr class="hover:bg-slate-900/50 transition border-b border-slate-800 ${!isActive ? 'opacity-60 bg-slate-950/30' : ''}">
+                <tr class="border-b border-slate-200 hover:bg-slate-50 transition ${!isActive ? 'opacity-60 bg-slate-100/50' : ''}">
                     <td class="p-3">
-                        <div class="flex items-center gap-1">
-                            <img src="${mainImg}" class="w-10 h-10 object-cover rounded-lg border border-slate-700">
-                            <span class="text-[10px] text-amber-400 font-bold">+${imgCount-1}</span>
+                        <div class="flex items-center gap-1.5">
+                            <img src="${mainImg}" class="w-11 h-11 object-cover rounded-lg border border-slate-200 shadow-xs">
+                            <span class="text-[10px] text-slate-500 font-bold">+${imgCount-1}</span>
                         </div>
                     </td>
                     <td class="p-3">
-                        <div class="font-bold text-slate-100">${p.title}</div>
-                        <div class="text-[10px] text-amber-400 font-mono">${p.category}</div>
+                        <div class="font-black text-slate-900 text-xs">${p.title}</div>
+                        <div class="text-[10px] font-bold text-[#2563EB] mt-0.5">${p.category}</div>
                     </td>
                     <td class="p-3">
-                        <span class="bg-amber-950/80 text-amber-300 border border-amber-500/40 px-2.5 py-1 rounded font-bold text-[11px] inline-block">👤 ${vendorDisplayName}</span>
+                        <div class="flex items-center gap-2">
+                            <span class="font-black text-slate-900 text-xs">${stockVal} units</span>
+                            <div class="flex flex-col gap-0.5">
+                                <button onclick="updateProductStock('${id}', ${stockVal + 1})" class="w-5 h-5 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 rounded flex items-center justify-center font-black text-[10px]" title="Increase Stock">+</button>
+                                <button onclick="updateProductStock('${id}', ${Math.max(0, stockVal - 1)})" class="w-5 h-5 bg-rose-100 hover:bg-rose-200 text-rose-800 rounded flex items-center justify-center font-black text-[10px]" title="Decrease Stock">-</button>
+                            </div>
+                        </div>
                     </td>
                     <td class="p-3">
-                        <span class="text-slate-300 font-mono text-[10px] bg-slate-950 px-2 py-1 rounded border border-slate-800 inline-block">${uploaderEmail}</span>
-                    </td>
-                    <td class="p-3">
-                        <div class="font-bold text-amber-300">Single: PKR ${p.price}</div>
+                        <div class="font-black text-slate-900 text-xs">Single: PKR ${p.price}</div>
                         ${bulkInfo}
                     </td>
-                    <td class="p-3 space-y-1">
+                    <td class="p-3">
                         <div>${statusBadge}</div>
-                        <div class="text-[11px] text-slate-400">Stock: ${stockVal} units</div>
                     </td>
                     <td class="p-3 text-center space-x-1">
-                        <button onclick="editProduct('${id}')" class="bg-amber-500 hover:bg-amber-600 text-slate-950 px-2.5 py-1 rounded text-[11px] font-bold transition shadow">
+                        <button onclick="editProduct('${id}')" class="bg-amber-500 hover:bg-amber-600 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition shadow-xs">
                             <i class="fa-solid fa-pen"></i> Edit
                         </button>
-                        <button onclick="deleteProduct('${id}')" class="bg-rose-600 hover:bg-rose-700 text-white px-2.5 py-1 rounded text-[11px] font-bold transition shadow">
+                        <button onclick="deleteProduct('${id}')" class="bg-rose-600 hover:bg-rose-700 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition shadow-xs">
                             <i class="fa-solid fa-trash"></i> Delete
                         </button>
                     </td>
@@ -498,7 +507,7 @@ function loadAdminOrders() {
 
     db.collection('orders').onSnapshot(snapshot => {
         if (snapshot.empty) {
-            tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500">No orders received yet.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-500 font-semibold">No orders received yet.</td></tr>`;
             updateLogisticsSummaryCards([]);
             return;
         }
@@ -515,22 +524,22 @@ function loadAdminOrders() {
         let html = '';
         ordersList.forEach(o => {
             const id = o.id;
-            let itemsStr = o.items ? o.items.map(i => `${i.title} (x${i.qty || 1}) - Size: ${i.selectedSize || 'N/A'}, Color: ${i.selectedColor || 'N/A'}`).join('<br>') : (o.itemDetail || 'Details N/A');
+            let itemsStr = o.items ? o.items.map(i => `<span class="font-bold text-slate-900">${i.title}</span> (x${i.qty || 1}) - Size: ${i.selectedSize || 'N/A'}, Color: ${i.selectedColor || 'N/A'}`).join('<br>') : (o.itemDetail || 'Details N/A');
 
             html += `
-                <tr class="hover:bg-slate-900/50 transition border-b border-slate-800">
-                    <td class="p-3 font-bold text-white">
+                <tr class="border-b border-slate-200 hover:bg-slate-50 transition">
+                    <td class="p-3 font-bold text-slate-900">
                         ${o.customerName || o.custName || 'N/A'}
-                        <div class="text-[10px] text-amber-400">${o.customerPhone || o.custPhone || ''}</div>
-                        <div class="text-[10px] text-slate-400">${o.customerAddress || o.custAddress || ''}</div>
+                        <div class="text-[11px] font-bold text-[#2563EB]">${o.customerPhone || o.custPhone || ''}</div>
+                        <div class="text-[11px] text-slate-600 font-normal">${o.customerAddress || o.custAddress || ''}</div>
                     </td>
-                    <td class="p-3 text-slate-300">${itemsStr}</td>
-                    <td class="p-3 font-bold text-amber-300">PKR ${o.totalAmount || o.totalCod || 0}</td>
+                    <td class="p-3 text-slate-700 text-xs">${itemsStr}</td>
+                    <td class="p-3 font-black text-slate-900">PKR ${o.totalAmount || o.totalCod || 0}</td>
                     <td class="p-3">
-                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-900/50 text-amber-300 border border-amber-500/30">${o.status || 'Pending'}</span>
+                        <span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">${o.status || 'Pending'}</span>
                     </td>
                     <td class="p-3 text-center">
-                        <button onclick="deleteAdminOrder('${id}')" class="bg-rose-600 hover:bg-rose-700 text-white px-2 py-1 rounded text-[10px] font-bold shadow">Delete</button>
+                        <button onclick="deleteAdminOrder('${id}')" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-xs">Delete</button>
                     </td>
                 </tr>
             `;
@@ -551,7 +560,8 @@ async function deleteAdminOrder(id) {
 function handleLogout() {
     auth.signOut().then(() => window.location.href = "login.html");
 }
-// Stock Asset Details & Total Valuation calculation
+
+// Stock Asset Details & Total Valuation calculation with Sr#
 function renderStockAssetsTable() {
     const container = document.getElementById('stockAssetDetailsContainer');
     const totalValuationEl = document.getElementById('totalStockAssetAmount');
@@ -561,7 +571,8 @@ function renderStockAssetsTable() {
     let html = `
         <table class="w-full text-left border-collapse">
             <thead>
-                <tr class="border-b border-slate-200 text-slate-500 text-[11px] uppercase">
+                <tr class="border-b border-slate-300 text-slate-700 text-[11px] font-black uppercase">
+                    <th class="p-3 w-12">Sr#</th>
                     <th class="p-3">Product Title</th>
                     <th class="p-3">Category</th>
                     <th class="p-3">Unit Price (PKR)</th>
@@ -569,29 +580,30 @@ function renderStockAssetsTable() {
                     <th class="p-3 text-right">Asset Worth (PKR)</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-slate-100 text-xs">
+            <tbody class="divide-y divide-slate-200 text-xs font-medium text-slate-800">
     `;
 
     if (window.allAdminProducts.length === 0) {
-        html += `<tr><td colspan="5" class="p-4 text-center text-slate-400">No products found in inventory.</td></tr>`;
+        html += `<tr><td colspan="6" class="p-6 text-center text-slate-500">No products found in inventory.</td></tr>`;
     } else {
-        window.allAdminProducts.forEach(p => {
+        window.allAdminProducts.forEach((p, index) => {
             const price = p.price || 0;
             const stock = p.stock !== undefined ? p.stock : 0;
             const assetWorth = price * stock;
             totalValuation += assetWorth;
 
             html += `
-                <tr>
-                    <td class="p-3 font-bold text-slate-800">${p.title}</td>
-                    <td class="p-3 text-slate-500">${p.category || 'General'}</td>
-                    <td class="p-3 font-semibold text-slate-700">PKR ${price.toLocaleString()}</td>
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="p-3 font-bold text-slate-600">${index + 1}</td>
+                    <td class="p-3 font-bold text-slate-900">${p.title}</td>
+                    <td class="p-3 text-slate-600">${p.category || 'General'}</td>
+                    <td class="p-3 font-bold text-slate-800">PKR ${price.toLocaleString()}</td>
                     <td class="p-3">
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${stock > 0 ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-rose-50 text-rose-600 border border-rose-200'}">
-                            ${stock > 0 ? stock + ' in stock' : 'Out of Stock'}
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-black ${stock > 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+                            ${stock > 0 ? stock + ' units available' : 'Out of Stock'}
                         </span>
                     </td>
-                    <td class="p-3 text-right font-black text-[#102544]">PKR ${assetWorth.toLocaleString()}</td>
+                    <td class="p-3 text-right font-black text-slate-900">PKR ${assetWorth.toLocaleString()}</td>
                 </tr>
             `;
         });
