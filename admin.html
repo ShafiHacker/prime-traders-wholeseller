@@ -155,15 +155,14 @@
                                 <tr class="border-b border-slate-200 text-slate-500 text-[11px] uppercase">
                                     <th class="p-3">Images</th>
                                     <th class="p-3">Title & Category</th>
-                                    <th class="p-3">Vendor</th>
-                                    <th class="p-3">Added By</th>
+                                    <th class="p-3">Stock Qty</th>
                                     <th class="p-3">Wholesale Rates</th>
-                                    <th class="p-3">Status / Stock</th>
+                                    <th class="p-3">Status</th>
                                     <th class="p-3 text-center">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="adminProductTableBody" class="divide-y divide-slate-100 text-xs">
-                                <tr><td colspan="7" class="p-4 text-center text-slate-400">Loading products...</td></tr>
+                                <tr><td colspan="6" class="p-4 text-center text-slate-400">Loading products...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -373,7 +372,8 @@
             let html = `
                 <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr class="border-b border-slate-200 text-slate-500 text-[11px] uppercase">
+                        <tr class="border-b border-slate-300 text-slate-700 text-[11px] font-black uppercase">
+                            <th class="p-3 w-12">Sr#</th>
                             <th class="p-3">Product Title</th>
                             <th class="p-3">Category</th>
                             <th class="p-3">Unit Price (PKR)</th>
@@ -381,29 +381,30 @@
                             <th class="p-3 text-right">Asset Worth (PKR)</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100 text-xs">
+                    <tbody class="divide-y divide-slate-200 text-xs font-medium text-slate-800">
             `;
 
             if (window.allAdminProducts.length === 0) {
-                html += `<tr><td colspan="5" class="p-4 text-center text-slate-400">No products found in inventory.</td></tr>`;
+                html += `<tr><td colspan="6" class="p-6 text-center text-slate-500">No products found in inventory.</td></tr>`;
             } else {
-                window.allAdminProducts.forEach(p => {
+                window.allAdminProducts.forEach((p, index) => {
                     const price = p.price || 0;
                     const stock = p.stock !== undefined ? p.stock : 0;
                     const assetWorth = price * stock;
                     totalValuation += assetWorth;
 
                     html += `
-                        <tr>
-                            <td class="p-3 font-bold text-slate-800">${p.title}</td>
-                            <td class="p-3 text-slate-500">${p.category || 'General'}</td>
-                            <td class="p-3 font-semibold text-slate-700">PKR ${price.toLocaleString()}</td>
+                        <tr class="hover:bg-slate-50 transition">
+                            <td class="p-3 font-bold text-slate-600">${index + 1}</td>
+                            <td class="p-3 font-bold text-slate-900">${p.title}</td>
+                            <td class="p-3 text-slate-600">${p.category || 'General'}</td>
+                            <td class="p-3 font-bold text-slate-800">PKR ${price.toLocaleString()}</td>
                             <td class="p-3">
-                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${stock > 0 ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-rose-50 text-rose-600 border border-rose-200'}">
-                                    ${stock > 0 ? stock + ' in stock' : 'Out of Stock'}
+                                <span class="px-2.5 py-1 rounded-full text-[10px] font-black ${stock > 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+                                    ${stock > 0 ? stock + ' units available' : 'Out of Stock'}
                                 </span>
                             </td>
-                            <td class="p-3 text-right font-black text-[#102544]">PKR ${assetWorth.toLocaleString()}</td>
+                            <td class="p-3 text-right font-black text-slate-900">PKR ${assetWorth.toLocaleString()}</td>
                         </tr>
                     `;
                 });
