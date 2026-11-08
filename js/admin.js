@@ -2,7 +2,7 @@
 let selectedImageFiles = [];
 let currentAdminEmail = "";
 let loadedProductsMap = {};
-window.allAdminProducts = []; // Global array for Stock Assets calculation
+window.allAdminProducts = [];
 
 auth.onAuthStateChanged((user) => {
     if (!user) {
@@ -18,15 +18,9 @@ auth.onAuthStateChanged((user) => {
 
 function getVendorName(email) {
     const targetEmail = (email || "").toLowerCase().trim();
-    if (targetEmail.includes("abubakr@primetraders.com")) {
-        return "AbuBakar";
-    }
-    if (targetEmail.includes("mkashan@primetraders.com")) {
-        return "Muhammad Kashan";
-    }
-    if (targetEmail.includes("admin@primetraders.com")) {
-        return "Shafi Ul Haq";
-    }
+    if (targetEmail.includes("abubakr@primetraders.com")) return "AbuBakar";
+    if (targetEmail.includes("mkashan@primetraders.com")) return "Muhammad Kashan";
+    if (targetEmail.includes("admin@primetraders.com")) return "Shafi Ul Haq";
     return email || "Shafi Ul Haq";
 }
 
@@ -380,7 +374,7 @@ function loadAdminProducts() {
         });
 
         productsList.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
-        window.allAdminProducts = productsList; // Store globally for stock asset details
+        window.allAdminProducts = productsList;
 
         renderCategoriesGrid(productsList);
         if (typeof renderStockAssetsTable === 'function') renderStockAssetsTable();
@@ -561,7 +555,6 @@ function handleLogout() {
     auth.signOut().then(() => window.location.href = "login.html");
 }
 
-// Stock Asset Details & Total Valuation calculation with Sr#
 function renderStockAssetsTable() {
     const container = document.getElementById('stockAssetDetailsContainer');
     const totalValuationEl = document.getElementById('totalStockAssetAmount');
