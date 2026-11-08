@@ -551,3 +551,53 @@ async function deleteAdminOrder(id) {
 function handleLogout() {
     auth.signOut().then(() => window.location.href = "login.html");
 }
+// Stock Asset Details & Total Valuation calculation
+function renderStockAssetsTable() {
+    const container = document.getElementById('stockAssetDetailsContainer');
+    const totalValuationEl = document.getElementById('totalStockAssetAmount');
+    if (!container || !window.allAdminProducts) return;
+
+    let totalValuation = 0;
+    let html = `
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="border-b border-slate-200 text-slate-500 text-[11px] uppercase">
+                    <th class="p-3">Product Title</th>
+                    <th class="p-3">Category</th>
+                    <th class="p-3">Unit Price (PKR)</th>
+                    <th class="p-3">Available Stock Qty</th>
+                    <th class="p-3 text-right">Asset Worth (PKR)</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-xs">
+    `;
+
+    if (window.allAdminProducts.length === 0) {
+        html += `<tr><td colspan="5" class="p-4 text-center text-slate-400">No products found in inventory.</td></tr>`;
+    } else {
+        window.allAdminProducts.forEach(p => {
+            const price = p.price || 0;
+            const stock = p.stock !== undefined ? p.stock : 0;
+            const assetWorth = price * stock;
+            totalValuation += assetWorth;
+
+            html += `
+                <tr>
+                    <td class="p-3 font-bold text-slate-800">${p.title}</td>
+                    <td class="p-3 text-slate-500">${p.category || 'General'}</td>
+                    <td class="p-3 font-semibold text-slate-700">PKR ${price.toLocaleString()}</td>
+                    <td class="p-3">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${stock > 0 ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-rose-50 text-rose-600 border border-rose-200'}">
+                            ${stock > 0 ? stock + ' in stock' : 'Out of Stock'}
+                        </span>
+                    </td>
+                    <td class="p-3 text-right font-black text-[#102544]">PKR ${assetWorth.toLocaleString()}</td>
+                </tr>
+            `;
+        });
+    }
+
+    html += `</tbody></table>`;
+    container.innerHTML = html;
+    if (totalValuationEl) totalValuationEl.innerText = `PKR ${totalValuation.toLocaleString()}`;
+}
