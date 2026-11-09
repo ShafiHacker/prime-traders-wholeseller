@@ -13,21 +13,21 @@ if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
 
+const auth = firebase.auth();
+window.auth = auth;
+
 const db = firebase.firestore();
+window.db = db;
 
 // Settings pehle set hongi taaki Firestore crash na ho
 db.settings({ experimentalForceLongPolling: true });
 
-// Offline Cache Enable
-db.enablePersistence().catch((err) => {
+// Multi-Tab Persistence Configuration with Synchronization
+db.enablePersistence({ synchronizeTabs: true })
+  .catch((err) => {
     if (err.code == 'failed-precondition') {
-        // Multiple tabs open hone par ignore karein
+      console.warn('Firestore Multi-tab persistence failed to lock (multiple tabs open).');
     } else if (err.code == 'unimplemented') {
-        // Unsupported browser par ignore karein
+      console.warn('Firestore persistence not supported in this browser.');
     }
-});
-
-window.db = db; 
-
-const auth = firebase.auth();
-window.auth = auth;
+  });
