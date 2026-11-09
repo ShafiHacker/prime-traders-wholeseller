@@ -162,15 +162,27 @@ function renderProducts(products) {
                     </div>
                 </div>
 
-                <div class="p-4 pt-0">
-                    <button onclick="openProductModal('${p.id}')" ${isOutOfStock ? 'disabled' : ''} class="w-full py-2.5 ${isOutOfStock ? 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200' : 'bg-[#102544] hover:bg-[#2563EB] text-white shadow-md'} font-bold rounded-xl text-xs transition flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-cart-shopping text-amber-400"></i> ${isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
+                <div class="p-4 pt-0 grid grid-cols-2 gap-2">
+                    <button onclick="openProductModal('${p.id}')" ${isOutOfStock ? 'disabled' : ''} class="w-full py-2.5 ${isOutOfStock ? 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200' : 'bg-slate-100 hover:bg-slate-200 text-[#102544]'} font-bold rounded-xl text-[11px] transition flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-cart-shopping text-amber-500"></i> ${isOutOfStock ? 'Out of Stock' : 'Cart'}
+                    </button>
+                    <button onclick="buyCardProductDirect('${p.id}')" ${isOutOfStock ? 'disabled' : ''} class="w-full py-2.5 ${isOutOfStock ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-[#102544] hover:bg-[#2563EB] text-white shadow-md'} font-bold rounded-xl text-[11px] transition flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-bolt text-amber-400"></i> Buy Now
                     </button>
                 </div>
             </div>
         `;
     });
     grid.innerHTML = html;
+}
+
+function buyCardProductDirect(id) {
+    const product = allProducts.find(p => p.id === id);
+    if (!product) return;
+    cart = []; // Reset cart for direct buy or push
+    cart.push({ ...product, selectedSize: product.sizes?.[0] || 'Standard', selectedColor: product.colors?.[0] || 'As Shown', qty: 1 });
+    updateCartBadge();
+    openCheckoutModal();
 }
 
 async function openProductModal(id) {
@@ -290,7 +302,8 @@ function addSelectedToCart(id) {
 
 function buySelectedNow(id) {
     addSelectedToCart(id);
-    openCartModal();
+    closeProductModal();
+    openCheckoutModal();
 }
 
 function updateCartBadge() {
@@ -373,17 +386,7 @@ function setupCheckoutDCInputs() {
     container.id = 'checkoutDCBreakdown';
     container.className = "space-y-3 bg-slate-50 p-4 rounded-2xl border border-slate-200 text-xs";
     container.innerHTML = `
-        <div class="grid grid-cols-2 gap-3">
-            <div>
-                <label class="block text-slate-600 font-bold mb-1">Estimated Distance (KM):</label>
-                <input type="number" id="custDistanceKm" value="5" min="1" oninput="calculateLiveDC()" class="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 font-bold outline-none focus:border-[#2563EB]">
-            </div>
-            <div>
-                <label class="block text-slate-600 font-bold mb-1">Total Weight (KG):</label>
-                <input type="number" id="custTotalWeightKg" value="0.5" step="0.1" min="0.1" oninput="calculateLiveDC()" class="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 font-bold outline-none focus:border-[#2563EB]">
-            </div>
-        </div>
-        <div class="border-t border-slate-200 pt-3 space-y-1.5 text-slate-600">
+        <div class="border-t border-slate-200 pt-2 space-y-1.5 text-slate-600">
             <div class="flex justify-between"><span>Subtotal:</span> <span id="summarySubtotal" class="font-bold text-slate-900">PKR 0</span></div>
             <div class="flex justify-between"><span>Delivery Charges (DC):</span> <span id="summaryDC" class="font-bold text-[#102544]">PKR 0</span></div>
             <div class="flex justify-between text-sm border-t border-slate-200 pt-2 font-black text-[#102544]">
@@ -402,8 +405,10 @@ async function calculateLiveDC() {
 
     const cityInput = document.getElementById('custCity');
     const cityName = cityInput ? cityInput.value.trim().toLowerCase() : 'karachi';
-    const distanceKm = parseFloat(document.getElementById('custDistanceKm')?.value) || 5;
-    const weightKg = parseFloat(document.getElementById('custTotalWeightKg')?.value) || 0.5;
+    
+    // Fixed default distance and weight without showing inputs on form
+    const distanceKm = 5;
+    const weightKg = 0.5;
 
     let baseDC = 150, perKm = 20, perKg = 50, outerCityDC = 450;
     try {
@@ -426,7 +431,7 @@ async function calculateLiveDC() {
         calculatedDC = outerCityDC;
     }
 
-    const finalTotal = subtotal + calculatedDC;
+    let finalTotal = subtotal + calculatedDC;
 
     if (document.getElementById('summarySubtotal')) document.getElementById('summarySubtotal').innerText = `PKR ${subtotal}`;
     if (document.getElementById('summaryDC')) document.getElementById('summaryDC').innerText = `PKR ${calculatedDC}`;
@@ -450,8 +455,8 @@ async function submitCheckoutOrder(e) {
     const phone = document.getElementById('custPhone').value.trim();
     const city = document.getElementById('custCity').value.trim();
     const address = document.getElementById('custAddress').value.trim();
-    const distanceKm = parseFloat(document.getElementById('custDistanceKm')?.value) || 5;
-    const weightKg = parseFloat(document.getElementById('custTotalWeightKg')?.value) || 0.5;
+    const distanceKm = 5;
+    const weightKg = 0.5;
 
     const { subtotal, calculatedDC, finalTotal } = await calculateLiveDC();
 
