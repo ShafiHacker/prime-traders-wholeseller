@@ -20,7 +20,7 @@
     <div id="sidebarOverlay" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-slate-900/50 z-30 hidden md:hidden"></div>
 
     <!-- Sidebar Menu (Responsive for Mobile & Desktop) -->
-    <aside id="mobileSidebar" class="w-64 bg-white border-r border-[#E2E8F0] flex flex-col justify-between fixed md:sticky top-0 h-screen shadow-lg z-40 transform -translate-x-full md:translate-x-0 transition-transform duration-300">
+    <aside id="mobileSidebar" class="w-64 bg-white border-r border-[#E2E8F0] flex flex-col justify-between sticky top-0 h-screen shadow-sm z-40 transform -translate-x-full md:translate-x-0 transition-transform duration-300 fixed">
         <div>
             <!-- Logo Header -->
             <div class="p-6 border-b border-slate-100 flex items-center justify-between">
@@ -42,7 +42,7 @@
             <!-- Navigation Links -->
             <nav class="p-4 space-y-1.5 text-xs font-bold">
                 <button onclick="switchTab('dashboard'); toggleMobileSidebar();" id="nav-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition bg-[#102544] text-white shadow-sm">
-                    <i class="fa-solid fa-chart-line w-5 text-amber-400"></i> Dashboard Overview
+                    <i class="fa-solid fa-layer-group w-5 text-amber-400"></i> Dashboard Overview
                 </button>
                 <button onclick="switchTab('orders'); toggleMobileSidebar();" id="nav-orders" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition text-slate-600 hover:bg-slate-50 hover:text-[#102544]">
                     <i class="fa-solid fa-cart-flatbed w-5 text-[#2563EB]"></i> Received Orders
@@ -95,37 +95,18 @@
         <!-- Dynamic Body Content -->
         <main class="flex-1 p-4 md:p-8 space-y-6 max-w-7xl w-full mx-auto">
 
-            <!-- TAB 1: DASHBOARD OVERVIEW & LOGISTICS -->
-            <section id="tab-dashboard" class="space-y-6">
+            <!-- TAB 1: DASHBOARD OVERVIEW (Now Categories Overview) -->
+            <section id="tab-dashboard" class="space-y-4">
                 <div class="card-box p-6 rounded-2xl space-y-4">
-                    <h3 class="text-xs font-black text-[#102544] uppercase tracking-wider flex items-center gap-2">
-                        <i class="fa-solid fa-chart-line text-[#2563EB]"></i> Logistics & Courier Performance Summary
-                    </h3>
-                    
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
-                            <span class="text-[10px] font-bold text-slate-500 block uppercase">Total Parcels</span>
-                            <span id="statTotalParcels" class="text-xl font-black text-[#102544]">0</span>
+                    <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                        <div>
+                            <h3 class="text-sm font-black text-[#102544] uppercase tracking-wider"><i class="fa-solid fa-layer-group text-purple-600 mr-1.5"></i> Categories Overview</h3>
+                            <p class="text-[11px] text-slate-500">Total products count by category</p>
                         </div>
-                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
-                            <span class="text-[10px] font-bold text-slate-500 block uppercase">Delivered</span>
-                            <span id="statDelivered" class="text-xl font-black text-emerald-600">0</span>
-                        </div>
-                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
-                            <span class="text-[10px] font-bold text-slate-500 block uppercase">Processing</span>
-                            <span id="statProcessing" class="text-xl font-black text-blue-600">0</span>
-                        </div>
-                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
-                            <span class="text-[10px] font-bold text-slate-500 block uppercase">Returned</span>
-                            <span id="statReturned" class="text-xl font-black text-rose-600">0</span>
-                        </div>
-                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
-                            <span class="text-[10px] font-bold text-slate-500 block uppercase">COD Value</span>
-                            <span id="statTotalCod" class="text-sm font-black text-amber-600">PKR 0</span>
-                        </div>
-                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
-                            <span class="text-[10px] font-bold text-slate-500 block uppercase">Success Rate</span>
-                            <span id="statSuccessRate" class="text-xl font-black text-emerald-600">0%</span>
+                    </div>
+                    <div id="categoriesGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                        <div class="col-span-full text-center py-4 text-slate-400 text-xs font-semibold">
+                            <i class="fa-solid fa-spinner fa-spin text-[#102544] mr-1"></i> Calculating categories...
                         </div>
                     </div>
                 </div>
@@ -369,7 +350,7 @@
             }
 
             const titles = {
-                'dashboard': 'Dashboard Overview',
+                'dashboard': 'Categories Overview',
                 'orders': 'Received Orders Management',
                 'products': 'Manage Central Products',
                 'add-product': 'Add New Wholesale Product',
