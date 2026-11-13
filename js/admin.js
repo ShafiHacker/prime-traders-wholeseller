@@ -243,20 +243,27 @@ async function updateProductStock(id, newStock) {
     } catch (e) {
         alert("Error updating stock: " + e.message);
     }
-}
-
 function editProduct(id) {
     const p = loadedProductsMap[id];
     if (!p) return;
 
     document.getElementById('editingProductId').value = id;
     document.getElementById('prodTitle').value = p.title || '';
-    // ... baqi fields ka code jo pehle se hai ...
-
-    // YEHEE LINE LAAZMI ADD KAREIN:
-    switchTab('add-product');
-}
     
+    // Baqi fields ka code yahan aayega (jo aapke paas pehle se tha)
+    const select = document.getElementById('prodCategory');
+    let matched = false;
+    for (let option of select.options) {
+        if (option.value === p.category) {
+            select.value = p.category;
+            matched = true;
+            break;
+        }
+    }
+
+    // Aur function ke bilkul aakhir mein ye line aayegi:
+    switchTab('add-product');
+}    
     const select = document.getElementById('prodCategory');
     let matched = false;
     for (let option of select.options) {
