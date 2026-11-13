@@ -243,6 +243,8 @@ async function updateProductStock(id, newStock) {
     } catch (e) {
         alert("Error updating stock: " + e.message);
     }
+}
+
 function editProduct(id) {
     const p = loadedProductsMap[id];
     if (!p) return;
@@ -250,20 +252,6 @@ function editProduct(id) {
     document.getElementById('editingProductId').value = id;
     document.getElementById('prodTitle').value = p.title || '';
     
-    // Baqi fields ka code yahan aayega (jo aapke paas pehle se tha)
-    const select = document.getElementById('prodCategory');
-    let matched = false;
-    for (let option of select.options) {
-        if (option.value === p.category) {
-            select.value = p.category;
-            matched = true;
-            break;
-        }
-    }
-
-    // Aur function ke bilkul aakhir mein ye line aayegi:
-    switchTab('add-product');
-}    
     const select = document.getElementById('prodCategory');
     let matched = false;
     for (let option of select.options) {
@@ -302,6 +290,11 @@ function editProduct(id) {
     document.getElementById('cancelEditBtn').classList.remove('hidden');
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // Automatically switch tab to product form view
+    if (typeof switchTab === 'function') {
+        switchTab('add-product');
+    }
 }
 
 function resetProductForm() {
