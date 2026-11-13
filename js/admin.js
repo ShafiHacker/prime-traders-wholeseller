@@ -251,6 +251,11 @@ function editProduct(id) {
 
     document.getElementById('editingProductId').value = id;
     document.getElementById('prodTitle').value = p.title || '';
+    // ... baqi fields ka code jo pehle se hai ...
+
+    // YEHEE LINE LAAZMI ADD KAREIN:
+    switchTab('add-product');
+}
     
     const select = document.getElementById('prodCategory');
     let matched = false;
